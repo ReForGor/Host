@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #030712;
+    color: #f8fafc;
+  }
+  code, pre {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+/* Glow effects for CI Royal Blue */
+.glow-blue {
+  box-shadow: 0 0 25px -4px rgba(37, 99, 235, 0.4);
+}
+
+.glow-blue-sm {
+  box-shadow: 0 0 15px -3px rgba(37, 99, 235, 0.25);
+}
+
+.glow-blue-lg {
+  box-shadow: 0 0 40px -5px rgba(37, 99, 235, 0.35);
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.glass-panel-hover {
+  transition: all 0.25s ease-in-out;
+}
+.glass-panel-hover:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.5), 0 0 20px -3px rgba(37, 99, 235, 0.2);
+}
