@@ -8,6 +8,8 @@ from typing import Optional, Dict, Any
 
 from backend.core.config import settings
 from backend.core.database import AsyncSessionLocal
+import backend.features.auth.models
+import backend.features.products.models
 from backend.features.alerts.models import EmailLog
 
 logger = logging.getLogger("techprice.email")
