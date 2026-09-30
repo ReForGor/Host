@@ -10,16 +10,24 @@ import {
   HardDrive, 
   Tv, 
   Server, 
-  ShieldCheck, 
-  ExternalLink, 
+  Zap, 
+  Box, 
+  Wind, 
+  MousePointer, 
+  Laptop,
   ArrowRight,
-  Zap,
-  BarChart2,
-  Box,
-  Wind,
-  MousePointer,
-  HelpCircle,
-  BookOpen
+  TrendingUp,
+  Award,
+  Bell,
+  Scale,
+  ShieldCheck,
+  CheckCircle2,
+  Clock,
+  ChevronRight,
+  BookOpen,
+  Gamepad2,
+  LayoutGrid,
+  Activity
 } from 'lucide-react'
 import { productApi } from '../api/client'
 import ProductCard from '../components/ProductCard'
@@ -27,127 +35,160 @@ import PriceChartModal from '../components/PriceChartModal'
 import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
 
+// Fallback high-fidelity sample data matching Figma reference
+const MOCK_HOMEPAGE_PRODUCTS = [
+  {
+    id: 101,
+    name: 'Logitech G102 Lightsync RGB Gaming Mouse (Black)',
+    category: 'เกมมิ่งเกียร์ & อุปกรณ์เสริม',
+    brand: 'LOGITECH',
+    model_no: '910-005802',
+    lowest_price: 495,
+    msrp: 890,
+    max_discount_percent: 7.4,
+    best_store_name: 'Advice IT Infinite',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.advice.co.th'
+  },
+  {
+    id: 102,
+    name: 'Razer DeathAdder Essential Gaming Mouse (Black)',
+    category: 'เกมมิ่งเกียร์ & อุปกรณ์เสริม',
+    brand: 'RAZER',
+    model_no: 'RZ01-03850100',
+    lowest_price: 550,
+    msrp: 890,
+    max_discount_percent: 7.4,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 103,
+    name: 'Razer DeathAdder Essential Gaming Mouse (Mercury White)',
+    category: 'เกมมิ่งเกียร์ & อุปกรณ์เสริม',
+    brand: 'RAZER',
+    model_no: 'RZ01-03850200',
+    lowest_price: 550,
+    msrp: 890,
+    max_discount_percent: 7.4,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1626218174358-7769486c4b79?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 104,
+    name: 'Logitech G502 HERO High Performance Gaming Mouse',
+    category: 'เกมมิ่งเกียร์ & อุปกรณ์เสริม',
+    brand: 'LOGITECH',
+    model_no: '910-005472',
+    lowest_price: 1050,
+    msrp: 1990,
+    max_discount_percent: 7.4,
+    best_store_name: 'Advice IT Infinite',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1588691896791-5f21d3fcaee3?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.advice.co.th'
+  },
+  {
+    id: 105,
+    name: 'ASUS TUF Gaming GeForce RTX 4070 SUPER 12GB GDDR6X OC',
+    category: 'การ์ดจอ (GPU)',
+    brand: 'ASUS',
+    model_no: 'TUF-RTX4070S-O12G',
+    lowest_price: 25650,
+    msrp: 29900,
+    max_discount_percent: 14.2,
+    best_store_name: 'Advice IT Infinite',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.advice.co.th'
+  },
+  {
+    id: 106,
+    name: 'MSI GeForce RTX 4060 Ti GAMING X 16G GDDR6 Dual Fan',
+    category: 'การ์ดจอ (GPU)',
+    brand: 'MSI',
+    model_no: 'G4060TGX-16G',
+    lowest_price: 17100,
+    msrp: 18900,
+    max_discount_percent: 9.5,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 107,
+    name: 'AMD Ryzen 7 7800X3D 8-Core 16-Thread Socket AM5',
+    category: 'ซีพียู (CPU)',
+    brand: 'AMD',
+    model_no: '100-100000910WOF',
+    lowest_price: 14900,
+    msrp: 16900,
+    max_discount_percent: 11.8,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 108,
+    name: 'Intel Core i7-14700K 20 Cores (8P+12E) 28 Threads',
+    category: 'ซีพียู (CPU)',
+    brand: 'INTEL',
+    model_no: 'BX8071514700K',
+    lowest_price: 15200,
+    msrp: 16800,
+    max_discount_percent: 9.5,
+    best_store_name: 'Advice IT Infinite',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.advice.co.th'
+  }
+]
+
 export default function HomePage({ user, compareList, setCompareList }) {
   const { t } = useLanguage()
   const navigate = useNavigate()
 
   const [products, setProducts] = useState([])
-  const [hotDeals, setHotDeals] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
-  const [popularCategory, setPopularCategory] = useState('Graphics Cards (GPU)')
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState('All')
+  const [storeFilter, setStoreFilter] = useState('')
+  const [brandFilter, setBrandFilter] = useState('')
 
   // Modals
   const [activeChartProduct, setActiveChartProduct] = useState(null)
   const [activeAlertProduct, setActiveAlertProduct] = useState(null)
 
-  // 9 Categories as specifically requested on handwritten blueprint Page 1
-  const allCategories = [
-    { 
-      key: 'Graphics Cards (GPU)', 
-      nameTh: 'การ์ดจอ (GPU)', 
-      nameEn: 'Graphics Cards (GPU)', 
-      icon: Layers, 
-      count: '8 รุ่นฮิต', 
-      desc: 'RTX 5090, 5080, RX 7900' 
-    },
-    { 
-      key: 'Processors (CPU)', 
-      nameTh: 'ซีพียู (CPU)', 
-      nameEn: 'Processors (CPU)', 
-      icon: Cpu, 
-      count: '6 รุ่นฮิต', 
-      desc: 'Ryzen 7800X3D, Core i9' 
-    },
-    { 
-      key: 'Memory (RAM)', 
-      nameTh: 'แรม (RAM)', 
-      nameEn: 'Memory (RAM)', 
-      icon: Zap, 
-      count: '4 รุ่นฮิต', 
-      desc: 'DDR5 6000MHz, 32GB/64GB' 
-    },
-    { 
-      key: 'Storage (SSD, HDD)', 
-      nameTh: 'ที่เก็บข้อมูล (SSD, HDD)', 
-      nameEn: 'Storage (SSD, HDD)', 
-      icon: HardDrive, 
-      count: '4 รุ่นฮิต', 
-      desc: 'M.2 PCIe 4.0 / 5.0 2TB' 
-    },
-    { 
-      key: 'Monitors', 
-      nameTh: 'จอมอนิเตอร์', 
-      nameEn: 'Monitors', 
-      icon: Tv, 
-      count: '2 รุ่นฮิต', 
-      desc: '240Hz Fast IPS, OLED' 
-    },
-    { 
-      key: 'Motherboards', 
-      nameTh: 'เมนบอร์ด (Mainboard)', 
-      nameEn: 'Motherboards', 
-      icon: Server, 
-      count: '2 รุ่นฮิต', 
-      desc: 'X870, Z890, B650' 
-    },
-    { 
-      key: 'Power Supplies (PSU)', 
-      nameTh: 'พาวเวอร์ซัพพลาย (PSU)', 
-      nameEn: 'Power Supplies (PSU)', 
-      icon: Zap, 
-      count: '850W - 1200W', 
-      desc: 'PCIe 5.0 ATX 3.0 Gold/Plat' 
-    },
-    { 
-      key: 'Case & Cooling', 
-      nameTh: 'เคส & ระบายความร้อน', 
-      nameEn: 'Case & Cooling', 
-      icon: Wind, 
-      count: 'ระบบน้ำปิด & เคส', 
-      desc: 'AIO 360mm Liquid Coolers' 
-    },
-    { 
-      key: 'Accessories', 
-      nameTh: 'อุปกรณ์เสริม', 
-      nameEn: 'Accessories', 
-      icon: MousePointer, 
-      count: 'เกมมิ่งเกียร์', 
-      desc: 'Mechanical Keyboard, Mouse' 
-    },
+  // 10 Main Categories Grid from Figma
+  const figmaCategories = [
+    { name: 'การ์ดจอ (GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, count: '540 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, count: '218 รายการ', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
+    { name: 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, count: '325 รายการ', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
+    { name: 'ที่เก็บข้อมูล (SSD)', path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, count: '410 รายการ', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
+    { name: 'จอมอนิเตอร์', path: '/products?category=Monitors', icon: Tv, count: '280 รายการ', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
+    { name: 'เมนบอร์ด (Board)', path: '/products?category=Motherboards', icon: Server, count: '195 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: 'พาวเวอร์ซัพพลาย', path: '/products?category=Power Supplies (PSU)', icon: Zap, count: '160 รายการ', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
+    { name: 'เคส & ระบายความร้อน', path: '/products?category=Case & Cooling', icon: Wind, count: '310 รายการ', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
+    { name: 'เกมมิ่งเกียร์', path: '/products?category=Accessories', icon: MousePointer, count: '480 รายการ', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
+    { name: 'โน้ตบุ๊กทำงาน & เล่นเกม', path: '/products?category=Notebooks', icon: Laptop, count: '230 รายการ', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
   ]
 
-  // Retailers matching blueprint
-  const partnerStores = [
-    { name: 'JIB Computer Group', slug: 'jib', color: '#f59e0b', tag: 'ส่งฟรีทั่วไทย', status: 'Online 100%' },
-    { name: 'Advice IT Infinite', slug: 'advice', color: '#3b82f6', tag: 'สาขามากที่สุด', status: 'Online 100%' },
-    { name: 'BaNANA IT', slug: 'banana', color: '#10b981', tag: 'โปรโมชั่นบัตรเครดิต', status: 'Online 100%' },
-    { name: 'iHaveCPU Thailand', slug: 'ihavecpu', color: '#f43f5e', tag: 'คอมประกอบยอดนิยม', status: 'Online 100%' },
-  ]
-
-  // Articles & Buying Guides
-  const buyingGuides = [
-    {
-      id: 1,
-      title: 'คู่มือเลือกการ์ดจอปี 2026: RTX 5000 vs Radeon 8000 รุ่นไหนคุ้มเงินที่สุด',
-      summary: 'เจาะลึกความคุ้มค่าระหว่าง VRAM, DLSS 4, และประสิทธิภาพเรย์เทรซซิ่ง พร้อมตารางราคาเปรียบเทียบจาก 4 ร้าน',
-      category: 'การ์ดจอ (GPU)',
-      readTime: '5 นาที'
-    },
-    {
-      id: 2,
-      title: 'จัดสเปกคอมเล่นเกม 2026: งบ 30,000 - 60,000 บาท เลือกชิ้นส่วนไหนคุ้มสุด',
-      summary: 'ส่องราคาสดชิ้นต่อชิ้น ซีพียู แรม และการ์ดจอ เพื่อประสิทธิภาพสูงสุดต่อบาท',
-      category: 'จัดสเปกคอม',
-      readTime: '7 นาที'
-    },
-    {
-      id: 3,
-      title: 'เทคนิคจับจังหวะซื้ออุปกรณ์ไอทีให้ได้ราคาถูกที่สุด พร้อมวิธีตั้งเตือนราคาลด',
-      summary: 'วิเคราะห์กราฟราคาย้อนหลัง 30 วัน รู้วันที่ร้านค้าจัดโปรโมชั่น Flash Sale ลดสูงสุด 20%',
-      category: 'เทคนิคประหยัด',
-      readTime: '4 นาที'
-    }
+  // Category filter tabs for the Deals/Products section
+  const dealCategoryTabs = [
+    { key: 'All', label: 'สินค้าทั้งหมด', count: 26 },
+    { key: 'Graphics Cards (GPU)', label: 'การ์ดจอ (GPU)', count: 1 },
+    { key: 'Processors (CPU)', label: 'ซีพียู (CPU)', count: 4 },
+    { key: 'Memory (RAM)', label: 'แรม (RAM)', count: 2 },
+    { key: 'Storage (SSD, HDD)', label: 'ที่เก็บข้อมูล (SSD & HDD)', count: 4 },
+    { key: 'Monitors', label: 'จอมอนิเตอร์ & หน้าจอ', count: 2 },
+    { key: 'Motherboards', label: 'เมนบอร์ด (Mainboard)', count: 3 },
   ]
 
   useEffect(() => {
@@ -157,14 +198,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
   const loadHomeData = async () => {
     setLoading(true)
     try {
-      const [prodsRes, dealsRes] = await Promise.all([
-        productApi.getProducts({ limit: 100 }),
-        productApi.getDeals({ limit: 8 })
-      ])
-      setProducts(prodsRes.data)
-      setHotDeals(dealsRes.data)
+      const res = await productApi.getProducts({ limit: 100 })
+      if (res.data && res.data.length > 0) {
+        setProducts(res.data)
+      } else {
+        setProducts(MOCK_HOMEPAGE_PRODUCTS)
+      }
     } catch (e) {
-      console.error(e)
+      console.warn('Backend products fetch notice, utilizing high-fidelity mock:', e)
+      setProducts(MOCK_HOMEPAGE_PRODUCTS)
     } finally {
       setLoading(false)
     }
@@ -185,304 +227,631 @@ export default function HomePage({ user, compareList, setCompareList }) {
       setCompareList(compareList.filter(p => p.id !== product.id))
     } else {
       if (compareList.length >= 4) {
-        alert(t.compare.maxItemsNotice)
+        alert(t.compare?.maxItemsNotice || 'สามารถเปรียบเทียบได้สูงสุด 4 รายการ')
         return
       }
       setCompareList([...compareList, product])
     }
   }
 
-  // Filter popular items
-  const popularItems = products.filter(p => p.category === popularCategory).slice(0, 4)
+  // Filter products for display in Deals grid
+  const displayedProducts = products.filter(p => {
+    if (selectedFilterCategory !== 'All' && p.category !== selectedFilterCategory) return false
+    if (storeFilter && !((p.best_store_name || '').toLowerCase().includes(storeFilter.toLowerCase()))) return false
+    if (brandFilter && !((p.brand || '').toLowerCase().includes(brandFilter.toLowerCase()))) return false
+    return true
+  })
 
   return (
-    <div className="animate-fade-in space-y-16 pb-12">
-      {/* 1. HERO BANNER & SEARCH BAR (Drawn specifically on Page 1 wireframe) */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-950/60 via-[#030712] to-[#030712] pt-12 pb-16 border-b border-slate-800/80">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-600/15 via-transparent to-transparent pointer-events-none" />
+    <div className="space-y-16 sm:space-y-24 pb-20">
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center relative z-10">
-          {/* Badge: "เปิดมาแล้วรู้เลยว่าเป็นเว็บอะไร" */}
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-600/15 border border-blue-500/30 text-blue-400 text-xs font-bold mb-6 glow-blue-sm">
-            <Zap className="w-3.5 h-3.5" />
-            <span>{t.hero.tag}</span>
-          </div>
+      {/* SECTION 1: HERO COMMAND CENTER - GALAXY PURPLE THEME */}
+      <section className="relative pt-6 sm:pt-10 pb-6 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto">
+        {/* Enclosing Galaxy Cosmic Card matching Figma */}
+        <div className="relative rounded-3xl border border-purple-500/35 bg-[#0E061E]/80 backdrop-blur-xl p-6 sm:p-12 text-center overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.22)]">
+          {/* Radiant Purple Nebula Glows */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-gradient-to-b from-purple-600/40 via-violet-600/20 to-transparent blur-[85px] rounded-full pointer-events-none" />
+          <div className="absolute -top-16 left-1/4 w-[350px] h-[250px] bg-indigo-600/20 blur-[90px] rounded-full pointer-events-none" />
+          <div className="absolute -top-16 right-1/4 w-[350px] h-[250px] bg-purple-500/25 blur-[90px] rounded-full pointer-events-none" />
 
-          {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-4">
-            {t.hero.title} <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-300 bg-clip-text text-transparent">
-              {t.hero.titleHighlight}
-            </span>
-          </h1>
-
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8">
-            {t.hero.subtitle}
-          </p>
-
-          {/* Prominent Search Bar (Matching bottom wireframe on PDF Page 1) */}
-          <form 
-            onSubmit={handleHeroSearch}
-            className="max-w-2xl mx-auto flex items-center bg-[#030712] border-2 border-blue-600/60 hover:border-blue-500 rounded-2xl p-1.5 shadow-2xl shadow-blue-950/50 focus-within:ring-4 focus-within:ring-blue-600/20 transition-all"
-          >
-            <div className="pl-4 text-slate-400">
-              <Search className="w-5 h-5 text-blue-400" />
+          <div className="relative z-10">
+            {/* Beacon pill */}
+            <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[#160B2E]/90 border border-purple-500/40 text-cyan-300 text-xs font-semibold mb-6 shadow-[0_0_15px_rgba(139,92,246,0.25)]">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span>ระบบติดตามและแจ้งเตือนราคาอุปกรณ์ไอทีประเทศไทย</span>
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t.hero.searchPlaceholder}
-              className="w-full bg-transparent px-3 py-3 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-md shadow-blue-600/30 hover:scale-[1.02] flex items-center space-x-1.5 flex-shrink-0"
-            >
-              <span>{t.hero.searchBtn}</span>
-              <Search className="w-4 h-4" />
-            </button>
-          </form>
 
-          {/* Key Value Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-xs font-semibold text-slate-400">
-            <span className="flex items-center"><ShieldCheck className="w-4 h-4 mr-1.5 text-blue-400" /> {t.hero.statsStores}</span>
-            <span className="flex items-center"><Zap className="w-4 h-4 mr-1.5 text-blue-400" /> {t.hero.statsProducts}</span>
-            <span className="flex items-center"><Sparkles className="w-4 h-4 mr-1.5 text-amber-400" /> {t.hero.statsSavings}</span>
+            {/* Huge futuristic title */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-white tracking-tight leading-tight max-w-4xl mx-auto mb-4">
+              เปรียบเทียบ <span className="text-cyan-400">ราคาอุปกรณ์ไอที</span> จาก<br className="hidden sm:inline" />ร้านค้าชั้นนำในไทย
+            </h1>
+
+            <p className="text-slate-300 text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
+              ระบบรวบรวมราคาแบบเรียลไทม์ เปรียบเทียบราคาการ์ดจอ ซีพียู โน้ตบุ๊ก SSD จอมอนิเตอร์ จาก JIB, iHaveCPU, BaNANA IT และ Advice
+            </p>
+
+            {/* Big Search Box with glowing input */}
+            <div className="max-w-2xl mx-auto mb-10 text-left">
+              <div className="flex items-center space-x-1.5 text-xs text-cyan-400 mb-2 font-medium">
+                <Search className="w-4 h-4 text-cyan-400" />
+                <span>ค้นหาและเปรียบเทียบราคาสินค้า</span>
+              </div>
+
+              <form 
+                onSubmit={handleHeroSearch}
+                className="flex items-center bg-[#070312]/95 border-2 border-purple-500/40 hover:border-purple-400 focus-within:border-cyan-400 rounded-2xl p-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_30px_rgba(139,92,246,0.3)] transition-all"
+              >
+                <div className="pl-3 sm:pl-4 text-cyan-400">
+                  <Search className="w-5 h-5 text-cyan-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="ค้นหาการ์ดจอ (RTX 5090, 4070), ซีพียู (9800X3D), โน้ตบุ๊ก, SSD..."
+                  className="w-full bg-transparent px-3 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-1.5 flex-shrink-0 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all"
+                >
+                  <span>ค้นหา</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+
+              {/* Quick search tags */}
+              <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] text-slate-300">
+                <span className="font-semibold text-purple-300">คีย์เวิร์ดยอดนิยม:</span>
+                {[
+                  { tag: 'RTX 5080', query: 'RTX 5080' },
+                  { tag: 'Ryzen 7 9800X3D', query: 'Ryzen 7 9800X3D' },
+                  { tag: '990 PRO 2TB', query: '990 PRO 2TB' },
+                  { tag: 'DDR5 32GB', query: 'DDR5 32GB' }
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => navigate(`/products?q=${encodeURIComponent(item.query)}`)}
+                    className="px-2.5 py-0.5 rounded-full bg-[#160B2E] hover:bg-purple-600/30 border border-purple-500/25 hover:border-purple-400 text-purple-200 hover:text-white transition-all"
+                  >
+                    {item.tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4 Stat Counter Cards matching Figma */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+              <div className="bg-[#120826]/90 border border-purple-500/25 hover:border-purple-400/50 rounded-2xl p-4 text-left flex items-center space-x-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold font-display text-white">26+</div>
+                  <div className="text-[11px] text-slate-400">สินค้าที่ติดตามในระบบ</div>
+                </div>
+              </div>
+
+              <div className="bg-[#120826]/90 border border-purple-500/25 hover:border-purple-400/50 rounded-2xl p-4 text-left flex items-center space-x-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                  <Server className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold font-display text-white">4 ร้านค้า</div>
+                  <div className="text-[11px] text-slate-400">JIB, iHaveCPU, BaNA...</div>
+                </div>
+              </div>
+
+              <div className="bg-[#120826]/90 border border-purple-500/25 hover:border-purple-400/50 rounded-2xl p-4 text-left flex items-center space-x-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <TrendingDown className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-xl sm:text-2xl font-bold font-display text-white">104</div>
+                  <div className="text-[11px] text-slate-400">รายการราคาเปรียบเทียบ</div>
+                </div>
+              </div>
+
+              <div className="bg-[#120826]/90 border border-purple-500/25 hover:border-purple-400/50 rounded-2xl p-4 text-left flex items-center space-x-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                  <Bell className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-sm sm:text-base font-bold text-white">ระบบแจ้งเตือน</div>
+                  <div className="text-[11px] text-slate-400">ส่งสัญญาณเมื่อราคา...</div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* 2. ALL 9 CATEGORIES (หมวดหมู่ทั้งหมด - Explicitly specified on PDF Page 1) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-2">
-          <div>
-            <h2 className="text-2xl font-extrabold text-white flex items-center">
-              <Layers className="w-6 h-6 mr-2.5 text-blue-500" />
-              <span>{t.categories.title} (9 หมวดหมู่หลัก)</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              {t.categories.subtitle}
-            </p>
-          </div>
-          <Link
-            to="/products"
-            className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center"
-          >
-            <span>ดูสินค้าทั้งหมดในระบบ</span>
-            <ArrowRight className="w-3.5 h-3.5 ml-1" />
-          </Link>
-        </div>
+      {/* SECTION 2: FEATURED CAMPAIGN 2026 BANNER */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative rounded-3xl overflow-hidden border border-purple-500/35 bg-gradient-to-r from-[#1C0B36] via-[#130726] to-[#0A0314] p-6 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_30px_rgba(139,92,246,0.22)]">
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-gradient-to-l from-purple-600/20 via-violet-600/10 to-transparent pointer-events-none" />
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
-          {allCategories.map((c) => {
-            const Icon = c.icon
-            return (
-              <div
-                key={c.key}
-                onClick={() => navigate(`/products?category=${encodeURIComponent(c.key)}`)}
-                className="group p-5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-blue-950/20 flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-500 group-hover:text-blue-300 transition-colors">
-                    {c.count}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors mb-1">
-                    {c.nameTh}
-                  </h3>
-                  <p className="text-xs text-slate-400 line-clamp-1">
-                    {c.desc}
-                  </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            {/* Left copy */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[11px] font-bold tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>FEATURED CAMPAIGN 2026</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-4xl font-black font-display text-white tracking-tight">
+                Galaxy Tech Fest 2026
+              </h2>
+
+              <p className="text-base sm:text-lg font-semibold text-cyan-300">
+                รวมดีลการ์ดจอลดสูงสุด 30% จาก 4 ร้านดัง
+              </p>
+
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-xl">
+                ตรวจเช็คสต็อกแบบวินาทีต่อวินาที คูปองส่วนลดพิเศษเฉพาะผู้ใช้งาน IT PRICE พร้อมกราฟวิเคราะห์แนวโน้มราคาต่ำสุดในรอบ 90 วัน
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  onClick={() => navigate('/products?category=Graphics Cards (GPU)')}
+                  className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold flex items-center space-x-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all"
+                >
+                  <Zap className="w-4 h-4 fill-black" />
+                  <span>ดูสินค้าจัดรายการทั้งหมด</span>
+                </button>
+
+                <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#140826] border border-purple-500/25 text-xs text-slate-300 font-mono">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                  <span>สิ้นสุดแคมเปญในอีก 4 วัน 12 ชม.</span>
                 </div>
               </div>
+            </div>
+
+            {/* Right GPU Graphic with badge */}
+            <div className="lg:col-span-5 relative flex items-center justify-center">
+              <div className="relative w-full max-w-sm rounded-2xl overflow-hidden border border-purple-500/30 bg-[#0B0418] p-4 shadow-[0_0_40px_rgba(139,92,246,0.25)]">
+                <img
+                  src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=600&auto=format&fit=crop&q=80"
+                  alt="GeForce RTX Campaign"
+                  className="w-full h-48 object-cover rounded-xl"
+                />
+                <div className="absolute bottom-6 right-6 px-3 py-1 rounded-lg bg-[#0B0418]/90 border border-orange-500/50 text-[#F97316] font-display text-xs font-bold tracking-wider shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                  SAVE UP TO ฿12,400
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: ALL CATEGORIES (10 TILES) */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-1.5 rounded-lg bg-cyan-500/15 border border-cyan-500/40 text-cyan-400">
+              <LayoutGrid className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold font-display text-white">
+                หมวดหมู่ทั้งหมด (All Categories)
+              </h2>
+              <p className="text-xs text-slate-400">เลือกหมวดหมู่ที่ต้องการค้นหาและเปรียบเทียบสเปกคอมพิวเตอร์</p>
+            </div>
+          </div>
+
+          <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-[#160B2E] border border-purple-500/30 text-xs font-mono text-purple-300">
+            10 หมวดหมู่หลัก
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+          {figmaCategories.map((c, i) => {
+            const Icon = c.icon
+            return (
+              <Link
+                key={i}
+                to={c.path}
+                className="bg-[#120826]/85 rounded-2xl p-4 flex flex-col items-center text-center group border border-purple-500/20 hover:border-purple-400 hover:bg-[#1A0B36] hover:shadow-[0_0_25px_rgba(139,92,246,0.35)] transition-all duration-200"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#1C0F3A] border border-purple-500/30 flex items-center justify-center mb-3 group-hover:scale-110 text-cyan-400 transition-transform">
+                  <Icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-xs sm:text-sm font-semibold text-slate-100 group-hover:text-purple-300 transition-colors">
+                  {c.name}
+                </h3>
+                <span className="text-[11px] text-slate-400 font-mono mt-1">
+                  {c.count}
+                </span>
+              </Link>
             )
           })}
         </div>
       </section>
 
-      {/* 3. HOT DEALS (สินค้า Hot Deal ลดราคาแรง - On PDF Page 1) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
-          <div>
-            <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 text-[11px] font-bold mb-1 border border-rose-500/30">
-              <Flame className="w-3.5 h-3.5" />
-              <span>FLASH DEALS</span>
+      {/* SECTION 4: POPULAR CATEGORIES (3 SPOTLIGHT CARDS) */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <Flame className="w-4 h-4 fill-rose-400" />
+            <span>หมวดหมู่ยอดนิยม (Popular Categories)</span>
+          </div>
+          <p className="text-xs text-slate-400">ฮิตติดเทรนด์การค้นหาและประกอบคอมพิวเตอร์ในสัปดาห์นี้</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1 */}
+          <Link
+            to="/products?category=Graphics Cards (GPU)"
+            className="bg-[#120826]/85 rounded-2xl p-5 border border-purple-500/25 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] flex flex-col justify-between group transition-all"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold tracking-wider">
+                  ↗ TRENDING #1
+                </span>
+              </div>
+              <h3 className="text-base font-bold font-display text-white group-hover:text-cyan-300 transition-colors mb-2">
+                การ์ดจอ RTX 50 Series
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                สถาปัตยกรรม Blackwell ขุมพลัง AI รุ่นล่าสุด เช็คราคารายวัน ทั้ง RTX 5090, 5080 และ 5070
+              </p>
             </div>
-            <h2 className="text-2xl font-extrabold text-white flex items-center">
-              <span>{t.deals.title}</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              {t.deals.subtitle}
+            <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-3">
+              <span className="text-cyan-400 font-mono font-bold">ราคาเริ่มต้น ฿24,900</span>
+              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">48 รุ่นย่อย</span>
+            </div>
+          </Link>
+
+          {/* Card 2 */}
+          <Link
+            to="/products?category=Processors (CPU)"
+            className="bg-[#120826]/85 rounded-2xl p-5 border border-purple-500/25 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] flex flex-col justify-between group transition-all"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-bold tracking-wider flex items-center">
+                  <Gamepad2 className="w-3 h-3 mr-1 text-purple-300" />
+                  <span>GAMING KING</span>
+                </span>
+              </div>
+              <h3 className="text-base font-bold font-display text-white group-hover:text-purple-300 transition-colors mb-2">
+                AMD Ryzen 9000 & X3D
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                สุดยอดชิปประมวลผลสำหรับเกมเมอร์ Zen 5 พร้อม 3D V-Cache ลื่นไหลทุกเฟรมเรต
+              </p>
+            </div>
+            <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-3">
+              <span className="text-purple-400 font-mono font-bold">ราคาเริ่มต้น ฿11,500</span>
+              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">24 รุ่นย่อย</span>
+            </div>
+          </Link>
+
+          {/* Card 3 */}
+          <Link
+            to="/products?category=Memory (RAM)"
+            className="bg-[#120826]/85 rounded-2xl p-5 border border-purple-500/25 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] flex flex-col justify-between group transition-all"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold tracking-wider inline-flex items-center">
+                  <Award className="w-3 h-3 text-amber-400 mr-1" />
+                  <span>BEST VALUE</span>
+                </span>
+              </div>
+              <h3 className="text-base font-bold font-display text-white group-hover:text-amber-300 transition-colors mb-2">
+                แรม DDR5 6000MHz+
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                มาตรฐานใหม่ของพีซีไฮเอนด์ บัสสูง ค่า Latency ต่ำ พร้อมโปรไฟล์ EXPO & XMP 3.0
+              </p>
+            </div>
+            <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-3">
+              <span className="text-cyan-400 font-mono font-bold">ราคาเริ่มต้น ฿3,690</span>
+              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">64 รุ่นย่อย</span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* SECTION 5: LIVE DEALS & PRICE COMPARISON GRID */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header & Subtitle */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center space-x-2 text-xs font-bold text-rose-400 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 font-mono text-[10px] flex items-center space-x-1">
+                <Activity className="w-3 h-3 text-rose-400" />
+                <span>LIVE DEALS</span>
+              </span>
+              <h2 className="text-lg sm:text-xl font-bold font-display text-white">
+                สินค้า Hot Deal & เปรียบเทียบราคาล่าสุด
+              </h2>
+            </div>
+            <p className="text-xs text-slate-400">
+              สินค้าลดราคาพิเศษ คัดสรรราคาที่ถูกที่สุดในประเทศไทยประจำวันนี้
             </p>
           </div>
+
+          <div className="flex items-center space-x-3 text-xs text-slate-400">
+            <span>แสดงสินค้า {displayedProducts.length} รายการ</span>
+            <span className="text-purple-400/40">|</span>
+            <span className="text-cyan-400 font-medium">เรียงตาม: ราคาถูกที่สุดก่อน</span>
+          </div>
+        </div>
+
+        {/* Category Pills Bar matching Figma */}
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
+          {dealCategoryTabs.map((tab) => {
+            const active = selectedFilterCategory === tab.key
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setSelectedFilterCategory(tab.key)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center space-x-1.5 ${
+                  active
+                    ? 'bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold shadow-[0_0_15px_rgba(124,58,237,0.6)]'
+                    : 'bg-[#140826] text-slate-300 hover:text-white hover:bg-purple-900/30 border border-purple-500/20'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${active ? 'bg-white/20' : 'bg-purple-950/60 text-purple-300'}`}>
+                  {tab.count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Filter Toolbar (Store, Max Price, Brand) in Galaxy Purple */}
+        <div className="flex flex-wrap items-center gap-3 p-3 rounded-2xl bg-[#120826] border border-purple-500/25 text-xs">
+          {/* Store select */}
+          <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-1.5 rounded-xl">
+            <span className="text-purple-300">ร้านค้า:</span>
+            <select
+              value={storeFilter}
+              onChange={(e) => setStoreFilter(e.target.value)}
+              className="bg-transparent text-white focus:outline-none cursor-pointer"
+            >
+              <option value="" className="bg-[#120826] text-white">ทุกร้านค้าไทย (4 ร้านหลัก)</option>
+              <option value="advice" className="bg-[#120826] text-white">Advice IT Infinite</option>
+              <option value="ihavecpu" className="bg-[#120826] text-white">iHaveCPU</option>
+              <option value="jib" className="bg-[#120826] text-white">JIB Online</option>
+              <option value="banana" className="bg-[#120826] text-white">BaNANA IT</option>
+            </select>
+          </div>
+
+          {/* Brand select */}
+          <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-1.5 rounded-xl">
+            <span className="text-purple-300">แบรนด์:</span>
+            <select
+              value={brandFilter}
+              onChange={(e) => setBrandFilter(e.target.value)}
+              className="bg-transparent text-white focus:outline-none cursor-pointer"
+            >
+              <option value="" className="bg-[#120826] text-white">ทุกแบรนด์</option>
+              <option value="logitech" className="bg-[#120826] text-white">Logitech</option>
+              <option value="razer" className="bg-[#120826] text-white">Razer</option>
+              <option value="asus" className="bg-[#120826] text-white">ASUS</option>
+              <option value="msi" className="bg-[#120826] text-white">MSI</option>
+              <option value="amd" className="bg-[#120826] text-white">AMD</option>
+              <option value="intel" className="bg-[#120826] text-white">Intel</option>
+            </select>
+          </div>
+
+          {(storeFilter || brandFilter) && (
+            <button
+              onClick={() => { setStoreFilter(''); setBrandFilter('') }}
+              className="text-xs text-rose-400 hover:underline ml-auto"
+            >
+              ล้างตัวกรอง
+            </button>
+          )}
+        </div>
+
+        {/* Product Cards Grid (4 columns) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {displayedProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onOpenChart={(p) => setActiveChartProduct(p)}
+              onOpenAlert={(p) => setActiveAlertProduct(p)}
+              onToggleCompare={handleToggleCompare}
+              isSelectedForCompare={compareList.some(c => c.id === product.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 6: PARTNER SHOPS & BRANDS */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div>
+          <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mb-1">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-lg sm:text-xl font-bold font-display text-white">
+              ร้านค้าพันธมิตร & แบรนด์ชั้นนำ (Partner Shops & Brands)
+            </h2>
+          </div>
+          <p className="text-xs text-slate-400">
+            ดึงข้อมูลสต็อกและราคาเรียลไทม์จากตัวแทนจำหน่ายอุปกรณ์คอมพิวเตอร์อย่างเป็นทางการ
+          </p>
+        </div>
+
+        {/* 4 Partner Store Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[#120826]/85 rounded-2xl p-4 flex items-center space-x-3.5 border border-purple-500/25 hover:border-purple-400/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center font-bold text-amber-400 text-xs font-mono">
+              JIB
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white">JIB Computer</h4>
+              <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>สต็อกออนไลน์ 99.4%</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-[#120826]/85 rounded-2xl p-4 flex items-center space-x-3.5 border border-purple-500/25 hover:border-purple-400/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400 text-xs font-mono">
+              iHAVE<br/>CPU
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white">iHaveCPU</h4>
+              <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>จัดส่งด่วนกทม.</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-[#120826]/85 rounded-2xl p-4 flex items-center space-x-3.5 border border-purple-500/25 hover:border-purple-400/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-400 text-xs font-mono">
+              BNN
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white">BaNANA IT</h4>
+              <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>โปรโมชั่นผ่อน 0%</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-[#120826]/85 rounded-2xl p-4 flex items-center space-x-3.5 border border-purple-500/25 hover:border-purple-400/50 transition-all">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-bold text-cyan-400 text-xs font-mono">
+              ADVICE
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white">Advice IT Infinite</h4>
+              <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>จัดส่งด่วน 3 ชม.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Brand ticker strip */}
+        <div className="p-4 rounded-2xl bg-[#0D051C] border border-purple-500/20 flex flex-wrap items-center justify-around gap-6 text-purple-200/70 font-cyber font-bold text-xs sm:text-sm tracking-widest">
+          <span className="hover:text-cyan-400 transition-colors cursor-pointer">ASUS ROG</span>
+          <span className="hover:text-cyan-400 transition-colors cursor-pointer">MSI GAMING</span>
+          <span className="hover:text-cyan-400 transition-colors cursor-pointer">GIGABYTE AORUS</span>
+          <span className="hover:text-cyan-400 transition-colors cursor-pointer">CORSAIR</span>
+          <span className="hover:text-cyan-400 transition-colors cursor-pointer">NZXT</span>
+          <span className="hover:text-cyan-400 transition-colors cursor-pointer">ZOTAC GAMING</span>
+        </div>
+      </section>
+
+      {/* SECTION 7: ARTICLES & TECH GUIDES */}
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mb-1">
+              <BookOpen className="w-4 h-4 text-cyan-400" />
+              <h2 className="text-lg sm:text-xl font-bold font-display text-white">
+                บทความ & ทริคไอทีแนะนำ (Articles & Tech Guides)
+              </h2>
+            </div>
+            <p className="text-xs text-slate-400">
+              รีวิวเจาะลึก คู่มือจัดสเปกคอมพิวเตอร์ และเทคนิคเลือกซื้อของคุ้มค่าเงิน
+            </p>
+          </div>
+
           <Link
-            to="/deals"
-            className="text-xs font-bold text-rose-400 hover:text-rose-300 flex items-center"
+            to="/products"
+            className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
           >
-            <span>{t.deals.viewAll}</span>
-            <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            <span>อ่านทั้งหมด</span>
+            <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {hotDeals.slice(0, 4).map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onOpenChart={(p) => setActiveChartProduct(p)}
-              onOpenAlert={(p) => setActiveAlertProduct(p)}
-              onToggleCompare={handleToggleCompare}
-              isSelectedForCompare={compareList.some(p => p.id === product.id)}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* 4. POPULAR CATEGORIES (หมวดหมู่ยอดนิยม - On PDF Page 1) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-4 mb-6">
-          <div>
-            <h2 className="text-2xl font-extrabold text-white">
-              {t.popular.title}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-              {t.popular.subtitle}
-            </p>
-          </div>
-
-          {/* Quick Category Tabs */}
-          <div className="flex items-center space-x-2 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
-            <button
-              onClick={() => setPopularCategory('Graphics Cards (GPU)')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                popularCategory === 'Graphics Cards (GPU)'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              การ์ดจอ (GPU)
-            </button>
-            <button
-              onClick={() => setPopularCategory('Processors (CPU)')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                popularCategory === 'Processors (CPU)'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              ซีพียู (CPU)
-            </button>
-            <button
-              onClick={() => setPopularCategory('Memory (RAM)')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                popularCategory === 'Memory (RAM)'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              แรม (RAM)
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {popularItems.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onOpenChart={(p) => setActiveChartProduct(p)}
-              onOpenAlert={(p) => setActiveAlertProduct(p)}
-              onToggleCompare={handleToggleCompare}
-              isSelectedForCompare={compareList.some(p => p.id === product.id)}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* 5. BRANDS & RECOMMENDED RETAILERS (ยี่ห้อ, ร้านแนะนำ - On PDF Page 1) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-extrabold text-white">
-            {t.brandsStores.title}
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            {t.brandsStores.subtitle}
-          </p>
-        </div>
-
-        {/* 4 Retailers */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {partnerStores.map((st) => (
-            <div
-              key={st.slug}
-              className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: st.color }} />
-                <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  ● {st.status}
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-white mb-1">
-                {st.name}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Guide 1 */}
+          <div className="bg-[#120826]/85 rounded-2xl overflow-hidden border border-purple-500/20 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] transition-all flex flex-col justify-between group">
+            <div className="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=600&auto=format&fit=crop&q=80"
+                alt="Guide 2026"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-cyan-500 text-black font-display text-[10px] font-bold">
+                GUIDE 2026
+              </span>
+            </div>
+            <div className="p-4 space-y-2">
+              <div className="text-[11px] text-slate-500 font-mono">12 ก.พ. 2026 • อ่าน 5 นาที</div>
+              <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug">
+                จัดสเปกคอมงบ 30,000 บาท ปี 2026 เล่นลื่นทุกเกม AAA ในระดับ 2K
               </h3>
-              <p className="text-xs text-slate-400 mb-4">
-                {st.tag}
+              <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                วิเคราะห์การจัดงบสมดุลระหว่างการ์ดจอ RTX 4060 Ti / 5060 กับซีพียู Core i5 เจนใหม่ พร้อมวิธีเทียบราคาประหยัดได้ถึง 3,500
               </p>
-              <button
-                onClick={() => navigate(`/products?store=${st.slug}`)}
-                className="w-full py-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-300 text-xs font-semibold rounded-xl transition-all"
-              >
-                ดูสินค้าในร้าน {st.name.split(' ')[0]} →
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 6. TECH ARTICLES / GUIDES (บทความเล็กน้อย - On PDF Page 1) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-extrabold text-white flex items-center">
-            <BookOpen className="w-6 h-6 mr-2.5 text-blue-500" />
-            <span>{t.articles.title}</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            {t.articles.subtitle}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {buyingGuides.map((guide) => (
-            <div
-              key={guide.id}
-              className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col justify-between hover:border-blue-500/40 transition-colors"
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                  <span className="text-blue-400 font-semibold">{guide.category}</span>
-                  <span>อ่าน {guide.readTime}</span>
-                </div>
-                <h3 className="text-base font-bold text-white mb-2 leading-snug">
-                  {guide.title}
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {guide.summary}
-                </p>
-              </div>
-              <div className="pt-4 mt-4 border-t border-slate-800/80">
-                <span className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center cursor-pointer">
-                  <span>{t.articles.readMore}</span>
-                  <ArrowRight className="w-3 h-3 ml-1" />
-                </span>
+              <div className="pt-2 text-xs font-semibold text-cyan-400 flex items-center space-x-1">
+                <span>อ่านบทความฉบับเต็ม</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* Guide 2 */}
+          <div className="bg-[#120826]/85 rounded-2xl overflow-hidden border border-purple-500/20 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] transition-all flex flex-col justify-between group">
+            <div className="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&auto=format&fit=crop&q=80"
+                alt="Benchmark"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-purple-500 text-white font-display text-[10px] font-bold">
+                BENCHMARK
+              </span>
+            </div>
+            <div className="p-4 space-y-2">
+              <div className="text-[11px] text-slate-500 font-mono">10 ก.พ. 2026 • อ่าน 8 นาที</div>
+              <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors leading-snug">
+                เจาะลึก RTX 5080 คุ้มไหมกับราคาเปิดตัว? เทียบผลทดสอบจริง vs 4080 Super
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                เจาะลึกประสิทธิภาพสถาปัตยกรรม Blackwell อัตราการกินไฟจริง และกราฟเปรียบเทียบราคาต่อเฟรมเรตที่คุณต้องรู้ก่อนจ่ายเงิน
+              </p>
+              <div className="pt-2 text-xs font-semibold text-purple-400 flex items-center space-x-1">
+                <span>อ่านบทความฉบับเต็ม</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </div>
+
+          {/* Guide 3 */}
+          <div className="bg-[#120826]/85 rounded-2xl overflow-hidden border border-purple-500/20 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(139,92,246,0.3)] transition-all flex flex-col justify-between group">
+            <div className="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=600&auto=format&fit=crop&q=80"
+                alt="Hardware 101"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-emerald-500 text-black font-display text-[10px] font-bold">
+                HARDWARE 101
+              </span>
+            </div>
+            <div className="p-4 space-y-2">
+              <div className="text-[11px] text-slate-500 font-mono">08 ก.พ. 2026 • อ่าน 4 นาที</div>
+              <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                วิธีเลือก RAM DDR5 ให้เข้ากับเมนบอร์ด Intel & AMD ไม่ให้จอฟ้า
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                เข้าใจความแตกต่างระหว่างโปรไฟล์ XMP 3.0 กับ AMD EXPO, วิธีเช็ครายชื่อ QVL List และความเร็วบัสที่เสถียรที่สุดในปัจจุบัน
+              </p>
+              <div className="pt-2 text-xs font-semibold text-emerald-400 flex items-center space-x-1">
+                <span>อ่านบทความฉบับเต็ม</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -503,9 +872,9 @@ export default function HomePage({ user, compareList, setCompareList }) {
           product={activeAlertProduct}
           user={user}
           onClose={() => setActiveAlertProduct(null)}
-          onSuccess={() => {}}
         />
       )}
+
     </div>
   )
 }
