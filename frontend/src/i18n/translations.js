@@ -317,11 +317,11 @@ export const translations = {
       guaranteeCoverage: 'Full Coverage of Popular Thai Hardware',
       supportedStores: 'Supported IT Retailers',
       systemArch: 'System Architecture',
-      copyright: '© 2026 KPTM PRICE Thailand. All rights reserved.',
+      copyright: '© 2026 IT PRICE Thailand. All rights reserved.',
       builtFor: 'Built to empower gamers and PC builders to find the best deals.'
     },
     admin: {
-      title: 'KPTM PRICE System Administration',
+      title: 'IT PRICE System Administration',
       subtitle: 'Control Web Scrapers, configure store platforms, audit notifications, and manage catalog data',
       tabOverview: 'KPI Overview',
       tabScrapers: 'Scraper Health',
