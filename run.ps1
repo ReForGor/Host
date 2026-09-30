@@ -42,4 +42,4 @@ Write-Host "⚡ Thai Scrapers:    http://localhost:$PORT/platforms" -ForegroundC
 Write-Host "🚀 API Swagger Docs: http://localhost:$PORT/docs" -ForegroundColor Blue
 Write-Host ""
 
-uvicorn backend.main:app --host $APP_HOST --port $PORT --reload
+uvicorn app.main:app --host $APP_HOST --port $PORT --reload
