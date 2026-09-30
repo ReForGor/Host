@@ -202,8 +202,7 @@ class ScraperManager:
                         errors.append(f"{store.name} / {prod.name}: {str(item_err)}")
 
                 prod.updated_at = datetime.utcnow()
-
-            await db.commit()
+                await db.commit()
 
             result = {
                 "job_id": job_id,

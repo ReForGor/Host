@@ -14,14 +14,14 @@ import backend.features.auth.models
 import backend.features.alerts.models
 import backend.features.analytics.models
 from datetime import datetime
-from sqlalchemy import select
+from sqlalchemy import select, update
 from backend.core.database import AsyncSessionLocal
 from backend.features.products.models import Product, PriceListing, Store, PriceHistory
 from backend.features.scrapers.manager import scraper_manager
 
 async def run_full_sync():
     print("=" * 80)
-    print("🚀 TECHPRICE: FULL LIVE PRICE AUDIT & SYNCHRONIZATION")
+    print("🚀 KPTM PRICE: FULL LIVE PRICE AUDIT & SYNCHRONIZATION")
     print("Checking every product across JIB, Advice, BaNANA, and iHaveCPU...")
     print("=" * 80)
 
@@ -35,7 +35,7 @@ async def run_full_sync():
         all_results = []
 
         for p_idx, prod in enumerate(products, 1):
-            print(f"[{p_idx}/{len(products)}] {prod.name}")
+            print(f"[{p_idx:02d}/{len(products)}] {prod.name}")
             listings_res = await db.execute(
                 select(PriceListing, Store)
                 .join(Store)
@@ -50,12 +50,12 @@ async def run_full_sync():
                     print(f"   ⚠️ No scraper for {store.slug}")
                     continue
 
-                old_price = listing.price
+                old_price = float(listing.price)
                 scraped_price = 0.0
                 scraped_orig = None
 
                 try:
-                    await asyncio.sleep(0.3)
+                    await asyncio.sleep(0.2)
                     res = await scraper.scrape_product(
                         product_name=prod.name,
                         model_no=prod.model_no,
@@ -69,10 +69,15 @@ async def run_full_sync():
                 if scraped_price and scraped_price > 0:
                     diff = scraped_price - old_price
                     if abs(diff) > 0.01:
-                        listing.price = scraped_price
-                        if scraped_orig:
-                            listing.original_price = scraped_orig
-                        listing.last_checked = datetime.utcnow()
+                        await db.execute(
+                            update(PriceListing)
+                            .where(PriceListing.id == listing.id)
+                            .values(
+                                price=scraped_price,
+                                original_price=scraped_orig,
+                                last_checked=datetime.utcnow()
+                            )
+                        )
 
                         # Add price history
                         h = PriceHistory(
@@ -99,12 +104,16 @@ async def run_full_sync():
                 else:
                     print(f"   • {store.name:18}: ⚠️ Keeping previous: ฿{old_price:,.0f}")
 
-            prod.updated_at = datetime.utcnow()
+            await db.execute(
+                update(Product)
+                .where(Product.id == prod.id)
+                .values(updated_at=datetime.utcnow())
+            )
             await db.commit()
             print()
 
         print("=" * 80)
-        print(f"🎉 AUDIT & SYNC COMPLETE!")
+        print("🎉 KPTM PRICE: AUDIT & SYNC COMPLETE!")
         print(f"Total Listings Audited : {total_checked}")
         print(f"Total Prices Updated   : {total_updated}")
         print("=" * 80)
