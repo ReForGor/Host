@@ -18,7 +18,9 @@ import {
   FileText,
   Sliders,
   ExternalLink,
-  Search
+  Search,
+  Zap,
+  MapPin
 } from 'lucide-react'
 import { adminApi, alertApi, productApi, scraperApi, analyticsApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -176,10 +178,10 @@ export default function AdminPage({ user }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-purple-500/25 gap-4 mb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center">
-            <ShieldCheck className="w-8 h-8 mr-3 text-blue-500" />
+            <ShieldCheck className="w-8 h-8 mr-3 text-purple-400" />
             <span>{t.admin.title}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
@@ -190,7 +192,7 @@ export default function AdminPage({ user }) {
         <div className="flex items-center space-x-2">
           <button
             onClick={loadData}
-            className="flex items-center space-x-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
+            className="flex items-center space-x-2 px-3.5 py-2 bg-[#1C0F3A] hover:bg-purple-900/40 text-purple-200 text-xs font-bold rounded-xl border border-purple-500/30 transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>รีเฟรชข้อมูล</span>
@@ -199,13 +201,13 @@ export default function AdminPage({ user }) {
       </div>
 
       {/* Tabs Menu (Fulfilling all 7 items from PDF Page 2) */}
-      <div className="flex items-center space-x-1 border-b border-slate-800 pb-3 mb-8 overflow-x-auto scrollbar-none text-xs">
+      <div className="flex items-center space-x-1 border-b border-purple-500/25 pb-3 mb-8 overflow-x-auto scrollbar-none text-xs">
         <button
           onClick={() => setActiveTab('overview')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
             activeTab === 'overview'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -216,8 +218,8 @@ export default function AdminPage({ user }) {
           onClick={() => setActiveTab('scrapers')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
             activeTab === 'scrapers'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
           }`}
         >
           <Server className="w-4 h-4" />
@@ -228,8 +230,8 @@ export default function AdminPage({ user }) {
           onClick={() => setActiveTab('products')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
             activeTab === 'products'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
           }`}
         >
           <Package className="w-4 h-4" />
@@ -240,8 +242,8 @@ export default function AdminPage({ user }) {
           onClick={() => setActiveTab('notifications')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
             activeTab === 'notifications'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
           }`}
         >
           <Bell className="w-4 h-4" />
@@ -252,8 +254,8 @@ export default function AdminPage({ user }) {
           onClick={() => setActiveTab('scheduler')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
             activeTab === 'scheduler'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
           }`}
         >
           <Clock className="w-4 h-4" />
@@ -264,8 +266,8 @@ export default function AdminPage({ user }) {
           onClick={() => setActiveTab('errors')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
             activeTab === 'errors'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
           }`}
         >
           <AlertTriangle className="w-4 h-4" />
@@ -279,10 +281,10 @@ export default function AdminPage({ user }) {
           {/* KPI Summary Cards with REAL Data from PostgreSQL */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Real Registered Users Card */}
-            <div className="bg-[#030712]/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t.admin.usersCount}</span>
-                <Users className="w-5 h-5 text-blue-400" />
+                <Users className="w-5 h-5 text-purple-400" />
               </div>
               <div className="text-3xl font-extrabold text-white">
                 {analytics?.total_users || usersList.length || 5} <span className="text-xs font-normal text-slate-400">บัญชีจริง</span>
@@ -293,21 +295,21 @@ export default function AdminPage({ user }) {
             </div>
 
             {/* Real Total Visitors Card */}
-            <div className="bg-[#030712]/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ยอดผู้เข้าชมสะสม</span>
-                <Activity className="w-5 h-5 text-blue-500" />
+                <Activity className="w-5 h-5 text-purple-400" />
               </div>
               <div className="text-3xl font-extrabold text-white font-mono">
                 {(analytics?.total_visitors || 158421).toLocaleString()} <span className="text-xs font-normal text-slate-400">ครั้ง</span>
               </div>
-              <p className="text-[11px] text-blue-400 mt-2">
+              <p className="text-[11px] text-purple-400 mt-2">
                 ผู้เข้าชมไม่ซ้ำ: {analytics?.unique_visitors || 1} คน
               </p>
             </div>
 
             {/* Real Online Users Now */}
-            <div className="bg-[#030712]/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ผู้ใช้งานออนไลน์ขณะนี้</span>
                 <span className="relative flex h-2.5 w-2.5">
@@ -324,26 +326,26 @@ export default function AdminPage({ user }) {
             </div>
 
             {/* Total Products in Catalog */}
-            <div className="bg-[#030712]/80 border border-slate-800 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t.admin.productsCount}</span>
-                <Package className="w-5 h-5 text-indigo-400" />
+                <Package className="w-5 h-5 text-purple-400" />
               </div>
               <div className="text-3xl font-extrabold text-white">
                 {stats?.total_products || products.length || 26} <span className="text-xs font-normal text-slate-400">รุ่นฮิต</span>
               </div>
-              <p className="text-[11px] text-indigo-400 mt-2">
+              <p className="text-[11px] text-purple-400 mt-2">
                 ครอบคลุม 9 หมวดหมู่หลัก
               </p>
             </div>
           </div>
 
           {/* Real Registered Users Table (ข้อมูลจริงผู้ใช้งานในระบบ) */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-800 gap-2">
+          <div className="bg-[#120826]/90 border border-purple-500/25 rounded-3xl p-6 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-purple-500/20 gap-2">
               <div>
                 <h3 className="text-base font-bold text-white flex items-center">
-                  <Users className="w-5 h-5 mr-2 text-blue-400" />
+                  <Users className="w-5 h-5 mr-2 text-purple-400" />
                   <span>รายชื่อผู้ใช้งานจริงทั้งหมดในระบบ (Real Users in PostgreSQL: {analytics?.real_users?.length || usersList.length || 5} บัญชี)</span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -357,7 +359,7 @@ export default function AdminPage({ user }) {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs sm:text-sm">
-                <thead className="bg-[#030712] text-slate-400 text-xs uppercase border-b border-slate-800">
+                <thead className="bg-[#0A0314] text-slate-400 text-xs uppercase border-b border-purple-500/25">
                   <tr>
                     <th className="py-3 px-4">User ID</th>
                     <th className="py-3 px-4">ชื่อผู้ใช้ (Username)</th>
@@ -368,27 +370,30 @@ export default function AdminPage({ user }) {
                     <th className="py-3 px-4">วันที่ลงทะเบียน</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80">
+                <tbody className="divide-y divide-purple-500/15">
                   {(analytics?.real_users || usersList).map((u) => (
-                    <tr key={u.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="py-3.5 px-4 font-mono text-blue-400 font-bold">#{u.id}</td>
+                    <tr key={u.id} className="hover:bg-purple-900/20 transition-colors">
+                      <td className="py-3.5 px-4 font-mono text-purple-400 font-bold">#{u.id}</td>
                       <td className="py-3.5 px-4 font-semibold text-white">{u.username}</td>
                       <td className="py-3.5 px-4 font-mono text-slate-300">{u.email}</td>
                       <td className="py-3.5 px-4 text-slate-300">{u.full_name || '—'}</td>
                       <td className="py-3.5 px-4 text-center">
                         {u.is_admin ? (
-                          <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                            👑 ผู้ดูแลระบบ (Admin)
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            <ShieldCheck className="w-3.5 h-3.5 text-amber-300" />
+                            <span>ผู้ดูแลระบบ (Admin)</span>
                           </span>
                         ) : (
-                          <span className="px-2.5 py-1 text-[11px] font-medium rounded-full bg-blue-600/15 text-blue-300 border border-blue-500/30">
-                            🎮 สมาชิกทั่วไป (User)
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-1 text-[11px] font-medium rounded-full bg-purple-600/20 text-purple-300 border border-purple-500/30">
+                            <Users className="w-3.5 h-3.5 text-purple-300" />
+                            <span>สมาชิกทั่วไป (User)</span>
                           </span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400">
-                          🟢 ใช้งานปกติ
+                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          <span>ใช้งานปกติ</span>
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-xs text-slate-400 font-mono">
@@ -404,25 +409,25 @@ export default function AdminPage({ user }) {
 
           {/* Quick Actions & System Health */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
+            <div className="bg-[#120826]/90 border border-purple-500/25 rounded-2xl p-6">
               <h3 className="text-base font-bold text-white mb-4 flex items-center">
-                <Activity className="w-4 h-4 mr-2 text-blue-400" />
+                <Activity className="w-4 h-4 mr-2 text-purple-400" />
                 <span>สถานะระบบฮาร์ดแวร์ & Database (Neon Singapore)</span>
               </h3>
               <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between p-3 bg-[#030712] rounded-xl border border-slate-800">
+                <div className="flex items-center justify-between p-3 bg-[#0A0314] rounded-xl border border-purple-500/20">
                   <span className="text-slate-300">FastAPI REST Server (v2.1.0)</span>
                   <span className="text-emerald-400 font-bold flex items-center">
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Healthy (2ms)
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-[#030712] rounded-xl border border-slate-800">
+                <div className="flex items-center justify-between p-3 bg-[#0A0314] rounded-xl border border-purple-500/20">
                   <span className="text-slate-300">Neon Cloud PostgreSQL (Singapore AWS)</span>
                   <span className="text-emerald-400 font-bold flex items-center">
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Connected (SSL Async)
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-[#030712] rounded-xl border border-slate-800">
+                <div className="flex items-center justify-between p-3 bg-[#0A0314] rounded-xl border border-purple-500/20">
                   <span className="text-slate-300">HTTPX Asynchronous Scraper Engine</span>
                   <span className="text-emerald-400 font-bold flex items-center">
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Active (4 Engines)
@@ -431,9 +436,9 @@ export default function AdminPage({ user }) {
               </div>
             </div>
 
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
+            <div className="bg-[#120826]/90 border border-purple-500/25 rounded-2xl p-6">
               <h3 className="text-base font-bold text-white mb-4 flex items-center">
-                <Send className="w-4 h-4 mr-2 text-blue-400" />
+                <Send className="w-4 h-4 mr-2 text-purple-400" />
                 <span>บรอดแคสต์ส่งข้อความแจ้งเตือนด่วน (Broadcast)</span>
               </h3>
               <form onSubmit={handleBroadcast} className="space-y-3 text-xs">
@@ -444,7 +449,7 @@ export default function AdminPage({ user }) {
                     value={broadcastTitle}
                     onChange={(e) => setBroadcastTitle(e.target.value)}
                     placeholder="หัวข้อแจ้งเตือน เช่น แจ้งโปรโมชั่น Flash Sale 5080 ลดแรง"
-                    className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-[#0A0314] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                   />
                 </div>
                 <div>
@@ -454,12 +459,12 @@ export default function AdminPage({ user }) {
                     value={broadcastMessage}
                     onChange={(e) => setBroadcastMessage(e.target.value)}
                     placeholder="รายละเอียดข้อความที่จะส่งถึงผู้ใช้ทุกคน..."
-                    className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-[#0A0314] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-600/30"
+                  className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(139,92,246,0.35)]"
                 >
                   ส่งแจ้งเตือนถึงผู้ใช้ทั้งหมดทันที
                 </button>
@@ -479,7 +484,7 @@ export default function AdminPage({ user }) {
             </div>
             <button
               onClick={() => setShowAddStoreModal(true)}
-              className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/30"
+              className="flex items-center space-x-1.5 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(139,92,246,0.35)]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>เพิ่มแพลตฟอร์มร้านค้าใหม่</span>
@@ -493,7 +498,7 @@ export default function AdminPage({ user }) {
               { name: 'BaNANA IT', slug: 'banana', status: 'Healthy', latency: '510ms', success: '97.8%', color: '#10b981', items: 26 },
               { name: 'iHaveCPU', slug: 'ihavecpu', status: 'Healthy', latency: '460ms', success: '99.1%', color: '#f43f5e', items: 26 },
             ].map((s) => (
-              <div key={s.slug} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+              <div key={s.slug} className="bg-[#120826]/90 border border-purple-500/25 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-400 hover:shadow-[0_8px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(139,92,246,0.25)] transition-all">
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
@@ -513,15 +518,16 @@ export default function AdminPage({ user }) {
                     </div>
                     <div className="flex justify-between">
                       <span>Mapped Products:</span>
-                      <span className="text-blue-400 font-mono">{s.items} รายการ</span>
+                      <span className="text-purple-400 font-mono">{s.items} รายการ</span>
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => handleTriggerScraper(s.slug)}
-                  className="w-full py-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-200 text-xs font-bold rounded-xl transition-all border border-slate-700/60"
+                  className="w-full py-2 bg-[#1C0F3A] hover:bg-purple-600 hover:text-white text-slate-200 text-xs font-bold rounded-xl transition-all border border-purple-500/30 shadow-[0_0_10px_rgba(139,92,246,0.2)] flex items-center justify-center space-x-1"
                 >
-                  ⚡ สั่งรัน Scraper ทันที
+                  <Zap className="w-3.5 h-3.5 text-amber-300" />
+                  <span>สั่งรัน Scraper ทันที</span>
                 </button>
               </div>
             ))}
@@ -539,16 +545,16 @@ export default function AdminPage({ user }) {
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/30"
+              className="flex items-center space-x-1.5 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(139,92,246,0.35)]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>เพิ่มสินค้าใหม่</span>
             </button>
           </div>
 
-          <div className="border border-slate-800 rounded-2xl overflow-hidden bg-[#030712]/50">
+          <div className="border border-purple-500/25 rounded-2xl overflow-hidden bg-[#120826]/90 shadow-xl">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-[#030712] text-slate-400 text-xs uppercase border-b border-slate-800">
+              <thead className="bg-[#0A0314] text-slate-400 text-xs uppercase border-b border-purple-500/25">
                 <tr>
                   <th className="py-3 px-4">รูป & ชื่อสินค้า</th>
                   <th className="py-3 px-4">หมวดหมู่</th>
@@ -557,20 +563,20 @@ export default function AdminPage({ user }) {
                   <th className="py-3 px-4 text-center">จัดการ</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-purple-500/15">
                 {products.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                  <tr key={p.id} className="hover:bg-purple-900/20 transition-colors">
                     <td className="py-3 px-4 flex items-center space-x-3">
-                      <img src={p.image_url} alt={p.name} className="w-9 h-9 object-contain rounded bg-slate-950 p-0.5 border border-slate-800" />
+                      <img src={p.image_url} alt={p.name} className="w-9 h-9 object-contain rounded bg-[#0A0314] p-0.5 border border-purple-500/20" />
                       <span className="font-semibold text-white line-clamp-1 max-w-xs">{p.name}</span>
                     </td>
-                    <td className="py-3 px-4 text-xs text-blue-400 font-medium">{p.category}</td>
+                    <td className="py-3 px-4 text-xs text-purple-400 font-medium">{p.category}</td>
                     <td className="py-3 px-4 text-xs text-slate-300">{p.brand}</td>
                     <td className="py-3 px-4 text-right font-bold text-white font-mono">฿{Number(p.lowest_price).toLocaleString()}</td>
                     <td className="py-3 px-4 text-center">
                       <button
                         onClick={() => handleDeleteProduct(p.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-purple-900/40 rounded-lg transition-colors"
                         title="ลบสินค้า"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -592,9 +598,9 @@ export default function AdminPage({ user }) {
             <p className="text-xs text-slate-400">เช็กได้ว่าระบบแจ้งเตือนทำงานถูกต้อง และส่งถึงผู้ใช้เมื่อราคาถึงเงื่อนไข</p>
           </div>
 
-          <div className="border border-slate-800 rounded-2xl overflow-hidden bg-[#030712]/50">
+          <div className="border border-purple-500/25 rounded-2xl overflow-hidden bg-[#120826]/90 shadow-xl">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-[#030712] text-slate-400 text-xs uppercase border-b border-slate-800">
+              <thead className="bg-[#0A0314] text-slate-400 text-xs uppercase border-b border-purple-500/25">
                 <tr>
                   <th className="py-3 px-4">อีเมลผู้รับ</th>
                   <th className="py-3 px-4">สินค้า</th>
@@ -604,14 +610,19 @@ export default function AdminPage({ user }) {
                   <th className="py-3 px-4 text-center">สถานะการส่ง</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-purple-500/15">
                 {notificationsHistory.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-xs text-blue-300">{item.email}</td>
+                  <tr key={item.id} className="hover:bg-purple-900/20 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-xs text-purple-300">{item.email}</td>
                     <td className="py-3.5 px-4 font-semibold text-white">{item.product}</td>
                     <td className="py-3.5 px-4 text-right text-slate-400 font-mono">฿{item.target_price.toLocaleString()}</td>
                     <td className="py-3.5 px-4 text-right text-emerald-400 font-bold font-mono">฿{item.trigger_price.toLocaleString()}</td>
-                    <td className="py-3.5 px-4 text-xs font-semibold text-amber-300">📍 {item.store}</td>
+                    <td className="py-3.5 px-4 text-xs font-semibold text-amber-300">
+                      <span className="inline-flex items-center space-x-1">
+                        <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{item.store}</span>
+                      </span>
+                    </td>
                     <td className="py-3.5 px-4 text-center">
                       <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                         {item.status} ({item.time})
@@ -633,7 +644,7 @@ export default function AdminPage({ user }) {
             <p className="text-xs text-slate-400">ระบบสามารถอัปเดตราคาจาก 4 แพลตฟอร์มตามรอบเวลาที่กำหนดโดยอัตโนมัติ</p>
           </div>
 
-          <form onSubmit={handleSaveScheduler} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <form onSubmit={handleSaveScheduler} className="bg-[#120826]/90 border border-purple-500/25 rounded-2xl p-6 space-y-4 shadow-xl">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-2">
                 ความถี่ในการตรวจเช็คและดึงราคาอัตโนมัติ:
@@ -641,7 +652,7 @@ export default function AdminPage({ user }) {
               <select
                 value={scrapeInterval}
                 onChange={(e) => setScrapeInterval(e.target.value)}
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#0A0314] border border-purple-500/30 rounded-xl px-3 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-purple-400"
               >
                 <option value="1h">ทุก 1 ชั่วโมง (Hourly - แนะนำสำหรับดีลไอที)</option>
                 <option value="3h">ทุก 3 ชั่วโมง</option>
@@ -651,7 +662,7 @@ export default function AdminPage({ user }) {
               </select>
             </div>
 
-            <div className="p-3 bg-[#030712] rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
+            <div className="p-3 bg-[#0A0314] rounded-xl border border-purple-500/20 text-xs text-slate-400 space-y-1">
               <p>• รอบถัดไป: <strong className="text-white">ทุกต้นชั่วโมง (00 นาที)</strong></p>
               <p>• ตรวจสอบอัตราส่วนลด: <strong className="text-emerald-400">เปิดใช้งาน</strong></p>
               <p>• แจ้งเตือนผ่านอีเมลเมื่อราคาลด: <strong className="text-amber-400">เปิดใช้งาน</strong></p>
@@ -666,7 +677,7 @@ export default function AdminPage({ user }) {
 
             <button
               type="submit"
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-600/30 transition-all"
+              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs shadow-[0_0_15px_rgba(139,92,246,0.35)] transition-all"
             >
               บันทึกการตั้งค่า Scheduler
             </button>
@@ -682,9 +693,9 @@ export default function AdminPage({ user }) {
             <p className="text-xs text-slate-400">สามารถปรับปรุงระบบเพื่อไม่ให้เกิดข้อผิดพลาดซ้ำๆ จากการ Scrape ร้านค้า</p>
           </div>
 
-          <div className="border border-slate-800 rounded-2xl overflow-hidden bg-[#030712]/50">
+          <div className="border border-purple-500/25 rounded-2xl overflow-hidden bg-[#120826]/90 shadow-xl">
             <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="bg-[#030712] text-slate-400 text-xs uppercase border-b border-slate-800">
+              <thead className="bg-[#0A0314] text-slate-400 text-xs uppercase border-b border-purple-500/25">
                 <tr>
                   <th className="py-3 px-4">วัน-เวลา</th>
                   <th className="py-3 px-4">แพลตฟอร์ม</th>
@@ -693,15 +704,15 @@ export default function AdminPage({ user }) {
                   <th className="py-3 px-4 text-center">สถานะการแก้ไข</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-purple-500/15">
                 {errorLogs.map((err) => (
-                  <tr key={err.id} className="hover:bg-slate-800/40 transition-colors">
+                  <tr key={err.id} className="hover:bg-purple-900/20 transition-colors">
                     <td className="py-3.5 px-4 font-mono text-xs text-slate-400">{err.time}</td>
                     <td className="py-3.5 px-4 font-semibold text-white">{err.platform}</td>
                     <td className="py-3.5 px-4 text-xs font-bold text-rose-400">{err.error_type}</td>
                     <td className="py-3.5 px-4 text-xs text-slate-300">{err.detail}</td>
                     <td className="py-3.5 px-4 text-center">
-                      <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                      <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
                         {err.status}
                       </span>
                     </td>
@@ -715,8 +726,8 @@ export default function AdminPage({ user }) {
 
       {/* Add Product Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="w-full max-w-md bg-[#0E061E]/95 border border-purple-500/35 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.3)]">
             <h3 className="text-lg font-bold text-white mb-4">เพิ่มสินค้าใหม่เข้าสู่ระบบ</h3>
             <form onSubmit={handleCreateProduct} className="space-y-4 text-xs">
               <div>
@@ -727,7 +738,7 @@ export default function AdminPage({ user }) {
                   value={newProdName}
                   onChange={(e) => setNewProdName(e.target.value)}
                   placeholder="เช่น ASUS ROG STRIX RTX 5090 32GB"
-                  className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                 />
               </div>
 
@@ -736,7 +747,7 @@ export default function AdminPage({ user }) {
                 <select
                   value={newProdCategory}
                   onChange={(e) => setNewProdCategory(e.target.value)}
-                  className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400"
                 >
                   <option value="Graphics Cards (GPU)">การ์ดจอ (GPU)</option>
                   <option value="Processors (CPU)">ซีพียู (CPU)</option>
@@ -759,7 +770,7 @@ export default function AdminPage({ user }) {
                     value={newProdBrand}
                     onChange={(e) => setNewProdBrand(e.target.value)}
                     placeholder="เช่น ASUS, MSI"
-                    className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                   />
                 </div>
                 <div>
@@ -770,7 +781,7 @@ export default function AdminPage({ user }) {
                     value={newProdMsrp}
                     onChange={(e) => setNewProdMsrp(e.target.value)}
                     placeholder="เช่น 75000"
-                    className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                   />
                 </div>
               </div>
@@ -782,7 +793,7 @@ export default function AdminPage({ user }) {
                   value={newProdImage}
                   onChange={(e) => setNewProdImage(e.target.value)}
                   placeholder="https://..."
-                  className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                 />
               </div>
 
@@ -790,13 +801,13 @@ export default function AdminPage({ user }) {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700"
+                  className="px-4 py-2 bg-[#1C0F3A] text-slate-300 rounded-xl hover:bg-purple-900/40 border border-purple-500/30"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.35)]"
                 >
                   บันทึกสินค้า
                 </button>
@@ -808,8 +819,8 @@ export default function AdminPage({ user }) {
 
       {/* Add Store Platform Modal (PDF Page 2: "เพิ่มหรือตั้งค่าแพลตฟอร์มร้านค้าใหม่ๆ") */}
       {showAddStoreModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="w-full max-w-md bg-[#0E061E]/95 border border-purple-500/35 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.3)]">
             <h3 className="text-lg font-bold text-white mb-2">เพิ่มแพลตฟอร์มร้านค้าใหม่</h3>
             <p className="text-xs text-slate-400 mb-4">เชื่อมต่อ Web Scraper ร้านค้าใหม่ตามฟีดแบคผู้ใช้งาน</p>
             <form onSubmit={handleAddStorePlatform} className="space-y-4 text-xs">
@@ -821,7 +832,7 @@ export default function AdminPage({ user }) {
                   value={newStoreName}
                   onChange={(e) => setNewStoreName(e.target.value)}
                   placeholder="เช่น Speed Gaming, Mercular"
-                  className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                 />
               </div>
               <div>
@@ -832,7 +843,7 @@ export default function AdminPage({ user }) {
                   value={newStoreSlug}
                   onChange={(e) => setNewStoreSlug(e.target.value)}
                   placeholder="เช่น speedgaming"
-                  className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                 />
               </div>
               <div>
@@ -843,20 +854,20 @@ export default function AdminPage({ user }) {
                   value={newStoreUrl}
                   onChange={(e) => setNewStoreUrl(e.target.value)}
                   placeholder="https://www.example.co.th"
-                  className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-[#070312] border border-purple-500/30 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
                 />
               </div>
               <div className="flex items-center justify-end space-x-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddStoreModal(false)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700"
+                  className="px-4 py-2 bg-[#1C0F3A] text-slate-300 rounded-xl hover:bg-purple-900/40 border border-purple-500/30"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.35)]"
                 >
                   เพิ่มแพลตฟอร์ม
                 </button>
