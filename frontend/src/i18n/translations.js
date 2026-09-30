@@ -57,7 +57,7 @@ export const translations = {
       subtitle: 'กลุ่มสินค้าที่มีผู้ค้นหาและเปรียบเทียบราคามากที่สุด'
     },
     deals: {
-      title: 'สินค้า Hot Deal ลดราคาแรง 🔥',
+      title: 'สินค้า Hot Deal ลดราคาแรง',
       subtitle: 'ฮาร์ดแวร์ไอทีที่ปรับลดราคาพิเศษจากร้านค้าพาร์ทเนอร์ในขณะนี้',
       viewAll: 'ดูดีลทั้งหมด'
     },
@@ -116,9 +116,9 @@ export const translations = {
       diff: 'ส่วนต่าง',
       goToStore: 'ไปยังร้าน',
       buyDirect: 'ซื้อเลย',
-      bestPriceBadge: 'ถูกที่สุด 🔥',
+      bestPriceBadge: 'ถูกที่สุด',
       priceTrendChart: 'กราฟแนวโน้มราคาย้อนหลัง 30 วัน (Price Trends)',
-      setAlertBtn: '🔔 ตั้งเตือนราคาลดสำหรับชิ้นนี้',
+      setAlertBtn: 'ตั้งเตือนราคาลดสำหรับชิ้นนี้',
       closeBtn: 'ปิดหน้าต่าง'
     },
     compare: {
@@ -131,13 +131,13 @@ export const translations = {
       noProductsDesc: 'คลิกปุ่มด้านบนเพื่อเลือกสินค้าที่ต้องการนำมาเปรียบเทียบสเปกและราคา',
       browseAllBtn: 'เลือกดูสินค้าทั้งหมด',
       comparedProducts: 'สินค้าที่เปรียบเทียบ',
-      bestValueBadge: 'จุดเด่น: คุ้มค่าราคาถูกสุด 🔥',
-      specHighlight: 'จุดเด่นที่เหนือกว่า ⭐',
+      bestValueBadge: 'จุดเด่น: คุ้มค่าราคาถูกสุด',
+      specHighlight: 'จุดเด่นที่เหนือกว่า',
       bestPriceHighlight: 'ราคาประหยัดที่สุด',
       buyAt: 'สั่งซื้อที่',
       maxItemsNotice: 'สามารถเปรียบเทียบได้สูงสุด 4 รายการครับ',
       floatingTray: 'เลือกเปรียบเทียบ ({count}/4 รายการ):',
-      openCompareBtn: 'เปิดตารางเปรียบเทียบสเปก 👉',
+      openCompareBtn: 'เปิดตารางเปรียบเทียบสเปก',
       clearBtn: 'ล้าง'
     },
     footer: {
@@ -225,7 +225,7 @@ export const translations = {
       subtitle: 'Most searched and compared hardware components this week'
     },
     deals: {
-      title: 'Hot Deals & Deep Discounts 🔥',
+      title: 'Hot Deals & Deep Discounts',
       subtitle: 'Special hardware price cuts from partner stores right now',
       viewAll: 'View All Deals'
     },
@@ -284,9 +284,9 @@ export const translations = {
       diff: 'Price Diff',
       goToStore: 'Go to Store',
       buyDirect: 'Buy Now',
-      bestPriceBadge: 'Cheapest 🔥',
+      bestPriceBadge: 'Cheapest',
       priceTrendChart: '30-Day Historical Price Trends',
-      setAlertBtn: '🔔 Set Price Drop Alert for this item',
+      setAlertBtn: 'Set Price Drop Alert for this item',
       closeBtn: 'Close Window'
     },
     compare: {
@@ -299,13 +299,13 @@ export const translations = {
       noProductsDesc: 'Click the button above to choose products for side-by-side spec comparison',
       browseAllBtn: 'Browse All Products',
       comparedProducts: 'Compared Items',
-      bestValueBadge: 'Highlight: Best Value Price 🔥',
-      specHighlight: 'Winning Spec Advantage ⭐',
+      bestValueBadge: 'Highlight: Best Value Price',
+      specHighlight: 'Winning Spec Advantage',
       bestPriceHighlight: 'Lowest Price Champion',
       buyAt: 'Buy at',
       maxItemsNotice: 'You can compare up to 4 items simultaneously.',
       floatingTray: 'Selected to Compare ({count}/4 items):',
-      openCompareBtn: 'Open Comparison Table 👉',
+      openCompareBtn: 'Open Comparison Table',
       clearBtn: 'Clear'
     },
     footer: {

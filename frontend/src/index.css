@@ -5,55 +5,149 @@
 @layer base {
   body {
     font-family: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #030712;
-    color: #f8fafc;
+    background-color: #070312;
+    color: #dfe2f0;
+    /* Figma Galaxy Cyber Grid & Cosmic Nebula Background */
+    background-image: 
+      /* Subtle Cyber Tech Grid lines from Figma */
+      linear-gradient(to right, rgba(139, 92, 246, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(139, 92, 246, 0.07) 1px, transparent 1px),
+      /* Cosmic Radial Nebulae */
+      radial-gradient(ellipse 95% 65% at 50% -8%, rgba(147, 51, 234, 0.42), transparent 70%),
+      radial-gradient(ellipse 85% 55% at 90% 35%, rgba(124, 58, 237, 0.32), transparent 70%),
+      radial-gradient(ellipse 80% 55% at 10% 65%, rgba(168, 85, 247, 0.28), transparent 70%),
+      radial-gradient(ellipse 70% 50% at 50% 95%, rgba(6, 182, 212, 0.18), transparent 70%);
+    background-size: 36px 36px, 36px 36px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-attachment: fixed;
   }
   code, pre {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+  }
+  h1, h2, h3, .font-heading {
+    font-family: 'Space Grotesk', 'Prompt', sans-serif;
   }
 }
 
-/* Custom Scrollbar */
+/* Material Symbols Outlined default styling (Web Icons & Symbols) */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: 300;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
+
+/* Custom Scrollbar in Galaxy Purple */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: #0B0518;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #5B21B6;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2563eb;
+  background: #8B5CF6;
 }
 
-/* Glow effects for CI Royal Blue */
-.glow-blue {
-  box-shadow: 0 0 25px -4px rgba(37, 99, 235, 0.4);
-}
-
-.glow-blue-sm {
-  box-shadow: 0 0 15px -3px rgba(37, 99, 235, 0.25);
-}
-
-.glow-blue-lg {
-  box-shadow: 0 0 40px -5px rgba(37, 99, 235, 0.35);
-}
-
-/* Glassmorphism */
+/* Glassmorphism with Galaxy Purple Translucency */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  background: rgba(18, 9, 36, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(139, 92, 246, 0.22);
 }
 
-.glass-panel-hover {
-  transition: all 0.25s ease-in-out;
+.glass-panel-elevated {
+  background: rgba(26, 13, 54, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.85), 0 0 25px rgba(139, 92, 246, 0.25);
 }
-.glass-panel-hover:hover {
-  border-color: rgba(59, 130, 246, 0.4);
+
+.glass-card {
+  background: rgba(18, 9, 36, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(168, 85, 247, 0.6);
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.5), 0 0 20px -3px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.85), 0 0 25px rgba(139, 92, 246, 0.35);
+}
+
+/* Glow Utilities */
+.glow-purple {
+  box-shadow: 0 0 30px -2px rgba(139, 92, 246, 0.5);
+}
+
+.glow-purple-lg {
+  box-shadow: 0 0 45px -4px rgba(139, 92, 246, 0.65);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 24px -2px rgba(6, 182, 212, 0.4);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 20px -2px rgba(16, 185, 129, 0.4);
+}
+
+/* Button Gradients */
+.btn-cyber-primary {
+  background: linear-gradient(135deg, #06B6D4 0%, #2563EB 50%, #7C3AED 100%);
+  color: #ffffff;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+
+.btn-cyber-primary:hover {
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.55), 0 0 15px rgba(6, 182, 212, 0.4);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-cyber-purple {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  color: #ffffff;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+}
+
+.btn-cyber-purple:hover {
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-cyber-secondary {
+  background: rgba(139, 92, 246, 0.18);
+  color: #d0bcff;
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  transition: all 0.25s ease;
+}
+
+.btn-cyber-secondary:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: #8B5CF6;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  color: #ffffff;
 }
