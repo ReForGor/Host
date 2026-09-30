@@ -41,6 +41,6 @@ echo ----------------------------------------------------------
 echo.
 
 :: Start Uvicorn Server on Windows
-uvicorn app.main:app --host %HOST% --port %PORT% --reload
+uvicorn backend.main:app --host %HOST% --port %PORT% --reload
 
 pause
