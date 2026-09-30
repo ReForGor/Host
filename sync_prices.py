@@ -1,7 +1,8 @@
-﻿import asyncio
+import asyncio
 import sys
-from datetime import datetime
+import os
 
+sys.path.insert(0, r"c:\Users\AdminTemp\Documents\GitHub\Software-Proj")
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -12,27 +13,29 @@ if sys.platform == "win32":
 import backend.features.auth.models
 import backend.features.alerts.models
 import backend.features.analytics.models
+from datetime import datetime
+from sqlalchemy import select
 from backend.core.database import AsyncSessionLocal
 from backend.features.products.models import Product, PriceListing, Store, PriceHistory
 from backend.features.scrapers.manager import scraper_manager
-from sqlalchemy import select
 
-async def sync_all_prices():
-    print("=" * 70)
-    print("⚡ TechPrice Live Price Synchronizer (Syncing with Source Stores)")
-    print("=" * 70)
-    started_at = datetime.utcnow()
-    total_updated = 0
-    total_checked = 0
-    errors = []
+async def run_full_sync():
+    print("=" * 80)
+    print("🚀 TECHPRICE: FULL LIVE PRICE AUDIT & SYNCHRONIZATION")
+    print("Checking every product across JIB, Advice, BaNANA, and iHaveCPU...")
+    print("=" * 80)
 
     async with AsyncSessionLocal() as db:
         prods_res = await db.execute(select(Product).order_by(Product.id.asc()))
         products = prods_res.scalars().all()
-        print(f"Found {len(products)} products in catalog. Starting live sync...\n")
+        print(f"Total Products in Catalog: {len(products)}\n")
 
-        for idx, prod in enumerate(products, 1):
-            print(f"[{idx}/{len(products)}] {prod.name}")
+        total_checked = 0
+        total_updated = 0
+        all_results = []
+
+        for p_idx, prod in enumerate(products, 1):
+            print(f"[{p_idx}/{len(products)}] {prod.name}")
             listings_res = await db.execute(
                 select(PriceListing, Store)
                 .join(Store)
@@ -44,61 +47,66 @@ async def sync_all_prices():
                 total_checked += 1
                 scraper = scraper_manager.scrapers.get(store.slug)
                 if not scraper:
+                    print(f"   ⚠️ No scraper for {store.slug}")
                     continue
 
+                old_price = listing.price
+                scraped_price = 0.0
+                scraped_orig = None
+
                 try:
-                    await asyncio.sleep(0.2)
-                    scraped = await scraper.scrape_product(
+                    await asyncio.sleep(0.3)
+                    res = await scraper.scrape_product(
                         product_name=prod.name,
                         model_no=prod.model_no,
                         product_url=listing.product_url
                     )
+                    scraped_price = res.get("price", 0.0)
+                    scraped_orig = res.get("original_price")
+                except Exception as e:
+                    print(f"   ❌ {store.name:18}: Error scraping: {e}")
 
-                    new_price = scraped.get("price", 0)
-                    if new_price and new_price > 0:
-                        old_price = listing.price
-                        listing.price = new_price
-                        if scraped.get("original_price"):
-                            listing.original_price = scraped.get("original_price")
+                if scraped_price and scraped_price > 0:
+                    diff = scraped_price - old_price
+                    if abs(diff) > 0.01:
+                        listing.price = scraped_price
+                        if scraped_orig:
+                            listing.original_price = scraped_orig
                         listing.last_checked = datetime.utcnow()
 
-                        # Add history record
-                        history = PriceHistory(
+                        # Add price history
+                        h = PriceHistory(
                             product_id=prod.id,
                             store_id=store.id,
-                            price=new_price,
+                            price=scraped_price,
                             currency="THB",
                             timestamp=datetime.utcnow()
                         )
-                        db.add(history)
+                        db.add(h)
                         total_updated += 1
-
-                        diff_str = ""
-                        if old_price != new_price:
-                            diff = new_price - old_price
-                            diff_str = f" [CHANGED: {old_price:,.0f} -> {new_price:,.0f} ({diff:+,.0f} THB)]"
-                        else:
-                            diff_str = f" [EXACT MATCH: {new_price:,.0f} THB]"
-
-                        print(f"    • {store.name:20}: ฿{new_price:,.2f}{diff_str}")
+                        status_str = f"🔄 UPDATED: ฿{old_price:,.0f} -> ฿{scraped_price:,.0f} ({diff:+,.0f} THB)"
                     else:
-                        print(f"    • {store.name:20}: (Kept previous: ฿{listing.price:,.2f})")
-                except Exception as ex:
-                    errors.append(f"{prod.name} on {store.name}: {ex}")
-                    print(f"    • {store.name:20}: [Error: {ex}]")
+                        status_str = f"✅ ACCURATE: ฿{scraped_price:,.0f}"
+
+                    print(f"   • {store.name:18}: {status_str}")
+                    all_results.append({
+                        "product": prod.name,
+                        "store": store.name,
+                        "old_price": old_price,
+                        "live_price": scraped_price,
+                        "updated": abs(diff) > 0.01
+                    })
+                else:
+                    print(f"   • {store.name:18}: ⚠️ Keeping previous: ฿{old_price:,.0f}")
 
             prod.updated_at = datetime.utcnow()
             await db.commit()
             print()
 
-        elapsed = (datetime.utcnow() - started_at).total_seconds()
-        print("=" * 70)
-        print(f"✅ Sync complete in {elapsed:.1f}s!")
-        print(f"Total listings checked: {total_checked}")
-        print(f"Total prices updated to live: {total_updated}")
-        if errors:
-            print(f"Warnings/Errors: {len(errors)}")
-        print("=" * 70)
+        print("=" * 80)
+        print(f"🎉 AUDIT & SYNC COMPLETE!")
+        print(f"Total Listings Audited : {total_checked}")
+        print(f"Total Prices Updated   : {total_updated}")
+        print("=" * 80)
 
-if __name__ == "__main__":
-    asyncio.run(sync_all_prices())
+asyncio.run(run_full_sync())
