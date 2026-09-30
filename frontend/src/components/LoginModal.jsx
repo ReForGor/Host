@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Lock, Mail, User, ShieldCheck, Zap } from 'lucide-react'
+import { X, Lock, Mail, User, ShieldCheck, Zap, Cpu } from 'lucide-react'
 import { authApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
 
@@ -63,22 +63,22 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-md bg-[#0E061E]/95 border border-purple-500/35 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.3)] backdrop-blur-xl p-6 sm:p-8">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-purple-900/30 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-md shadow-blue-600/20">
-            <Zap className="w-6 h-6 text-blue-500 fill-blue-500" />
+          <div className="w-12 h-12 bg-purple-500/20 border border-purple-500/40 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-[0_0_20px_rgba(139,92,246,0.35)]">
+            <Cpu className="w-6 h-6 text-purple-400" />
           </div>
-          <div className="flex items-center justify-center space-x-1.5 text-xl font-extrabold mb-1">
-            <span className="text-white">KPTM</span>
-            <span className="text-blue-500">PRICE</span>
+          <div className="flex items-center justify-center space-x-1.5 text-2xl font-black font-cyber mb-1">
+            <span className="text-cyan-400">IT</span>
+            <span className="text-white">PRICE</span>
           </div>
           <p className="text-xs text-slate-400">
             {isRegister ? 'สร้างบัญชีเพื่อติดตามราคาและรับการแจ้งเตือน' : 'เข้าถึงข้อมูลราคาและรายการติดตามส่วนตัวของคุณ'}
@@ -86,7 +86,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
         </div>
 
         {error && (
-          <div className="p-3 mb-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+          <div className="p-3 mb-4 rounded-xl bg-rose-500/15 border border-rose-500/35 text-rose-300 text-xs">
             {error}
           </div>
         )}
@@ -99,7 +99,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
                 required
               />
             </div>
@@ -109,7 +109,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
                 required
               />
             </div>
@@ -119,7 +119,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
               />
             </div>
             <div>
@@ -128,14 +128,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
                 required
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-600/30 transition-all"
+              className="w-full py-2.5 mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.35)] transition-all"
             >
               {loading ? 'กำลังลงทะเบียน...' : 'สมัครสมาชิกทันที'}
             </button>
@@ -149,7 +149,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 value={emailOrUser}
                 onChange={(e) => setEmailOrUser(e.target.value)}
                 placeholder="admin@techprice.com หรือ gamer@demo.com"
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
                 required
               />
             </div>
@@ -160,14 +160,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#030712] border border-slate-700 rounded-xl p-2.5 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
                 required
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 mt-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-600/30 transition-all"
+              className="w-full py-2.5 mt-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.35)] transition-all"
             >
               {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
             </button>
@@ -175,22 +175,24 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
         )}
 
         {/* Demo Fast Login Buttons */}
-        <div className="mt-6 pt-5 border-t border-slate-800 text-xs">
+        <div className="mt-6 pt-5 border-t border-purple-500/25 text-xs">
           <p className="text-slate-400 mb-2 font-medium">กดปุ่มเพื่อทดสอบระบบทันที (Demo Accounts):</p>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => fillDemo('admin@techprice.com', 'admin123')}
-              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-300 font-semibold border border-amber-500/30 text-center"
+              className="p-2 rounded-xl bg-[#160B2E] hover:bg-[#231248] text-amber-300 font-semibold border border-amber-500/30 text-center transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)] flex items-center justify-center space-x-1.5"
             >
-              👑 บัญชี Admin
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span>บัญชี Admin</span>
             </button>
             <button
               type="button"
               onClick={() => fillDemo('gamer@demo.com', 'demo1234')}
-              className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-blue-300 font-semibold border border-blue-500/30 text-center"
+              className="p-2 rounded-xl bg-[#160B2E] hover:bg-[#231248] text-purple-300 font-semibold border border-purple-500/30 text-center transition-all shadow-[0_0_10px_rgba(139,92,246,0.15)] flex items-center justify-center space-x-1.5"
             >
-              🎮 บัญชี User ทั่วไป
+              <User className="w-4 h-4 text-purple-400" />
+              <span>บัญชี User ทั่วไป</span>
             </button>
           </div>
         </div>
@@ -203,7 +205,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
               <button
                 type="button"
                 onClick={() => setIsRegister(false)}
-                className="text-blue-400 hover:underline font-bold"
+                className="text-purple-400 hover:text-purple-300 hover:underline font-bold"
               >
                 เข้าสู่ระบบที่นี่
               </button>
@@ -214,7 +216,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
               <button
                 type="button"
                 onClick={() => setIsRegister(true)}
-                className="text-blue-400 hover:underline font-bold"
+                className="text-purple-400 hover:text-purple-300 hover:underline font-bold"
               >
                 สมัครสมาชิกฟรี
               </button>
