@@ -4,17 +4,17 @@ import random
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional
 
-from app.database import AsyncSessionLocal
-from app.scrapers.manager import scraper_manager
+from backend.core.database import AsyncSessionLocal
+from backend.features.scrapers.manager import scraper_manager
 
-logger = logging.getLogger("techprice.scheduler")
+logger = logging.getLogger("kptmprice.scheduler")
 
-# Asia/Bangkok is UTC+7
+# Asia/Bangkok Timezone (UTC+7)
 BANGKOK_TZ = timezone(timedelta(hours=7))
 
 class DailyScrapeScheduler:
     def __init__(self):
-        self.is_active: bool = True
+        self.is_active: bool = False
         self.is_running_job: bool = False
         self.last_run_time: Optional[datetime] = None
         self.next_run_time: Optional[datetime] = None
@@ -36,7 +36,7 @@ class DailyScrapeScheduler:
         ) + timedelta(seconds=jitter_seconds)
 
         if now_bkk >= target_today:
-            # Already passed today, schedule for tomorrow
+            # Already passed today, schedule for tomorrow morning
             target_next = target_today + timedelta(days=1)
         else:
             target_next = target_today
@@ -46,7 +46,7 @@ class DailyScrapeScheduler:
 
     async def execute_scrape_job(self, simulate: bool = False) -> Dict[str, Any]:
         """
-        Runs the daily scrape job across all products and Thai stores.
+        Runs the daily price scrape job across all products and 4 Thai IT retailers.
         """
         if self.is_running_job:
             logger.warning("[Scheduler] Scrape job is already running, skipping overlapping invocation.")
@@ -54,7 +54,7 @@ class DailyScrapeScheduler:
 
         self.is_running_job = True
         started_at = datetime.now(BANGKOK_TZ)
-        logger.info(f"🚀 [Scheduler] Starting daily price sync at {started_at.strftime('%Y-%m-%d %H:%M:%S %Z')} (simulate={simulate})")
+        logger.info(f"🚀 [Scheduler] Starting daily live price sync at {started_at.strftime('%Y-%m-%d %H:%M:%S %Z')} (simulate={simulate})")
 
         try:
             async with AsyncSessionLocal() as session:
@@ -67,7 +67,7 @@ class DailyScrapeScheduler:
                 self.last_run_time = datetime.now(BANGKOK_TZ)
                 self.last_result = result
                 logger.info(
-                    f"✅ [Scheduler] Daily price sync completed successfully: "
+                    f"✅ [Scheduler] Daily live price sync completed: "
                     f"scraped={result.get('items_scraped')}, updated={result.get('prices_updated')}, "
                     f"alerts={result.get('triggered_alerts')}"
                 )
@@ -83,7 +83,7 @@ class DailyScrapeScheduler:
         """
         Infinite background worker loop: waits until 04:30 - 05:00 AM Bangkok Time every day.
         """
-        logger.info("⏰ [Scheduler] Daily 04:30-05:00 AM Automated Scraper background worker started.")
+        logger.info("⏰ [Scheduler] Daily 04:30-05:00 AM Automated Price Scraper background worker started.")
         while self.is_active:
             try:
                 next_dt, wait_secs = self.calculate_next_run(target_hour=4, target_minute=30, jitter_minutes=30)
@@ -96,18 +96,20 @@ class DailyScrapeScheduler:
                 if not self.is_active:
                     break
 
-                logger.info("🌅 [Scheduler] Daily morning window (04:30-05:00) reached. Triggering live store price sync...")
+                logger.info("🌅 [Scheduler] Daily morning window (04:30-05:00 AM) reached. Triggering live store price sync from JIB, Advice, BaNANA, and iHaveCPU...")
                 await self.execute_scrape_job(simulate=False)
 
             except asyncio.CancelledError:
-                logger.info("[Scheduler] Scheduler task cancelled.")
+                logger.info("[Scheduler] Daily Scrape scheduler task cancelled.")
                 break
             except Exception as e:
-                logger.error(f"[Scheduler] Unexpected loop error: {e}", exc_info=True)
+                logger.error(f"[Scheduler] Unexpected error in scheduler loop: {e}", exc_info=True)
                 await asyncio.sleep(60)
 
     def start(self) -> asyncio.Task:
         self.is_active = True
+        next_dt, _ = self.calculate_next_run(target_hour=4, target_minute=30, jitter_minutes=30)
+        self.next_run_time = next_dt
         self._task = asyncio.create_task(self.run_loop())
         return self._task
 
@@ -127,4 +129,3 @@ class DailyScrapeScheduler:
         }
 
 scheduler = DailyScrapeScheduler()
-

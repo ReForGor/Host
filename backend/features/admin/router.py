@@ -247,3 +247,61 @@ async def broadcast_notification(
 
     await db.commit()
     return {"message": f"Broadcast notification sent to {count} users", "dispatched_count": count}
+
+
+class StoreCreateAdmin(BaseModel):
+    name: str
+    slug: str
+    base_url: str
+    logo_url: Optional[str] = None
+    color: Optional[str] = "#3b82f6"
+
+@router.get("/stores")
+async def list_admin_stores(db: AsyncSession = Depends(get_db)):
+    res = await db.execute(select(Store).order_by(Store.id))
+    stores = res.scalars().all()
+    return [
+        {
+            "id": s.id,
+            "name": s.name,
+            "slug": s.slug,
+            "base_url": s.base_url,
+            "logo_url": s.logo_url,
+            "color": s.color,
+            "is_active": s.is_active,
+            "created_at": s.created_at
+        }
+        for s in stores
+    ]
+
+@router.post("/stores")
+async def create_admin_store(
+    data: StoreCreateAdmin,
+    db: AsyncSession = Depends(get_db)
+):
+    existing = await db.execute(select(Store).where(Store.slug == data.slug.strip().lower()))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Store with this slug already exists")
+    
+    store = Store(
+        name=data.name.strip(),
+        slug=data.slug.strip().lower(),
+        base_url=data.base_url.strip(),
+        logo_url=data.logo_url,
+        color=data.color or "#3b82f6",
+        is_active=True,
+        created_at=datetime.utcnow()
+    )
+    db.add(store)
+    await db.commit()
+    await db.refresh(store)
+    return {
+        "message": "Store platform created successfully",
+        "store": {
+            "id": store.id,
+            "name": store.name,
+            "slug": store.slug,
+            "base_url": store.base_url,
+            "color": store.color
+        }
+    }

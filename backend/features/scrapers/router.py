@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.database import get_db
 from backend.features.scrapers.manager import scraper_manager
 from backend.features.scrapers.schemas import ScraperRunRequest, ScrapeJobResult, ScraperPlatformStatus
+from backend.features.scrapers.scheduler import scheduler
 
 router = APIRouter(prefix="/api/scrapers", tags=["Scrapers"])
 
@@ -30,3 +31,13 @@ async def get_last_job():
     if not scraper_manager.last_job_result:
         return {"status": "No jobs executed recently"}
     return scraper_manager.last_job_result
+
+
+@router.get("/scheduler")
+async def get_scheduler_status():
+    return scheduler.get_status()
+
+@router.post("/scheduler/trigger")
+async def trigger_scheduler_job(background_tasks: BackgroundTasks):
+    background_tasks.add_task(scheduler.execute_scrape_job, False)
+    return {"message": "Daily scraper job triggered in background", "status": "running"}

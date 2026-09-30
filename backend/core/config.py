@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 class Settings:
-    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "TechPrice - Thai IT Equipment Price Aggregator API")
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "KPTM PRICE - ระบบเปรียบเทียบราคาอุปกรณ์ไอที")
     PROJECT_DESCRIPTION: str = "REST API for hardware price comparison across Thailand's top IT stores (JIB, Advice, BaNANA, iHaveCPU)"
     PROJECT_VERSION: str = "2.1.0"
     BASE_DIR: Path = BASE_DIR
