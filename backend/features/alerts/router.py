@@ -21,6 +21,9 @@ async def create_price_alert(
     current_user = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
+    if not req.email or "@" not in req.email or "." not in req.email.split("@")[-1]:
+        raise HTTPException(status_code=400, detail="กรุณากรอกรูปแบบอีเมลให้ถูกต้อง (Invalid email format)")
+
     prod = await db.get(Product, req.product_id)
     if not prod:
         raise HTTPException(status_code=404, detail="Product not found")
