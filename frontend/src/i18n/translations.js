@@ -1,7 +1,7 @@
 export const translations = {
   th: {
     brand: {
-      name: 'KPTM PRICE',
+      name: 'IT PRICE',
       tagline: 'ระบบเปรียบเทียบราคาอุปกรณ์ไอทีและคอมพิวเตอร์',
       subtag: 'เทียบราคาสด 4 ร้านไอทีชั้นนำในไทย',
       badge: 'PRICE COMPARISON'
@@ -149,11 +149,11 @@ export const translations = {
       guaranteeCoverage: 'ครอบคลุมครบทุกรุ่นยอดนิยมในไทย',
       supportedStores: 'ร้านค้าไอทีที่รองรับ',
       systemArch: 'สถาปัตยกรรมระบบ',
-      copyright: '© 2026 KPTM PRICE Thailand. All rights reserved.',
+      copyright: '© 2026 IT PRICE Thailand. All rights reserved.',
       builtFor: 'สร้างขึ้นเพื่อการค้นหาดีลที่ดีที่สุดสำหรับเกมเมอร์และสายไอที'
     },
     admin: {
-      title: 'แดชบอร์ดจัดการระบบ KPTM PRICE',
+      title: 'แดชบอร์ดจัดการระบบ IT PRICE',
       subtitle: 'ควบคุมการทำงาน Web Scraper, ตั้งค่าแพลตฟอร์มร้านค้า, ประวัติการแจ้งเตือน และจัดการฐานข้อมูล',
       tabOverview: 'สรุปภาพรวม KPI',
       tabScrapers: 'สถานะ Web Scraper',
@@ -169,7 +169,7 @@ export const translations = {
   },
   en: {
     brand: {
-      name: 'KPTM PRICE',
+      name: 'IT PRICE',
       tagline: 'IT Hardware & PC Components Price Comparison Hub',
       subtag: 'Live Price Comparison across 4 Top Thai Retailers',
       badge: 'PRICE COMPARISON'
@@ -317,11 +317,11 @@ export const translations = {
       guaranteeCoverage: 'Full Coverage of Popular Thai Hardware',
       supportedStores: 'Supported IT Retailers',
       systemArch: 'System Architecture',
-      copyright: '© 2026 KPTM PRICE Thailand. All rights reserved.',
+      copyright: '© 2026 IT PRICE Thailand. All rights reserved.',
       builtFor: 'Built to empower gamers and PC builders to find the best deals.'
     },
     admin: {
-      title: 'KPTM PRICE System Administration',
+      title: 'IT PRICE System Administration',
       subtitle: 'Control Web Scrapers, configure store platforms, audit notifications, and manage catalog data',
       tabOverview: 'KPI Overview',
       tabScrapers: 'Scraper Health',
