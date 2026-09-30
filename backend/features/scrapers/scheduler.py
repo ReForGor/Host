@@ -1,4 +1,4 @@
-﻿import asyncio
+import asyncio
 import logging
 import random
 from datetime import datetime, timedelta, timezone
@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional
 from backend.core.database import AsyncSessionLocal
 from backend.features.scrapers.manager import scraper_manager
 
-logger = logging.getLogger("techprice.scheduler")
+logger = logging.getLogger("kptmprice.scheduler")
 
 # Asia/Bangkok Timezone (UTC+7)
 BANGKOK_TZ = timezone(timedelta(hours=7))
@@ -108,6 +108,8 @@ class DailyScrapeScheduler:
 
     def start(self) -> asyncio.Task:
         self.is_active = True
+        next_dt, _ = self.calculate_next_run(target_hour=4, target_minute=30, jitter_minutes=30)
+        self.next_run_time = next_dt
         self._task = asyncio.create_task(self.run_loop())
         return self._task
 
