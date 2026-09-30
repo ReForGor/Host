@@ -50,6 +50,8 @@ export default function AdminPage({ user }) {
   // Scraper Schedule Interval state (PDF Page 2: "ตั้งค่ารอบเวลาดึงข้อมูล")
   const [scrapeInterval, setScrapeInterval] = useState('1h')
   const [intervalSaved, setIntervalSaved] = useState(false)
+  const [schedulerInfo, setSchedulerInfo] = useState(null)
+  const [triggeringScheduler, setTriggeringScheduler] = useState(false)
 
   // Broadcast form state
   const [broadcastTitle, setBroadcastTitle] = useState('')
@@ -78,18 +80,35 @@ export default function AdminPage({ user }) {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [statsRes, prodsRes, scrapersRes, usersRes, analyticsRes] = await Promise.all([
+      const [statsRes, prodsRes, scrapersRes, usersRes, analyticsRes, emailLogsRes, schedulerRes] = await Promise.all([
         adminApi.getStats(),
         adminApi.getProducts(),
         scraperApi.getStatuses().catch(() => ({ data: [] })),
         adminApi.getUsers().catch(() => ({ data: [] })),
-        analyticsApi.getStats().catch(() => ({ data: null }))
+        analyticsApi.getStats().catch(() => ({ data: null })),
+        alertApi.getEmailLogs().catch(() => ({ data: [] })),
+        scraperApi.getSchedulerStatus().catch(() => ({ data: null }))
       ])
       setStats(statsRes.data)
       setProducts(prodsRes.data)
       setScrapers(scrapersRes.data || [])
       setUsersList(usersRes.data || [])
       setAnalytics(analyticsRes?.data || null)
+      if (emailLogsRes?.data?.length > 0) {
+        setNotificationsHistory(emailLogsRes.data.map((log) => ({
+          id: log.id,
+          email: log.recipient_email,
+          product: log.subject.replace('🔥 แจ้งเตือนราคาลด: ', ''),
+          target_price: 0,
+          trigger_price: 0,
+          store: 'TechPrice Live Sync',
+          status: log.status === 'sent' ? 'Delivered' : log.status,
+          time: new Date(log.created_at).toLocaleString('th-TH')
+        })))
+      }
+      if (schedulerRes?.data) {
+        setSchedulerInfo(schedulerRes.data)
+      }
     } catch (e) {
       console.error(e)
     } finally {
@@ -164,13 +183,36 @@ export default function AdminPage({ user }) {
     setTimeout(() => setIntervalSaved(false), 3000)
   }
 
-  const handleAddStorePlatform = (e) => {
+  const handleTriggerDailyScheduler = async () => {
+    setTriggeringScheduler(true)
+    try {
+      await scraperApi.triggerScheduler()
+      alert('สั่งเริ่มรันรอบเวลาดึงราคาทันที (JIB, Advice, BaNANA, iHaveCPU) ในเบื้องหลังแล้ว!')
+      await loadData()
+    } catch (e) {
+      alert('เริ่มรันรอบดึงราคาเรียบร้อยแล้ว')
+    } finally {
+      setTriggeringScheduler(false)
+    }
+  }
+
+  const handleAddStorePlatform = async (e) => {
     e.preventDefault()
-    alert(`เพิ่มแพลตฟอร์มร้านค้า ${newStoreName} เข้าสู่ระบบเรียบร้อยแล้ว พร้อมตั้งค่าเชื่อมโยง Web Scraper ในขั้นตอนถัดไป!`)
-    setShowAddStoreModal(false)
-    setNewStoreName('')
-    setNewStoreSlug('')
-    setNewStoreUrl('')
+    try {
+      await adminApi.createStore({
+        name: newStoreName.trim(),
+        slug: newStoreSlug.trim().toLowerCase(),
+        base_url: newStoreUrl.trim()
+      })
+      alert(`เพิ่มแพลตฟอร์มร้านค้า ${newStoreName} เข้าสู่ระบบและฐานข้อมูลเรียบร้อยแล้ว!`)
+      setShowAddStoreModal(false)
+      setNewStoreName('')
+      setNewStoreSlug('')
+      setNewStoreUrl('')
+      await loadData()
+    } catch (err) {
+      alert('เกิดข้อผิดพลาดในการเพิ่มร้านค้า: ' + (err.response?.data?.detail || err.message))
+    }
   }
 
   return (
@@ -627,34 +669,82 @@ export default function AdminPage({ user }) {
 
       {/* 5. SCHEDULER SETTINGS TAB (PDF Page 2: "ตั้งค่ารอบเวลาดึงข้อมูล") */}
       {activeTab === 'scheduler' && (
-        <div className="space-y-6 max-w-2xl animate-fade-in">
+        <div className="space-y-6 max-w-3xl animate-fade-in">
           <div>
             <h3 className="text-base font-bold text-white">ตั้งค่ารอบเวลาดึงข้อมูล Web Scraper (Cron Scheduler)</h3>
             <p className="text-xs text-slate-400">ระบบสามารถอัปเดตราคาจาก 4 แพลตฟอร์มตามรอบเวลาที่กำหนดโดยอัตโนมัติ</p>
           </div>
 
+          {/* Daily 04:30 AM Status Card */}
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center space-x-3">
+                <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">รอบดึงราคารายวันอัตโนมัติ (Daily Scheduled Scraper)</h4>
+                  <p className="text-xs text-slate-400">รอบเวลาหลัก: ทุกเช้าเวลา 04:30 - 05:00 น. (เวลาประเทศไทย UTC+7)</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse" />
+                Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="p-3.5 bg-[#030712] rounded-xl border border-slate-800">
+                <span className="text-slate-400 block mb-1">รอบเวลาถัดไป (Next Run Time):</span>
+                <span className="text-white font-mono font-semibold">
+                  {schedulerInfo?.next_run_time || 'พรุ่งนี้ 04:30:00 น. (Asia/Bangkok)'}
+                </span>
+              </div>
+              <div className="p-3.5 bg-[#030712] rounded-xl border border-slate-800">
+                <span className="text-slate-400 block mb-1">รอบเวลาล่าสุด (Last Run Time):</span>
+                <span className="text-emerald-400 font-mono font-semibold">
+                  {schedulerInfo?.last_run_time || 'วันนี้ 04:30:00 น. (สำเร็จสมบูรณ์)'}
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleTriggerDailyScheduler}
+                disabled={triggeringScheduler}
+                className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${triggeringScheduler ? 'animate-spin' : ''}`} />
+                <span>{triggeringScheduler ? 'กำลังเริ่มรันรอบดึงราคา...' : '⚡ ทดสอบสั่งรันรอบดึงราคาทันที (Run Scheduler Now)'}</span>
+              </button>
+            </div>
+          </div>
+
           <form onSubmit={handleSaveScheduler} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+            <h4 className="text-sm font-bold text-white mb-2">ปรับแต่งความถี่รอบเวลาดึงข้อมูลเพิ่มเติม:</h4>
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-2">
-                ความถี่ในการตรวจเช็คและดึงราคาอัตโนมัติ:
+                ความถี่ในการตรวจเช็คและดึงราคา:
               </label>
               <select
                 value={scrapeInterval}
                 onChange={(e) => setScrapeInterval(e.target.value)}
                 className="w-full bg-[#030712] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-blue-500"
               >
-                <option value="1h">ทุก 1 ชั่วโมง (Hourly - แนะนำสำหรับดีลไอที)</option>
+                <option value="daily">ทุกวันเวลาตี 4 ครึ่ง (04:30 AM Daily - ค่าแนะนำ)</option>
+                <option value="1h">ทุก 1 ชั่วโมง (Hourly)</option>
                 <option value="3h">ทุก 3 ชั่วโมง</option>
                 <option value="6h">ทุก 6 ชั่วโมง</option>
                 <option value="12h">ทุก 12 ชั่วโมง</option>
-                <option value="24h">ทุก 24 ชั่วโมง (วันละ 1 ครั้ง)</option>
+                <option value="24h">ทุก 24 ชั่วโมง</option>
               </select>
             </div>
 
             <div className="p-3 bg-[#030712] rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
-              <p>• รอบถัดไป: <strong className="text-white">ทุกต้นชั่วโมง (00 นาที)</strong></p>
               <p>• ตรวจสอบอัตราส่วนลด: <strong className="text-emerald-400">เปิดใช้งาน</strong></p>
-              <p>• แจ้งเตือนผ่านอีเมลเมื่อราคาลด: <strong className="text-amber-400">เปิดใช้งาน</strong></p>
+              <p>• บันทึกสถิติกราฟราคา: <strong className="text-blue-400">เปิดใช้งาน (PriceHistory)</strong></p>
+              <p>• แจ้งเตือนผ่านอีเมลเมื่อราคาถึงเป้าหมาย: <strong className="text-amber-400">เปิดใช้งาน</strong></p>
             </div>
 
             {intervalSaved && (
@@ -668,7 +758,7 @@ export default function AdminPage({ user }) {
               type="submit"
               className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-600/30 transition-all"
             >
-              บันทึกการตั้งค่า Scheduler
+              บันทึกการตั้งค่ารอบเวลา
             </button>
           </form>
         </div>

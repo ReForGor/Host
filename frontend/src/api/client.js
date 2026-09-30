@@ -38,12 +38,15 @@ export const alertApi = {
   toggleAlert: (id) => api.patch(`/alerts/${id}/toggle`),
   getNotifications: () => api.get('/notifications'),
   markRead: (id) => api.post(`/notifications/${id}/read`),
+  getEmailLogs: () => api.get('/emails/logs'),
 }
 
 export const scraperApi = {
   getStatuses: () => api.get('/scrapers/status'),
   runScraper: (data) => api.post('/scrapers/run', data),
   getLastJob: () => api.get('/scrapers/last-job'),
+  getSchedulerStatus: () => api.get('/scrapers/scheduler'),
+  triggerScheduler: () => api.post('/scrapers/scheduler/trigger'),
 }
 
 export const adminApi = {
@@ -54,6 +57,8 @@ export const adminApi = {
   deleteProduct: (id) => api.delete(`/admin/products/${id}`),
   getUsers: () => api.get('/admin/users'),
   broadcastNotification: (data) => api.post('/admin/broadcast-notification', data),
+  getStores: () => api.get('/admin/stores'),
+  createStore: (data) => api.post('/admin/stores', data),
 }
 
 export const authApi = {

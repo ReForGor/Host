@@ -12,6 +12,7 @@ from backend.features.auth.router import router as auth_router
 from backend.features.admin.router import router as admin_router
 from backend.features.analytics.router import router as analytics_router
 from backend.features.analytics.models import VisitorRecord, SystemMetric
+from backend.features.scrapers.scheduler import scheduler
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +21,11 @@ async def lifespan(app: FastAPI):
         await init_db()
     except Exception as e:
         print(f"Warning: init_db connection notice: {e}")
+    
+    # Start automated daily price scraper scheduler (04:30 AM Bangkok time)
+    scheduler.start()
     yield
+    scheduler.stop()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
