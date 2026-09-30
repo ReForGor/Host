@@ -80,14 +80,14 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
             <div className="flex flex-col">
               <div className="flex items-center space-x-1.5">
                 <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-blue-400 transition-colors">
-                  IT
+                  KPTM
                 </span>
                 <span className="text-xl font-extrabold tracking-tight text-blue-500">
                   PRICE
                 </span>
               </div>
               <span className="text-[10px] font-semibold text-slate-400 tracking-wider -mt-1 hidden sm:block">
-                IT PRICE COMPARISON
+                TECH PRICE COMPARISON
               </span>
             </div>
           </Link>

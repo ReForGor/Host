@@ -74,7 +74,7 @@ export default function Footer() {
                 <Zap className="w-5 h-5 text-white fill-white" />
               </div>
               <div className="flex items-center space-x-1">
-                <span className="text-xl font-extrabold text-white tracking-tight">IT</span>
+                <span className="text-xl font-extrabold text-white tracking-tight">KPTM</span>
                 <span className="text-xl font-extrabold text-blue-500">PRICE</span>
               </div>
             </div>
