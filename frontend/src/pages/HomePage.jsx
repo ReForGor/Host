@@ -262,7 +262,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
             </div>
 
             {/* Huge futuristic title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-white tracking-tight leading-tight max-w-4xl mx-auto mb-4">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-white leading-normal sm:leading-[1.35] lg:leading-[1.4] max-w-4xl mx-auto mb-4 py-1">
               เปรียบเทียบ <span className="text-cyan-400">ราคาอุปกรณ์ไอที</span> จาก<br className="hidden sm:inline" />ร้านค้าชั้นนำในไทย
             </h1>
 
