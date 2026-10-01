@@ -152,7 +152,7 @@ const MOCK_HOMEPAGE_PRODUCTS = [
 ]
 
 export default function HomePage({ user, compareList, setCompareList }) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const navigate = useNavigate()
 
   const [products, setProducts] = useState([])
@@ -168,27 +168,27 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
   // 10 Main Categories Grid from Figma
   const figmaCategories = [
-    { name: 'การ์ดจอ (GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, count: '540 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, count: '218 รายการ', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
-    { name: 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, count: '325 รายการ', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
-    { name: 'ที่เก็บข้อมูล (SSD)', path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, count: '410 รายการ', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
-    { name: 'จอมอนิเตอร์', path: '/products?category=Monitors', icon: Tv, count: '280 รายการ', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
-    { name: 'เมนบอร์ด (Board)', path: '/products?category=Motherboards', icon: Server, count: '195 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: 'พาวเวอร์ซัพพลาย', path: '/products?category=Power Supplies (PSU)', icon: Zap, count: '160 รายการ', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
-    { name: 'เคส & ระบายความร้อน', path: '/products?category=Case & Cooling', icon: Wind, count: '310 รายการ', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
-    { name: 'เกมมิ่งเกียร์', path: '/products?category=Accessories', icon: MousePointer, count: '480 รายการ', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
-    { name: 'โน้ตบุ๊กทำงาน & เล่นเกม', path: '/products?category=Notebooks', icon: Laptop, count: '230 รายการ', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, count: lang === 'en' ? '540 Items' : '540 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, count: lang === 'en' ? '218 Items' : '218 รายการ', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
+    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, count: lang === 'en' ? '325 Items' : '325 รายการ', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
+    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, count: lang === 'en' ? '410 Items' : '410 รายการ', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
+    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: '/products?category=Monitors', icon: Tv, count: lang === 'en' ? '280 Items' : '280 รายการ', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
+    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: '/products?category=Motherboards', icon: Server, count: lang === 'en' ? '195 Items' : '195 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: '/products?category=Power Supplies (PSU)', icon: Zap, count: lang === 'en' ? '160 Items' : '160 รายการ', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
+    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: '/products?category=Case & Cooling', icon: Wind, count: lang === 'en' ? '310 Items' : '310 รายการ', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
+    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: '/products?category=Accessories', icon: MousePointer, count: lang === 'en' ? '480 Items' : '480 รายการ', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
+    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: '/products?category=Notebooks', icon: Laptop, count: lang === 'en' ? '230 Items' : '230 รายการ', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
   ]
 
   // Category filter tabs for the Deals/Products section
   const dealCategoryTabs = [
-    { key: 'All', label: 'สินค้าทั้งหมด', count: 26 },
-    { key: 'Graphics Cards (GPU)', label: 'การ์ดจอ (GPU)', count: 1 },
-    { key: 'Processors (CPU)', label: 'ซีพียู (CPU)', count: 4 },
-    { key: 'Memory (RAM)', label: 'แรม (RAM)', count: 2 },
-    { key: 'Storage (SSD, HDD)', label: 'ที่เก็บข้อมูล (SSD & HDD)', count: 4 },
-    { key: 'Monitors', label: 'จอมอนิเตอร์ & หน้าจอ', count: 2 },
-    { key: 'Motherboards', label: 'เมนบอร์ด (Mainboard)', count: 3 },
+    { key: 'All', label: lang === 'en' ? 'All Products' : 'สินค้าทั้งหมด', count: 26 },
+    { key: 'Graphics Cards (GPU)', label: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', count: 1 },
+    { key: 'Processors (CPU)', label: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', count: 4 },
+    { key: 'Memory (RAM)', label: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', count: 2 },
+    { key: 'Storage (SSD, HDD)', label: lang === 'en' ? 'Storage (SSD & HDD)' : 'ที่เก็บข้อมูล (SSD & HDD)', count: 4 },
+    { key: 'Monitors', label: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์ & หน้าจอ', count: 2 },
+    { key: 'Motherboards', label: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Mainboard)', count: 3 },
   ]
 
   useEffect(() => {
@@ -258,23 +258,29 @@ export default function HomePage({ user, compareList, setCompareList }) {
             {/* Beacon pill */}
             <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-[#160B2E]/90 border border-purple-500/40 text-cyan-300 text-xs font-semibold mb-6 shadow-[0_0_15px_rgba(139,92,246,0.25)]">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>ระบบติดตามและแจ้งเตือนราคาอุปกรณ์ไอทีประเทศไทย</span>
+              <span>{lang === 'en' ? 'IT Hardware Price Tracker & Alert System in Thailand' : 'ระบบติดตามและแจ้งเตือนราคาอุปกรณ์ไอทีประเทศไทย'}</span>
             </div>
 
             {/* Huge futuristic title */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-white leading-normal sm:leading-[1.35] lg:leading-[1.4] max-w-4xl mx-auto mb-4 py-1">
-              เปรียบเทียบ <span className="text-cyan-400">ราคาอุปกรณ์ไอที</span> จาก<br className="hidden sm:inline" />ร้านค้าชั้นนำในไทย
+              {lang === 'en' ? (
+                <>Compare <span className="text-cyan-400">IT Hardware Prices</span> Across<br className="hidden sm:inline" /> Leading Stores in Thailand</>
+              ) : (
+                <>เปรียบเทียบ <span className="text-cyan-400">ราคาอุปกรณ์ไอที</span> จาก<br className="hidden sm:inline" />ร้านค้าชั้นนำในไทย</>
+              )}
             </h1>
 
             <p className="text-slate-300 text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
-              ระบบรวบรวมราคาแบบเรียลไทม์ เปรียบเทียบราคาการ์ดจอ ซีพียู โน้ตบุ๊ก SSD จอมอนิเตอร์ จาก JIB, iHaveCPU, BaNANA IT และ Advice
+              {lang === 'en'
+                ? 'Real-time price comparison across GPUs, CPUs, Laptops, SSDs, and Monitors from JIB, iHaveCPU, BaNANA IT, and Advice.'
+                : 'ระบบรวบรวมราคาแบบเรียลไทม์ เปรียบเทียบราคาการ์ดจอ ซีพียู โน้ตบุ๊ก SSD จอมอนิเตอร์ จาก JIB, iHaveCPU, BaNANA IT และ Advice'}
             </p>
 
             {/* Big Search Box with glowing input */}
             <div className="max-w-2xl mx-auto mb-10 text-left">
               <div className="flex items-center space-x-1.5 text-xs text-cyan-400 mb-2 font-medium">
                 <Search className="w-4 h-4 text-cyan-400" />
-                <span>ค้นหาและเปรียบเทียบราคาสินค้า</span>
+                <span>{lang === 'en' ? 'Search and compare product prices' : 'ค้นหาและเปรียบเทียบราคาสินค้า'}</span>
               </div>
 
               <form 
@@ -288,21 +294,21 @@ export default function HomePage({ user, compareList, setCompareList }) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ค้นหาการ์ดจอ (RTX 5090, 4070), ซีพียู (9800X3D), โน้ตบุ๊ก, SSD..."
+                  placeholder={lang === 'en' ? 'Search GPUs (RTX 5090, 4070), CPUs (9800X3D), Laptops, SSDs...' : 'ค้นหาการ์ดจอ (RTX 5090, 4070), ซีพียู (9800X3D), โน้ตบุ๊ก, SSD...'}
                   className="w-full bg-transparent px-3 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none"
                 />
                 <button
                   type="submit"
                   className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-1.5 flex-shrink-0 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all"
                 >
-                  <span>ค้นหา</span>
+                  <span>{lang === 'en' ? 'Search' : 'ค้นหา'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
 
               {/* Quick search tags */}
               <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] text-slate-300">
-                <span className="font-semibold text-purple-300">คีย์เวิร์ดยอดนิยม:</span>
+                <span className="font-semibold text-purple-300">{lang === 'en' ? 'Popular Keywords:' : 'คีย์เวิร์ดยอดนิยม:'}</span>
                 {[
                   { tag: 'RTX 5080', query: 'RTX 5080' },
                   { tag: 'Ryzen 7 9800X3D', query: 'Ryzen 7 9800X3D' },
@@ -329,7 +335,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
                 </div>
                 <div>
                   <div className="text-xl sm:text-2xl font-bold font-display text-white">26+</div>
-                  <div className="text-[11px] text-slate-400">สินค้าที่ติดตามในระบบ</div>
+                  <div className="text-[11px] text-slate-400">{lang === 'en' ? 'Tracked Products' : 'สินค้าที่ติดตามในระบบ'}</div>
                 </div>
               </div>
 
@@ -338,7 +344,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
                   <Server className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-bold font-display text-white">4 ร้านค้า</div>
+                  <div className="text-xl sm:text-2xl font-bold font-display text-white">{lang === 'en' ? '4 Stores' : '4 ร้านค้า'}</div>
                   <div className="text-[11px] text-slate-400">JIB, iHaveCPU, BaNA...</div>
                 </div>
               </div>
@@ -349,7 +355,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
                 </div>
                 <div>
                   <div className="text-xl sm:text-2xl font-bold font-display text-white">104</div>
-                  <div className="text-[11px] text-slate-400">รายการราคาเปรียบเทียบ</div>
+                  <div className="text-[11px] text-slate-400">{lang === 'en' ? 'Price Comparisons' : 'รายการราคาเปรียบเทียบ'}</div>
                 </div>
               </div>
 
@@ -358,8 +364,8 @@ export default function HomePage({ user, compareList, setCompareList }) {
                   <Bell className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-sm sm:text-base font-bold text-white">ระบบแจ้งเตือน</div>
-                  <div className="text-[11px] text-slate-400">ส่งสัญญาณเมื่อราคา...</div>
+                  <div className="text-sm sm:text-base font-bold text-white">{lang === 'en' ? 'Alert System' : 'ระบบแจ้งเตือน'}</div>
+                  <div className="text-[11px] text-slate-400">{lang === 'en' ? 'Alerts on price drops...' : 'ส่งสัญญาณเมื่อราคา...'}</div>
                 </div>
               </div>
             </div>
@@ -386,11 +392,11 @@ export default function HomePage({ user, compareList, setCompareList }) {
               </h2>
 
               <p className="text-base sm:text-lg font-semibold text-cyan-300">
-                รวมดีลการ์ดจอลดสูงสุด 30% จาก 4 ร้านดัง
+                {lang === 'en' ? 'Top GPU deals up to 30% off across 4 leading retailers' : 'รวมดีลการ์ดจอลดสูงสุด 30% จาก 4 ร้านดัง'}
               </p>
 
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-xl">
-                ตรวจเช็คสต็อกแบบวินาทีต่อวินาที คูปองส่วนลดพิเศษเฉพาะผู้ใช้งาน IT PRICE พร้อมกราฟวิเคราะห์แนวโน้มราคาต่ำสุดในรอบ 90 วัน
+                {lang === 'en' ? 'Second-by-second stock verification, exclusive coupons for IT PRICE users, and 90-day lowest price trend analysis.' : 'ตรวจเช็คสต็อกแบบวินาทีต่อวินาที คูปองส่วนลดพิเศษเฉพาะผู้ใช้งาน IT PRICE พร้อมกราฟวิเคราะห์แนวโน้มราคาต่ำสุดในรอบ 90 วัน'}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -399,12 +405,12 @@ export default function HomePage({ user, compareList, setCompareList }) {
                   className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold flex items-center space-x-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all"
                 >
                   <Zap className="w-4 h-4 fill-black" />
-                  <span>ดูสินค้าจัดรายการทั้งหมด</span>
+                  <span>{lang === 'en' ? 'View All Campaign Deals' : 'ดูสินค้าจัดรายการทั้งหมด'}</span>
                 </button>
 
                 <div className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#140826] border border-purple-500/25 text-xs text-slate-300 font-mono">
                   <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                  <span>สิ้นสุดแคมเปญในอีก 4 วัน 12 ชม.</span>
+                  <span>{lang === 'en' ? 'Campaign ends in 4d 12h' : 'สิ้นสุดแคมเปญในอีก 4 วัน 12 ชม.'}</span>
                 </div>
               </div>
             </div>
@@ -435,14 +441,14 @@ export default function HomePage({ user, compareList, setCompareList }) {
             </div>
             <div>
               <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-                หมวดหมู่ทั้งหมด (All Categories)
+                {lang === 'en' ? 'All Categories' : 'หมวดหมู่ทั้งหมด (All Categories)'}
               </h2>
-              <p className="text-xs text-slate-400">เลือกหมวดหมู่ที่ต้องการค้นหาและเปรียบเทียบสเปกคอมพิวเตอร์</p>
+              <p className="text-xs text-slate-400">{lang === 'en' ? 'Select a category to search and compare PC hardware specifications' : 'เลือกหมวดหมู่ที่ต้องการค้นหาและเปรียบเทียบสเปกคอมพิวเตอร์'}</p>
             </div>
           </div>
 
           <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-[#160B2E] border border-purple-500/30 text-xs font-mono text-purple-300">
-            10 หมวดหมู่หลัก
+            {lang === 'en' ? '10 Core Categories' : '10 หมวดหมู่หลัก'}
           </span>
         </div>
 
@@ -475,9 +481,9 @@ export default function HomePage({ user, compareList, setCompareList }) {
         <div className="mb-6">
           <div className="flex items-center space-x-2 text-rose-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Flame className="w-4 h-4 fill-rose-400" />
-            <span>หมวดหมู่ยอดนิยม (Popular Categories)</span>
+            <span>{lang === 'en' ? 'Popular Categories' : 'หมวดหมู่ยอดนิยม (Popular Categories)'}</span>
           </div>
-          <p className="text-xs text-slate-400">ฮิตติดเทรนด์การค้นหาและประกอบคอมพิวเตอร์ในสัปดาห์นี้</p>
+          <p className="text-xs text-slate-400">{lang === 'en' ? 'Trending hardware searches and PC building picks this week' : 'ฮิตติดเทรนด์การค้นหาและประกอบคอมพิวเตอร์ในสัปดาห์นี้'}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -493,15 +499,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
                 </span>
               </div>
               <h3 className="text-base font-bold font-display text-white group-hover:text-cyan-300 transition-colors mb-2">
-                การ์ดจอ RTX 50 Series
+                {lang === 'en' ? 'RTX 50 Series GPUs' : 'การ์ดจอ RTX 50 Series'}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                สถาปัตยกรรม Blackwell ขุมพลัง AI รุ่นล่าสุด เช็คราคารายวัน ทั้ง RTX 5090, 5080 และ 5070
+                {lang === 'en' ? 'Blackwell architecture with cutting-edge AI power. Daily price checks on RTX 5090, 5080, and 5070.' : 'สถาปัตยกรรม Blackwell ขุมพลัง AI รุ่นล่าสุด เช็คราคารายวัน ทั้ง RTX 5090, 5080 และ 5070'}
               </p>
             </div>
             <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-3">
-              <span className="text-cyan-400 font-mono font-bold">ราคาเริ่มต้น ฿24,900</span>
-              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">48 รุ่นย่อย</span>
+              <span className="text-cyan-400 font-mono font-bold">{lang === 'en' ? 'Starting at ฿24,900' : 'ราคาเริ่มต้น ฿24,900'}</span>
+              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">{lang === 'en' ? '48 models' : '48 รุ่นย่อย'}</span>
             </div>
           </Link>
 
@@ -518,15 +524,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
                 </span>
               </div>
               <h3 className="text-base font-bold font-display text-white group-hover:text-purple-300 transition-colors mb-2">
-                AMD Ryzen 9000 & X3D
+                {lang === 'en' ? 'AMD Ryzen 9000 & X3D' : 'AMD Ryzen 9000 & X3D'}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                สุดยอดชิปประมวลผลสำหรับเกมเมอร์ Zen 5 พร้อม 3D V-Cache ลื่นไหลทุกเฟรมเรต
+                {lang === 'en' ? 'Ultimate processor for gamers. Zen 5 with 3D V-Cache delivers smooth framerates in every title.' : 'สุดยอดชิปประมวลผลสำหรับเกมเมอร์ Zen 5 พร้อม 3D V-Cache ลื่นไหลทุกเฟรมเรต'}
               </p>
             </div>
             <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-3">
-              <span className="text-purple-400 font-mono font-bold">ราคาเริ่มต้น ฿11,500</span>
-              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">24 รุ่นย่อย</span>
+              <span className="text-purple-400 font-mono font-bold">{lang === 'en' ? 'Starting at ฿11,500' : 'ราคาเริ่มต้น ฿11,500'}</span>
+              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">{lang === 'en' ? '24 models' : '24 รุ่นย่อย'}</span>
             </div>
           </Link>
 
@@ -543,15 +549,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
                 </span>
               </div>
               <h3 className="text-base font-bold font-display text-white group-hover:text-amber-300 transition-colors mb-2">
-                แรม DDR5 6000MHz+
+                {lang === 'en' ? 'DDR5 6000MHz+ RAM' : 'แรม DDR5 6000MHz+'}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                มาตรฐานใหม่ของพีซีไฮเอนด์ บัสสูง ค่า Latency ต่ำ พร้อมโปรไฟล์ EXPO & XMP 3.0
+                {lang === 'en' ? 'New high-end PC standard. High frequency, ultra-low latency with EXPO & XMP 3.0 profiles.' : 'มาตรฐานใหม่ของพีซีไฮเอนด์ บัสสูง ค่า Latency ต่ำ พร้อมโปรไฟล์ EXPO & XMP 3.0'}
               </p>
             </div>
             <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-3">
-              <span className="text-cyan-400 font-mono font-bold">ราคาเริ่มต้น ฿3,690</span>
-              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">64 รุ่นย่อย</span>
+              <span className="text-cyan-400 font-mono font-bold">{lang === 'en' ? 'Starting at ฿3,690' : 'ราคาเริ่มต้น ฿3,690'}</span>
+              <span className="text-slate-400 font-mono text-[11px] bg-[#1C0F3A] px-2 py-0.5 rounded border border-purple-500/20">{lang === 'en' ? '64 models' : '64 รุ่นย่อย'}</span>
             </div>
           </Link>
         </div>
@@ -568,18 +574,18 @@ export default function HomePage({ user, compareList, setCompareList }) {
                 <span>LIVE DEALS</span>
               </span>
               <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-                สินค้า Hot Deal & เปรียบเทียบราคาล่าสุด
+                {lang === 'en' ? 'Hot Deals & Latest Price Comparison' : 'สินค้า Hot Deal & เปรียบเทียบราคาล่าสุด'}
               </h2>
             </div>
             <p className="text-xs text-slate-400">
-              สินค้าลดราคาพิเศษ คัดสรรราคาที่ถูกที่สุดในประเทศไทยประจำวันนี้
+              {lang === 'en' ? 'Special discounted hardware curated for the best prices in Thailand today' : 'สินค้าลดราคาพิเศษ คัดสรรราคาที่ถูกที่สุดในประเทศไทยประจำวันนี้'}
             </p>
           </div>
 
           <div className="flex items-center space-x-3 text-xs text-slate-400">
-            <span>แสดงสินค้า {displayedProducts.length} รายการ</span>
+            <span>{lang === 'en' ? `Showing ${displayedProducts.length} items` : `แสดงสินค้า ${displayedProducts.length} รายการ`}</span>
             <span className="text-purple-400/40">|</span>
-            <span className="text-cyan-400 font-medium">เรียงตาม: ราคาถูกที่สุดก่อน</span>
+            <span className="text-cyan-400 font-medium">{lang === 'en' ? 'Sorted by: Lowest Price First' : 'เรียงตาม: ราคาถูกที่สุดก่อน'}</span>
           </div>
         </div>
 
@@ -610,13 +616,13 @@ export default function HomePage({ user, compareList, setCompareList }) {
         <div className="flex flex-wrap items-center gap-3 p-3 rounded-2xl bg-[#120826] border border-purple-500/25 text-xs">
           {/* Store select */}
           <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-1.5 rounded-xl">
-            <span className="text-purple-300">ร้านค้า:</span>
+            <span className="text-purple-300">{lang === 'en' ? 'Store:' : 'ร้านค้า:'}</span>
             <select
               value={storeFilter}
               onChange={(e) => setStoreFilter(e.target.value)}
               className="bg-transparent text-white focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-[#120826] text-white">ทุกร้านค้าไทย (4 ร้านหลัก)</option>
+              <option value="" className="bg-[#120826] text-white">{lang === 'en' ? 'All Thai Stores (4 Major Stores)' : 'ทุกร้านค้าไทย (4 ร้านหลัก)'}</option>
               <option value="advice" className="bg-[#120826] text-white">Advice IT Infinite</option>
               <option value="ihavecpu" className="bg-[#120826] text-white">iHaveCPU</option>
               <option value="jib" className="bg-[#120826] text-white">JIB Online</option>
@@ -626,13 +632,13 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
           {/* Brand select */}
           <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-1.5 rounded-xl">
-            <span className="text-purple-300">แบรนด์:</span>
+            <span className="text-purple-300">{lang === 'en' ? 'Brand:' : 'แบรนด์:'}</span>
             <select
               value={brandFilter}
               onChange={(e) => setBrandFilter(e.target.value)}
               className="bg-transparent text-white focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-[#120826] text-white">ทุกแบรนด์</option>
+              <option value="" className="bg-[#120826] text-white">{lang === 'en' ? 'All Brands' : 'ทุกแบรนด์'}</option>
               <option value="logitech" className="bg-[#120826] text-white">Logitech</option>
               <option value="razer" className="bg-[#120826] text-white">Razer</option>
               <option value="asus" className="bg-[#120826] text-white">ASUS</option>
@@ -647,7 +653,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
               onClick={() => { setStoreFilter(''); setBrandFilter('') }}
               className="text-xs text-rose-400 hover:underline ml-auto"
             >
-              ล้างตัวกรอง
+              {lang === 'en' ? 'Clear Filters' : 'ล้างตัวกรอง'}
             </button>
           )}
         </div>
@@ -673,11 +679,11 @@ export default function HomePage({ user, compareList, setCompareList }) {
           <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mb-1">
             <CheckCircle2 className="w-4 h-4 text-cyan-400" />
             <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-              ร้านค้าพันธมิตร & แบรนด์ชั้นนำ (Partner Shops & Brands)
+              {lang === 'en' ? 'Partner Shops & Leading Brands' : 'ร้านค้าพันธมิตร & แบรนด์ชั้นนำ (Partner Shops & Brands)'}
             </h2>
           </div>
           <p className="text-xs text-slate-400">
-            ดึงข้อมูลสต็อกและราคาเรียลไทม์จากตัวแทนจำหน่ายอุปกรณ์คอมพิวเตอร์อย่างเป็นทางการ
+            {lang === 'en' ? 'Real-time stock and price synchronization from authorized computer hardware distributors' : 'ดึงข้อมูลสต็อกและราคาเรียลไทม์จากตัวแทนจำหน่ายอุปกรณ์คอมพิวเตอร์อย่างเป็นทางการ'}
           </p>
         </div>
 
@@ -691,7 +697,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
               <h4 className="text-xs font-bold text-white">JIB Computer</h4>
               <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span>สต็อกออนไลน์ 99.4%</span>
+                <span>{lang === 'en' ? 'Online Stock 99.4%' : 'สต็อกออนไลน์ 99.4%'}</span>
               </p>
             </div>
           </div>
@@ -704,7 +710,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
               <h4 className="text-xs font-bold text-white">iHaveCPU</h4>
               <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span>จัดส่งด่วนกทม.</span>
+                <span>{lang === 'en' ? 'Express Delivery BKK' : 'จัดส่งด่วนกทม.'}</span>
               </p>
             </div>
           </div>
@@ -717,7 +723,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
               <h4 className="text-xs font-bold text-white">BaNANA IT</h4>
               <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span>โปรโมชั่นผ่อน 0%</span>
+                <span>{lang === 'en' ? '0% Installment Offers' : 'โปรโมชั่นผ่อน 0%'}</span>
               </p>
             </div>
           </div>
@@ -730,7 +736,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
               <h4 className="text-xs font-bold text-white">Advice IT Infinite</h4>
               <p className="text-[11px] text-slate-400 flex items-center space-x-1 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span>จัดส่งด่วน 3 ชม.</span>
+                <span>{lang === 'en' ? 'Express 3-Hour Delivery' : 'จัดส่งด่วน 3 ชม.'}</span>
               </p>
             </div>
           </div>
@@ -754,11 +760,11 @@ export default function HomePage({ user, compareList, setCompareList }) {
             <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mb-1">
               <BookOpen className="w-4 h-4 text-cyan-400" />
               <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-                บทความ & ทริคไอทีแนะนำ (Articles & Tech Guides)
+                {lang === 'en' ? 'Featured Articles & Tech Guides' : 'บทความ & ทริคไอทีแนะนำ (Articles & Tech Guides)'}
               </h2>
             </div>
             <p className="text-xs text-slate-400">
-              รีวิวเจาะลึก คู่มือจัดสเปกคอมพิวเตอร์ และเทคนิคเลือกซื้อของคุ้มค่าเงิน
+              {lang === 'en' ? 'In-depth reviews, PC build guides, and smart purchasing tips' : 'รีวิวเจาะลึก คู่มือจัดสเปกคอมพิวเตอร์ และเทคนิคเลือกซื้อของคุ้มค่าเงิน'}
             </p>
           </div>
 
@@ -766,7 +772,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
             to="/products"
             className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
           >
-            <span>อ่านทั้งหมด</span>
+            <span>{lang === 'en' ? 'View All' : 'อ่านทั้งหมด'}</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -785,15 +791,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
               </span>
             </div>
             <div className="p-4 space-y-2">
-              <div className="text-[11px] text-slate-500 font-mono">12 ก.พ. 2026 • อ่าน 5 นาที</div>
+              <div className="text-[11px] text-slate-500 font-mono">{lang === 'en' ? 'Feb 12, 2026 • 5 min read' : '12 ก.พ. 2026 • อ่าน 5 นาที'}</div>
               <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug">
-                จัดสเปกคอมงบ 30,000 บาท ปี 2026 เล่นลื่นทุกเกม AAA ในระดับ 2K
+                {lang === 'en' ? '30,000 THB PC Build Guide 2026: Smooth 2K Gaming for All AAA Titles' : 'จัดสเปกคอมงบ 30,000 บาท ปี 2026 เล่นลื่นทุกเกม AAA ในระดับ 2K'}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                วิเคราะห์การจัดงบสมดุลระหว่างการ์ดจอ RTX 4060 Ti / 5060 กับซีพียู Core i5 เจนใหม่ พร้อมวิธีเทียบราคาประหยัดได้ถึง 3,500
+                {lang === 'en' ? 'Balanced budget breakdown between RTX 4060 Ti / 5060 and next-gen Core i5, saving up to ฿3,500.' : 'วิเคราะห์การจัดงบสมดุลระหว่างการ์ดจอ RTX 4060 Ti / 5060 กับซีพียู Core i5 เจนใหม่ พร้อมวิธีเทียบราคาประหยัดได้ถึง 3,500'}
               </p>
               <div className="pt-2 text-xs font-semibold text-cyan-400 flex items-center space-x-1">
-                <span>อ่านบทความฉบับเต็ม</span>
+                <span>{lang === 'en' ? 'Read Full Article' : 'อ่านบทความฉบับเต็ม'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -812,15 +818,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
               </span>
             </div>
             <div className="p-4 space-y-2">
-              <div className="text-[11px] text-slate-500 font-mono">10 ก.พ. 2026 • อ่าน 8 นาที</div>
+              <div className="text-[11px] text-slate-500 font-mono">{lang === 'en' ? 'Feb 10, 2026 • 8 min read' : '10 ก.พ. 2026 • อ่าน 8 นาที'}</div>
               <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors leading-snug">
-                เจาะลึก RTX 5080 คุ้มไหมกับราคาเปิดตัว? เทียบผลทดสอบจริง vs 4080 Super
+                {lang === 'en' ? 'RTX 5080 Deep Dive: Is Launch Price Worth It? Benchmark vs 4080 Super' : 'เจาะลึก RTX 5080 คุ้มไหมกับราคาเปิดตัว? เทียบผลทดสอบจริง vs 4080 Super'}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                เจาะลึกประสิทธิภาพสถาปัตยกรรม Blackwell อัตราการกินไฟจริง และกราฟเปรียบเทียบราคาต่อเฟรมเรตที่คุณต้องรู้ก่อนจ่ายเงิน
+                {lang === 'en' ? 'Blackwell architecture efficiency, real power draw, and price-to-performance charts.' : 'เจาะลึกประสิทธิภาพสถาปัตยกรรม Blackwell อัตราการกินไฟจริง และกราฟเปรียบเทียบราคาต่อเฟรมเรตที่คุณต้องรู้ก่อนจ่ายเงิน'}
               </p>
               <div className="pt-2 text-xs font-semibold text-purple-400 flex items-center space-x-1">
-                <span>อ่านบทความฉบับเต็ม</span>
+                <span>{lang === 'en' ? 'Read Full Article' : 'อ่านบทความฉบับเต็ม'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -839,15 +845,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
               </span>
             </div>
             <div className="p-4 space-y-2">
-              <div className="text-[11px] text-slate-500 font-mono">08 ก.พ. 2026 • อ่าน 4 นาที</div>
+              <div className="text-[11px] text-slate-500 font-mono">{lang === 'en' ? 'Feb 08, 2026 • 4 min read' : '08 ก.พ. 2026 • อ่าน 4 นาที'}</div>
               <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
-                วิธีเลือก RAM DDR5 ให้เข้ากับเมนบอร์ด Intel & AMD ไม่ให้จอฟ้า
+                {lang === 'en' ? 'How to Choose DDR5 RAM for Intel & AMD Motherboards Without BSOD' : 'วิธีเลือก RAM DDR5 ให้เข้ากับเมนบอร์ด Intel & AMD ไม่ให้จอฟ้า'}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                เข้าใจความแตกต่างระหว่างโปรไฟล์ XMP 3.0 กับ AMD EXPO, วิธีเช็ครายชื่อ QVL List และความเร็วบัสที่เสถียรที่สุดในปัจจุบัน
+                {lang === 'en' ? 'Understanding XMP 3.0 vs AMD EXPO, checking QVL lists, and best stable frequencies.' : 'เข้าใจความแตกต่างระหว่างโปรไฟล์ XMP 3.0 กับ AMD EXPO, วิธีเช็ครายชื่อ QVL List และความเร็วบัสที่เสถียรที่สุดในปัจจุบัน'}
               </p>
               <div className="pt-2 text-xs font-semibold text-emerald-400 flex items-center space-x-1">
-                <span>อ่านบทความฉบับเต็ม</span>
+                <span>{lang === 'en' ? 'Read Full Article' : 'อ่านบทความฉบับเต็ม'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>

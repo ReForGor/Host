@@ -162,7 +162,7 @@ const MOCK_SPEC_ROWS = [
 ]
 
 export default function ComparePage({ compareList, setCompareList }) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
   const idsParam = searchParams.get('ids')
 
@@ -245,7 +245,7 @@ export default function ComparePage({ compareList, setCompareList }) {
     const current = compareData.products.map(p => p.id)
     if (current.includes(productId)) return
     if (current.length >= 4) {
-      alert(t.compare?.maxItemsNotice || 'เปรียบเทียบได้สูงสุด 4 รายการ')
+      alert(t.compare?.maxItemsNotice || (lang === 'en' ? 'You can compare up to 4 items simultaneously.' : 'เปรียบเทียบได้สูงสุด 4 รายการ'))
       return
     }
     const updated = [...current, productId]
@@ -254,7 +254,7 @@ export default function ComparePage({ compareList, setCompareList }) {
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href)
-    alert('คัดลอกลิงก์การเปรียบเทียบสเปกแล้ว!')
+    alert(lang === 'en' ? 'Comparison link copied to clipboard!' : 'คัดลอกลิงก์การเปรียบเทียบสเปกแล้ว!')
   }
 
   const handleAlertSubmit = (e) => {
@@ -276,19 +276,21 @@ export default function ComparePage({ compareList, setCompareList }) {
             IT PRICE ENGINE / HARDWARE BENCHMARK / SIDE-BY-SIDE <span className="text-white px-2 py-0.5 rounded bg-purple-500/30 ml-2">v4.4 PRO</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black font-display text-white tracking-tight">
-            เปรียบเทียบสเปกและราคาฮาร์ดแวร์ไอที
+            {lang === 'en' ? 'Hardware Spec & Price Comparison' : 'เปรียบเทียบสเปกและราคาฮาร์ดแวร์ไอที'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-3xl mt-1 leading-relaxed">
-            ระบบวิเคราะห์ความต่างแบบเจาะลึก เทียบความคุ้มค่าแบบตัวต่อตัว อิงฐานข้อมูลราคาเรียลไทม์จาก 4 ร้านไอทีชั้นนำในไทย (iHaveCPU, Advice, JIB, BaNANA)
+            {lang === 'en'
+              ? 'In-depth spec comparison, value analysis, and real-time lowest price across 4 premier Thai IT retailers (iHaveCPU, Advice, JIB, BaNANA)'
+              : 'ระบบวิเคราะห์ความต่างแบบเจาะลึก เทียบความคุ้มค่าแบบตัวต่อตัว อิงฐานข้อมูลราคาเรียลไทม์จาก 4 ร้านไอทีชั้นนำในไทย (iHaveCPU, Advice, JIB, BaNANA)'}
           </p>
         </div>
 
         {/* Category switch tabs */}
         <div className="flex items-center space-x-2 bg-[#120826] border border-purple-500/25 p-1 rounded-2xl self-start lg:self-auto overflow-x-auto">
           {[
-            { key: 'CPU', label: 'ซีพียู (CPU)', icon: Cpu },
-            { key: 'GPU', label: 'การ์ดจอ (GPU)', icon: Layers },
-            { key: 'RAM', label: 'แรม (RAM)', icon: Zap },
+            { key: 'CPU', label: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', icon: Cpu },
+            { key: 'GPU', label: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', icon: Layers },
+            { key: 'RAM', label: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', icon: Zap },
             { key: 'SSD', label: 'SSD / Storage', icon: HardDrive }
           ].map((cat) => {
             const Icon = cat.icon
@@ -317,7 +319,7 @@ export default function ComparePage({ compareList, setCompareList }) {
         <div className="flex items-center space-x-2 overflow-x-auto w-full md:w-auto scrollbar-none text-xs">
           <span className="text-purple-300 font-medium whitespace-nowrap flex items-center">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse mr-2"></span>
-            กำลังเทียบ ({activeProducts.length} รายการ):
+            {lang === 'en' ? 'Comparing' : 'กำลังเทียบ'} ({activeProducts.length} {lang === 'en' ? 'items' : 'รายการ'}):
           </span>
           {activeProducts.map((p, idx) => (
             <div
@@ -329,7 +331,7 @@ export default function ComparePage({ compareList, setCompareList }) {
               <button
                 onClick={() => handleRemoveProduct(p.id)}
                 className="text-slate-400 hover:text-rose-400 transition-colors ml-1"
-                title="ลบออกจากการเปรียบเทียบ"
+                title={lang === 'en' ? 'Remove from comparison' : 'ลบออกจากการเปรียบเทียบ'}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -344,13 +346,13 @@ export default function ComparePage({ compareList, setCompareList }) {
             className="flex-1 md:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl bg-[#140826] hover:bg-purple-900/30 border border-purple-500/25 text-xs font-semibold text-purple-200 hover:text-white transition-all"
           >
             <Plus className="w-4 h-4 text-purple-400" />
-            <span>+ ค้นหาเพื่อเพิ่มสินค้าตัวที่ 3...</span>
+            <span>+ {lang === 'en' ? 'Search to add 3rd product...' : 'ค้นหาเพื่อเพิ่มสินค้าตัวที่ 3...'}</span>
           </button>
 
           <button
             onClick={handleShare}
             className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.1] text-slate-300 hover:text-cyan-400 transition-colors"
-            title="แชร์การเปรียบเทียบนี้"
+            title={lang === 'en' ? 'Share this comparison' : 'แชร์การเปรียบเทียบนี้'}
           >
             <Share2 className="w-4 h-4" />
           </button>
@@ -358,7 +360,7 @@ export default function ComparePage({ compareList, setCompareList }) {
           {/* Add Dropdown */}
           {showAddDropdown && (
             <div className="absolute right-0 top-12 w-80 max-h-96 overflow-y-auto glass-panel-elevated rounded-2xl p-2 z-50 shadow-2xl divide-y divide-white/[0.06]">
-              <div className="p-2 text-xs font-bold text-slate-400">เลือกสินค้าเพื่อเปรียบเทียบเพิ่ม</div>
+              <div className="p-2 text-xs font-bold text-slate-400">{lang === 'en' ? 'Select product to add to comparison' : 'เลือกสินค้าเพื่อเปรียบเทียบเพิ่ม'}</div>
               {allProducts.map(p => (
                 <div
                   key={p.id}
@@ -430,7 +432,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                 />
                 <div className="absolute bottom-2.5 left-3 flex items-center space-x-1.5 text-[10px] text-slate-400">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>ครบ 4 ร้าน</span>
+                  <span>{lang === 'en' ? 'All 4 Stores' : 'ครบ 4 ร้าน'}</span>
                 </div>
               </div>
 
@@ -438,7 +440,7 @@ export default function ComparePage({ compareList, setCompareList }) {
               <div className="space-y-3">
                 <div className="flex items-baseline justify-between">
                   <div>
-                    <span className="text-[11px] text-slate-400 block">ราคาต่ำสุดในไทย:</span>
+                    <span className="text-[11px] text-slate-400 block">{lang === 'en' ? 'Lowest Price in TH:' : 'ราคาต่ำสุดในไทย:'}</span>
                     <div className="flex items-baseline space-x-2">
                       <span className="text-2xl sm:text-3xl font-black font-display text-cyan-400">
                         ฿{Number(p.lowest_price).toLocaleString()}
@@ -450,7 +452,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                   </div>
                   {p.msrp && (
                     <div className="text-right">
-                      <span className="text-[10px] text-slate-500 block">ราคาเปิดตัว</span>
+                      <span className="text-[10px] text-slate-500 block">{lang === 'en' ? 'MSRP' : 'ราคาเปิดตัว'}</span>
                       <span className="text-xs text-slate-500 line-through font-display">
                         ฿{Number(p.msrp).toLocaleString()}
                       </span>
@@ -460,7 +462,7 @@ export default function ComparePage({ compareList, setCompareList }) {
 
                 {/* Reference store select */}
                 <div className="space-y-1">
-                  <span className="text-[11px] text-slate-400">ร้านค้าอ้างอิง:</span>
+                  <span className="text-[11px] text-slate-400">{lang === 'en' ? 'Reference Retailer:' : 'ร้านค้าอ้างอิง:'}</span>
                   <div className="relative">
                     <select
                       value={curStoreIdx}
@@ -469,7 +471,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                     >
                       {storeOpt.map((opt, sIdx) => (
                         <option key={sIdx} value={sIdx} className="bg-[#120826] text-white">
-                          {opt.name} - ฿{Number(opt.price).toLocaleString()} {opt.tag ? `(${opt.tag})` : ''}
+                          {opt.name} - ฿{Number(opt.price).toLocaleString()} {opt.tag ? `(${lang === 'en' ? 'Lowest Now' : opt.tag})` : ''}
                         </option>
                       ))}
                     </select>
@@ -488,7 +490,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                       : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]'
                   }`}
                 >
-                  <span>ไปร้านที่ถูกที่สุด ({curStore.name})</span>
+                  <span>{lang === 'en' ? `Go to Cheapest Store (${curStore.name})` : `ไปร้านที่ถูกที่สุด (${curStore.name})`}</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
 
@@ -496,7 +498,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                 <div className="flex items-center justify-between text-xs pt-1 border-t border-purple-500/20">
                   <span className="text-slate-300 font-medium flex items-center space-x-1">
                     <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>{p.score_label || 'คะแนนรวมความคุ้มค่า'}</span>
+                    <span>{p.score_label || (lang === 'en' ? 'Overall Value Score' : 'คะแนนรวมความคุ้มค่า')}</span>
                   </span>
                   <span className="font-mono font-bold text-cyan-400">{p.score_val || '9.5/10'}</span>
                 </div>
@@ -513,11 +515,11 @@ export default function ComparePage({ compareList, setCompareList }) {
             <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mb-1">
               <Activity className="w-4 h-4 text-cyan-400" />
               <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-                ดัชนีคะแนนเปรียบเทียบเชิงวิศวกรรม (Engineering Benchmark)
+                {lang === 'en' ? 'Engineering Benchmark & Performance Index' : 'ดัชนีคะแนนเปรียบเทียบเชิงวิศวกรรม (Engineering Benchmark)'}
               </h2>
             </div>
             <p className="text-xs text-slate-400">
-              คะแนนประเมินระหว่าง FPS เกมมิ่ง 1080p Ultra และคะแนน Cinebench R23 Multi-Core
+              {lang === 'en' ? 'Estimated 1080p Ultra Gaming FPS and Cinebench R23 Multi-Core rendering scores' : 'คะแนนประเมินระหว่าง FPS เกมมิ่ง 1080p Ultra และคะแนน Cinebench R23 Multi-Core'}
             </p>
           </div>
 
@@ -537,7 +539,7 @@ export default function ComparePage({ compareList, setCompareList }) {
           {/* Benchmark 1: Gaming FPS */}
           <div className="bg-[#0A0314] border border-purple-500/20 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-white">ค่าเฉลี่ย 1080p Gaming FPS (12 เกมดัง)</span>
+              <span className="font-bold text-white">{lang === 'en' ? 'Average 1080p Gaming FPS (12 Titles)' : 'ค่าเฉลี่ย 1080p Gaming FPS (12 เกมดัง)'}</span>
               <span className="text-emerald-400 font-mono font-bold">AMD +9.4%</span>
             </div>
             
@@ -567,7 +569,7 @@ export default function ComparePage({ compareList, setCompareList }) {
           {/* Benchmark 2: Cinebench Multi-thread */}
           <div className="bg-[#0A0314] border border-purple-500/20 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-white">คะแนนเรนเดอร์ Cinebench R23 (Multi-Thread)</span>
+              <span className="font-bold text-white">{lang === 'en' ? 'Cinebench R23 Rendering (Multi-Thread)' : 'คะแนนเรนเดอร์ Cinebench R23 (Multi-Thread)'}</span>
               <span className="text-purple-400 font-mono font-bold">Intel +85%</span>
             </div>
             
@@ -601,7 +603,7 @@ export default function ComparePage({ compareList, setCompareList }) {
         <div className="flex items-center space-x-2 text-xs font-bold text-cyan-400 mb-2">
           <Scale className="w-4 h-4 text-cyan-400" />
           <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-            รายการสเปกฮาร์ดแวร์ (Spec Comparison Matrix)
+            {lang === 'en' ? 'Hardware Spec Comparison Matrix' : 'รายการสเปกฮาร์ดแวร์ (Spec Comparison Matrix)'}
           </h2>
         </div>
 
@@ -609,7 +611,7 @@ export default function ComparePage({ compareList, setCompareList }) {
           <table className="w-full text-left border-collapse min-w-[720px]">
             <thead>
               <tr className="border-b border-white/[0.1] text-xs">
-                <th className="py-3 px-4 text-slate-400 w-1/3 font-semibold uppercase">รายการสเปกฮาร์ดแวร์</th>
+                <th className="py-3 px-4 text-slate-400 w-1/3 font-semibold uppercase">{lang === 'en' ? 'SPECIFICATION' : 'รายการสเปกฮาร์ดแวร์'}</th>
                 <th className="py-3 px-4 text-emerald-400 font-bold w-1/3">AMD Ryzen 7 7800X3D</th>
                 <th className="py-3 px-4 text-purple-400 font-bold w-1/3">Intel Core i7-14700K</th>
               </tr>
@@ -660,19 +662,19 @@ export default function ComparePage({ compareList, setCompareList }) {
 
         {/* Quick Stock Check buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-purple-500/20 text-xs">
-          <span className="text-slate-400">ตรวจสอบสต็อกทั้ง 4 ร้านค้าแบบสด:</span>
+          <span className="text-slate-400">{lang === 'en' ? 'Live Stock Check across 4 stores:' : 'ตรวจสอบสต็อกทั้ง 4 ร้านค้าแบบสด:'}</span>
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => alert('กำลังเช็คสต็อก 7800X3D: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
+              onClick={() => alert(lang === 'en' ? 'Stock Check 7800X3D: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 7800X3D: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
               className="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-semibold"
             >
-              ดูราคา 7800X3D ทุกร้าน
+              {lang === 'en' ? 'Check 7800X3D Stock' : 'ดูราคา 7800X3D ทุกร้าน'}
             </button>
             <button
-              onClick={() => alert('กำลังเช็คสต็อก 14700K: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
+              onClick={() => alert(lang === 'en' ? 'Stock Check 14700K: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 14700K: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
               className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 font-semibold"
             >
-              ดูราคา 14700K ทุกร้าน
+              {lang === 'en' ? 'Check 14700K Stock' : 'ดูราคา 14700K ทุกร้าน'}
             </button>
           </div>
         </div>
@@ -685,27 +687,29 @@ export default function ComparePage({ compareList, setCompareList }) {
           <div className="flex items-center justify-between">
             <span className="font-bold text-white flex items-center space-x-2 text-sm sm:text-base">
               <Gamepad2 className="w-4 h-4 text-emerald-400" />
-              <span>บทวิเคราะห์: สายเน้นเล่นเกมล้วนๆ</span>
+              <span>{lang === 'en' ? 'Analysis: Pure Gaming Priority' : 'บทวิเคราะห์: สายเน้นเล่นเกมล้วนๆ'}</span>
             </span>
             <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[11px] font-bold">
               AMD 7800X3D
             </span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            หากเป้าหมายหลักในการประกอบคอมพิวเตอร์คือการเล่นเกม ไม่ว่าจะเป็นเกมแนว eSports (CS2, Valorant, Apex Legends) ที่ต้องการ 1% Low FPS เสถียรสูงสุด หรือเกมระดับ AAA โลกเปิด (Cyberpunk 2077, Black Myth Wukong) เทคโนโลยี <strong className="text-emerald-400">3D V-Cache 96MB</strong> ทำให้ 7800X3D ส่งข้อมูลเฟรมเรตได้เหนือชั้นกว่า Intel ทุกรุ่นในปัจจุบัน และใช้ไฟน้อยกว่าถึงเกือบครึ่ง ทำให้ประหยัดงบพาวเวอร์ซัพพลายและชุดระบายความร้อนได้อีกนับพันบาท
+            {lang === 'en'
+              ? 'If your primary PC usage is gaming, whether competitive eSports titles (CS2, Valorant, Apex Legends) demanding high 1% low FPS or AAA open-world games (Cyberpunk 2077, Black Myth: Wukong), 3D V-Cache 96MB delivers class-leading framerates while drawing nearly half the power of competing Intel CPUs.'
+              : 'หากเป้าหมายหลักในการประกอบคอมพิวเตอร์คือการเล่นเกม ไม่ว่าจะเป็นเกมแนว eSports (CS2, Valorant, Apex Legends) ที่ต้องการ 1% Low FPS เสถียรสูงสุด หรือเกมระดับ AAA โลกเปิด (Cyberpunk 2077, Black Myth Wukong) เทคโนโลยี 3D V-Cache 96MB ทำให้ 7800X3D ส่งข้อมูลเฟรมเรตได้เหนือชั้นกว่า Intel ทุกรุ่นในปัจจุบัน และใช้ไฟน้อยกว่าถึงเกือบครึ่ง ทำให้ประหยัดงบพาวเวอร์ซัพพลายและชุดระบายความร้อนได้อีกนับพันบาท'}
           </p>
           <div className="space-y-1.5 pt-2 text-xs text-emerald-300 font-medium">
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>ไม่ต้องใช้ชุดน้ำ 360mm</span>
+              <span>{lang === 'en' ? 'Standard air or 240mm cooling is sufficient' : 'ไม่ต้องใช้ชุดน้ำ 360mm'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>เมนบอร์ด B650 ใช้งานได้สมบูรณ์</span>
+              <span>{lang === 'en' ? 'B650 motherboards run at full speed' : 'เมนบอร์ด B650 ใช้งานได้สมบูรณ์'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>อัปเกรดในอนาคตได้ต่อ</span>
+              <span>{lang === 'en' ? 'AM5 socket upgrade path through 2027+' : 'อัปเกรดในอนาคตได้ต่อ'}</span>
             </div>
           </div>
         </div>
@@ -715,14 +719,16 @@ export default function ComparePage({ compareList, setCompareList }) {
           <div className="flex items-center justify-between">
             <span className="font-bold text-white flex items-center space-x-2 text-sm sm:text-base">
               <Briefcase className="w-4 h-4 text-purple-400" />
-              <span>บทวิเคราะห์: สายทำงานตัดต่อ & เรนเดอร์</span>
+              <span>{lang === 'en' ? 'Analysis: Video Editing & Multi-Thread Rendering' : 'บทวิเคราะห์: สายทำงานตัดต่อ & เรนเดอร์'}</span>
             </span>
             <span className="px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-[11px] font-bold">
               Intel 14700K
             </span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            หากคุณใช้งานโปรแกรมตัดต่อ Premiere Pro, DaVinci Resolve, ทำงาน 3D Blender, Unreal Engine 5 หรือสตรีมเกมพร้อมเปิดโปรแกรมเบื้องหลังหนักๆ <strong className="text-purple-400">20 Cores / 28 Threads</strong> ของ 14700K กวาดคะแนน Multi-Thread แซงหน้า 7800X3D ไปไกลถึงเกือบ 85% พร้อมทั้งมีชุดคำสั่ง Intel QuickSync ช่วยเอ็นโค้ดวิดีโอแบบเรียลไทม์ ทำให้ไทม์ไลน์ 4K ลื่นไหลเป็นพิเศษ
+            {lang === 'en'
+              ? 'If you run video editing software like Premiere Pro, DaVinci Resolve, 3D Blender, Unreal Engine 5, or stream games with heavy background tasks, 20 Cores / 28 Threads on the 14700K outpace the 7800X3D by up to 85% in multi-threaded benchmarks, bolstered by Intel QuickSync video encoding.'
+              : 'หากคุณใช้งานโปรแกรมตัดต่อ Premiere Pro, DaVinci Resolve, ทำงาน 3D Blender, Unreal Engine 5 หรือสตรีมเกมพร้อมเปิดโปรแกรมเบื้องหลังหนักๆ 20 Cores / 28 Threads ของ 14700K กวาดคะแนน Multi-Thread แซงหน้า 7800X3D ไปไกลถึงเกือบ 85% พร้อมทั้งมีชุดคำสั่ง Intel QuickSync ช่วยเอ็นโค้ดวิดีโอแบบเรียลไทม์ ทำให้ไทม์ไลน์ 4K ลื่นไหลเป็นพิเศษ'}
           </p>
           <div className="space-y-1.5 pt-2 text-xs text-purple-300 font-medium">
             <div className="flex items-center space-x-2">
@@ -731,11 +737,11 @@ export default function ComparePage({ compareList, setCompareList }) {
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>28 เธรด ทำงานหลายหน้าต่างลื่น</span>
+              <span>{lang === 'en' ? '28 threads for smooth multi-tasking' : '28 เธรด ทำงานหลายหน้าต่างลื่น'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>แนะนำจับคู่ชุดน้ำ 3 ตอน</span>
+              <span>{lang === 'en' ? 'Recommended: 360mm AIO liquid cooling' : 'แนะนำจับคู่ชุดน้ำ 3 ตอน'}</span>
             </div>
           </div>
         </div>
@@ -748,15 +754,15 @@ export default function ComparePage({ compareList, setCompareList }) {
             <Bell className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-white">ต้องการรับแจ้งเตือนเมื่อราคาคู่เทียบนี้ลดลงหรือไม่?</h4>
-            <p className="text-xs text-slate-400">ระบบ IT PRICE Bot จะส่งการแจ้งเตือนทันทีที่ JIB, Advice, iHaveCPU หรือ BaNANA ทำราคา Flash Sale</p>
+            <h4 className="text-sm font-bold text-white">{lang === 'en' ? 'Want price drop alerts for this head-to-head matchup?' : 'ต้องการรับแจ้งเตือนเมื่อราคาคู่เทียบนี้ลดลงหรือไม่?'}</h4>
+            <p className="text-xs text-slate-400">{lang === 'en' ? 'IT PRICE Bot will notify you immediately if JIB, Advice, iHaveCPU, or BaNANA launch a Flash Sale.' : 'ระบบ IT PRICE Bot จะส่งการแจ้งเตือนทันทีที่ JIB, Advice, iHaveCPU หรือ BaNANA ทำราคา Flash Sale'}</p>
           </div>
         </div>
 
         {alertSuccess ? (
           <div className="p-2.5 px-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center space-x-1.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span>บันทึกการติดตามสำเร็จ ระบบจะแจ้งเตือนเมื่อราคาปรับลด!</span>
+            <span>{lang === 'en' ? 'Tracking saved! You will receive an alert on price drop.' : 'บันทึกการติดตามสำเร็จ ระบบจะแจ้งเตือนเมื่อราคาปรับลด!'}</span>
           </div>
         ) : (
           <form onSubmit={handleAlertSubmit} className="flex items-center space-x-2 w-full md:w-auto">
@@ -764,7 +770,7 @@ export default function ComparePage({ compareList, setCompareList }) {
               type="email"
               value={alertEmail}
               onChange={(e) => setAlertEmail(e.target.value)}
-              placeholder="ใส่อีเมลของคุณ..."
+              placeholder={lang === 'en' ? 'Enter your email...' : 'ใส่อีเมลของคุณ...'}
               required
               className="bg-white/[0.04] border border-white/[0.1] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 min-w-[200px]"
             />
@@ -772,7 +778,7 @@ export default function ComparePage({ compareList, setCompareList }) {
               type="submit"
               className="px-4 py-2 rounded-xl btn-cyber-primary text-xs font-bold whitespace-nowrap"
             >
-              ติดตามคู่นี้
+              {lang === 'en' ? 'Track Pair' : 'ติดตามคู่นี้'}
             </button>
           </form>
         )}

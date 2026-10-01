@@ -58,7 +58,7 @@ const SAMPLE_NOTIFICATIONS = [
 ]
 
 export default function WatchlistPage({ user }) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [alerts, setAlerts] = useState([])
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
@@ -95,12 +95,15 @@ export default function WatchlistPage({ user }) {
   }
 
   const handleDeleteAlert = async (id) => {
-    if (!window.confirm('คุณต้องการยกเลิกการติดตามสินค้ารายการนี้ใช่หรือไม่?')) return
+    const confirmMsg = lang === 'en' 
+      ? 'Are you sure you want to stop tracking this product?' 
+      : 'คุณต้องการยกเลิกการติดตามสินค้ารายการนี้ใช่หรือไม่?'
+    if (!window.confirm(confirmMsg)) return
     try {
       await alertApi.deleteAlert(id)
       setAlerts(alerts.filter(a => a.id !== id))
     } catch (e) {
-      alert('ไม่สามารถลบการแจ้งเตือนได้')
+      alert(lang === 'en' ? 'Unable to delete alert' : 'ไม่สามารถลบการแจ้งเตือนได้')
     }
   }
 
@@ -109,7 +112,7 @@ export default function WatchlistPage({ user }) {
       const res = await alertApi.toggleAlert(id)
       setAlerts(alerts.map(a => a.id === id ? { ...a, is_active: res.data.is_active } : a))
     } catch (e) {
-      alert('ไม่สามารถเปลี่ยนสถานะการแจ้งเตือนได้')
+      alert(lang === 'en' ? 'Unable to change alert status' : 'ไม่สามารถเปลี่ยนสถานะการแจ้งเตือนได้')
     }
   }
 
@@ -129,10 +132,12 @@ export default function WatchlistPage({ user }) {
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center">
             <Bookmark className="w-8 h-8 mr-3 text-purple-400" />
-            <span>รายการติดตามราคา & ศูนย์การแจ้งเตือน</span>
+            <span>{lang === 'en' ? 'Price Watchlist & Alert Center' : 'รายการติดตามราคา & ศูนย์การแจ้งเตือน'}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            จัดการสินค้ารอซื้อ และดูประวัติการลดราคาที่ระบบแจ้งเตือนมาถึงคุณ
+            {lang === 'en' 
+              ? 'Manage your saved products and track real-time price drop notifications.' 
+              : 'จัดการสินค้ารอซื้อ และดูประวัติการลดราคาที่ระบบแจ้งเตือนมาถึงคุณ'}
           </p>
         </div>
 
@@ -146,7 +151,7 @@ export default function WatchlistPage({ user }) {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            รายการติดตาม ({alerts.length})
+            {lang === 'en' ? `Watchlist (${alerts.length})` : `รายการติดตาม (${alerts.length})`}
           </button>
           <button
             onClick={() => setActiveTab('notifications')}
@@ -156,23 +161,25 @@ export default function WatchlistPage({ user }) {
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            แจ้งเตือนราคาลด ({notifications.filter(n => !n.is_read).length})
+            {lang === 'en' ? `Price Alerts (${notifications.filter(n => !n.is_read).length})` : `แจ้งเตือนราคาลด (${notifications.filter(n => !n.is_read).length})`}
           </button>
         </div>
       </div>
 
       {loading ? (
         <div className="text-center py-20 text-slate-400 text-sm">
-          กำลังโหลดข้อมูลรายการติดตามของคุณ...
+          {lang === 'en' ? 'Loading your watchlist...' : 'กำลังโหลดข้อมูลรายการติดตามของคุณ...'}
         </div>
       ) : activeTab === 'alerts' ? (
         /* Alerts Tab */
         alerts.length === 0 ? (
           <div className="text-center py-20 bg-[#120826]/80 rounded-3xl border border-purple-500/25">
             <Bell className="w-12 h-12 text-purple-400/60 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white mb-2">ยังไม่มีสินค้าที่กำลังติดตามราคา</h3>
+            <h3 className="text-lg font-bold text-white mb-2">{lang === 'en' ? 'No tracked products yet' : 'ยังไม่มีสินค้าที่กำลังติดตามราคา'}</h3>
             <p className="text-sm text-slate-400">
-              กดที่ไอคอนกระดิ่ง <Bell className="w-4 h-4 inline text-amber-400" /> ในการ์ดสินค้าหน้าแรก เพื่อตั้งราคาเป้าหมายที่คุณต้องการซื้อได้เลยครับ
+              {lang === 'en' 
+                ? 'Click the bell icon on any product card to set your target purchase price.' 
+                : 'กดที่ไอคอนกระดิ่ง ในการ์ดสินค้าหน้าแรก เพื่อตั้งราคาเป้าหมายที่คุณต้องการซื้อได้เลยครับ'}
             </p>
           </div>
         ) : (
@@ -196,7 +203,7 @@ export default function WatchlistPage({ user }) {
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         alert.is_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-[#1C0F3A] text-slate-400'
                       }`}>
-                        {alert.is_active ? 'กำลังติดตาม' : 'หยุดชั่วคราว'}
+                        {alert.is_active ? (lang === 'en' ? 'Active' : 'กำลังติดตาม') : (lang === 'en' ? 'Paused' : 'หยุดชั่วคราว')}
                       </span>
                     </div>
 
@@ -213,7 +220,7 @@ export default function WatchlistPage({ user }) {
                           {alert.product_name}
                         </h4>
                         <div className="mt-1 text-xs">
-                          ราคาตลาดตอนนี้: <span className="text-white font-bold font-mono">฿{Number(alert.current_lowest_price || 0).toLocaleString()}</span>
+                          {lang === 'en' ? 'Current Market: ' : 'ราคาตลาดตอนนี้: '}<span className="text-white font-bold font-mono">฿{Number(alert.current_lowest_price || 0).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -221,17 +228,17 @@ export default function WatchlistPage({ user }) {
                     {/* Progress to target */}
                     <div className="bg-[#0A0314] p-3 rounded-xl border border-purple-500/20 mb-4">
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-slate-400">เป้าหมายที่คุณตั้งไว้:</span>
+                        <span className="text-slate-400">{lang === 'en' ? 'Your Target Price:' : 'เป้าหมายที่คุณตั้งไว้:'}</span>
                         <span className="text-purple-400 font-bold font-mono">฿{Number(alert.target_price).toLocaleString()}</span>
                       </div>
                       <div className="text-[11px]">
                         {reached ? (
                           <span className="text-emerald-400 font-bold flex items-center">
-                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> ถึงราคาเป้าหมายแล้ว! สั่งซื้อได้เลย
+                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> {lang === 'en' ? 'Target reached! Ready to purchase' : 'ถึงราคาเป้าหมายแล้ว! สั่งซื้อได้เลย'}
                           </span>
                         ) : (
                           <span className="text-slate-400">
-                            อีกเพียง <strong className="text-amber-400">฿{Number(diff).toLocaleString()}</strong> จะถึงเป้าหมาย
+                            {lang === 'en' ? 'Only ' : 'อีกเพียง '}<strong className="text-amber-400">฿{Number(diff).toLocaleString()}</strong>{lang === 'en' ? ' away from target' : ' จะถึงเป้าหมาย'}
                           </span>
                         )}
                       </div>
@@ -246,12 +253,12 @@ export default function WatchlistPage({ user }) {
                       {alert.is_active ? (
                         <>
                           <ToggleRight className="w-5 h-5 text-emerald-400" />
-                          <span>เปิดอยู่</span>
+                          <span>{lang === 'en' ? 'Active' : 'เปิดอยู่'}</span>
                         </>
                       ) : (
                         <>
                           <ToggleLeft className="w-5 h-5 text-slate-500" />
-                          <span>ปิดอยู่</span>
+                          <span>{lang === 'en' ? 'Paused' : 'ปิดอยู่'}</span>
                         </>
                       )}
                     </button>
@@ -259,7 +266,7 @@ export default function WatchlistPage({ user }) {
                     <button
                       onClick={() => handleDeleteAlert(alert.id)}
                       className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg transition-colors"
-                      title="ลบการแจ้งเตือน"
+                      title={lang === 'en' ? 'Delete alert' : 'ลบการแจ้งเตือน'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -274,7 +281,7 @@ export default function WatchlistPage({ user }) {
         notifications.length === 0 ? (
           <div className="text-center py-20 bg-[#120826]/80 rounded-3xl border border-purple-500/25">
             <CheckCircle2 className="w-12 h-12 text-purple-400/60 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white mb-2">ยังไม่มีประวัติการแจ้งเตือนราคาลด</h3>
+            <h3 className="text-lg font-bold text-white mb-2">{lang === 'en' ? 'No price drop history yet' : 'ยังไม่มีประวัติการแจ้งเตือนราคาลด'}</h3>
           </div>
         ) : (
           <div className="space-y-4 max-w-4xl mx-auto">
@@ -295,9 +302,9 @@ export default function WatchlistPage({ user }) {
                     <h4 className="text-sm font-bold text-white">{notif.title}</h4>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">{notif.message}</p>
                     <div className="flex items-center space-x-3 mt-2 text-[11px] text-slate-400">
-                      <span>ร้าน: <strong className="text-purple-400">{notif.store_name}</strong></span>
-                      <span>ราคาใหม่: <strong className="text-white font-mono font-bold">฿{Number(notif.new_price).toLocaleString()}</strong></span>
-                      <span>{new Date(notif.created_at).toLocaleString('th-TH')}</span>
+                      <span>{lang === 'en' ? 'Store: ' : 'ร้าน: '}<strong className="text-purple-400">{notif.store_name}</strong></span>
+                      <span>{lang === 'en' ? 'New Price: ' : 'ราคาใหม่: '}<strong className="text-white font-mono font-bold">฿{Number(notif.new_price).toLocaleString()}</strong></span>
+                      <span>{new Date(notif.created_at).toLocaleString(lang === 'en' ? 'en-US' : 'th-TH')}</span>
                     </div>
                   </div>
                 </div>
@@ -310,7 +317,7 @@ export default function WatchlistPage({ user }) {
                       rel="noreferrer"
                       className="px-3.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl flex items-center space-x-1 shadow-[0_0_15px_rgba(139,92,246,0.35)] transition-all"
                     >
-                      <span>ซื้อเลย</span>
+                      <span>{lang === 'en' ? 'Buy Now' : 'ซื้อเลย'}</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
@@ -319,7 +326,7 @@ export default function WatchlistPage({ user }) {
                       onClick={() => handleMarkRead(notif.id)}
                       className="px-2.5 py-1 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-[#1C0F3A]"
                     >
-                      อ่านแล้ว
+                      {lang === 'en' ? 'Mark Read' : 'อ่านแล้ว'}
                     </button>
                   )}
                 </div>

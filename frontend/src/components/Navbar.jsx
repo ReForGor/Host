@@ -46,32 +46,32 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
     }
   }
 
-  // 12 Categories from specifications
+  // 12 Categories from specifications with i18n support
   const megaMenuCategories = [
-    { name: 'หน้าหลัก', path: '/', icon: Home, highlight: false },
-    { name: 'ทั้งหมด', path: '/products', icon: LayoutGrid, highlight: false },
-    { name: 'การ์ดจอ (VGA/GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, highlight: true },
-    { name: 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, highlight: true },
-    { name: 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, highlight: true },
-    { name: 'ที่เก็บข้อมูล (SSD, HDD)', path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, highlight: false },
-    { name: 'จอมอนิเตอร์ (Monitor)', path: '/products?category=Monitors', icon: Tv, highlight: false },
-    { name: 'เมนบอร์ด (Motherboard)', path: '/products?category=Motherboards', icon: Server, highlight: false },
-    { name: 'พาวเวอร์ซัพพลาย (PSU)', path: '/products?category=Power Supplies (PSU)', icon: Zap, highlight: false },
-    { name: 'เคส & ชุดระบายความร้อน', path: '/products?category=Case & Cooling', icon: Wind, highlight: false },
-    { name: 'อุปกรณ์เสริม & เกมมิ่งเกียร์', path: '/products?category=Accessories', icon: MousePointer, highlight: false },
-    { name: 'เปรียบเทียบสเปก', path: '/compare', icon: Scale, highlight: true, special: true },
+    { name: t.nav?.home || (lang === 'en' ? 'Home' : 'หน้าหลัก'), path: '/', icon: Home, highlight: false },
+    { name: t.nav?.allProducts || (lang === 'en' ? 'All Products' : 'ทั้งหมด'), path: '/products', icon: LayoutGrid, highlight: false },
+    { name: t.nav?.gpu || (lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (VGA/GPU)'), path: '/products?category=Graphics Cards (GPU)', icon: Layers, highlight: true },
+    { name: t.nav?.cpu || (lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)'), path: '/products?category=Processors (CPU)', icon: Cpu, highlight: true },
+    { name: t.nav?.ram || (lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)'), path: '/products?category=Memory (RAM)', icon: Zap, highlight: true },
+    { name: t.nav?.storage || (lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD, HDD)'), path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, highlight: false },
+    { name: t.nav?.monitor || (lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์ (Monitor)'), path: '/products?category=Monitors', icon: Tv, highlight: false },
+    { name: t.nav?.mainboard || (lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Motherboard)'), path: '/products?category=Motherboards', icon: Server, highlight: false },
+    { name: t.nav?.psu || (lang === 'en' ? 'Power Supplies (PSU)' : 'พาวเวอร์ซัพพลาย (PSU)'), path: '/products?category=Power Supplies (PSU)', icon: Zap, highlight: false },
+    { name: t.nav?.caseCooling || (lang === 'en' ? 'Case & Cooling' : 'เคส & ชุดระบายความร้อน'), path: '/products?category=Case & Cooling', icon: Wind, highlight: false },
+    { name: t.nav?.accessories || (lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์'), path: '/products?category=Accessories', icon: MousePointer, highlight: false },
+    { name: t.nav?.compare || (lang === 'en' ? 'Compare Specs' : 'เปรียบเทียบสเปก'), path: '/compare', icon: Scale, highlight: true, special: true },
   ]
 
-  // Quick navigation links
+  // Quick navigation links with i18n support
   const quickLinks = [
-    { name: 'หน้าหลัก', path: '/' },
-    { name: 'ทั้งหมด', path: '/products' },
-    { name: 'การ์ดจอ', path: '/products?category=Graphics Cards (GPU)' },
-    { name: 'ซีพียู', path: '/products?category=Processors (CPU)' },
-    { name: 'แรม', path: '/products?category=Memory (RAM)' },
-    { name: 'เปรียบเทียบสเปก', path: '/compare' },
-    { name: 'Hot Deals', path: '/deals', isHotDeal: true },
-    { name: 'สถานะร้านค้า', path: '/platforms' },
+    { name: t.nav?.home || (lang === 'en' ? 'Home' : 'หน้าหลัก'), path: '/' },
+    { name: t.nav?.allProducts || (lang === 'en' ? 'All Products' : 'ทั้งหมด'), path: '/products' },
+    { name: lang === 'en' ? 'GPU' : 'การ์ดจอ', path: '/products?category=Graphics Cards (GPU)' },
+    { name: lang === 'en' ? 'CPU' : 'ซีพียู', path: '/products?category=Processors (CPU)' },
+    { name: lang === 'en' ? 'RAM' : 'แรม', path: '/products?category=Memory (RAM)' },
+    { name: t.nav?.compare || (lang === 'en' ? 'Compare' : 'เปรียบเทียบสเปก'), path: '/compare' },
+    { name: t.nav?.deals || 'Hot Deals', path: '/deals', isHotDeal: true },
+    { name: t.nav?.stores || (lang === 'en' ? 'Stores' : 'สถานะร้านค้า'), path: '/platforms' },
   ]
 
   const isLinkActive = (path) => {
@@ -146,7 +146,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 }`}
               >
                 <LayoutGrid className="w-4 h-4 text-purple-400" />
-                <span>หมวดหมู่ทั้งหมด</span>
+                <span>{lang === 'en' ? 'All Categories' : 'หมวดหมู่ทั้งหมด'}</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMegaMenuOpen ? 'rotate-180 text-purple-400' : 'text-slate-400'}`} />
               </button>
 
@@ -154,7 +154,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
               {isMegaMenuOpen && (
                 <div className="absolute left-0 mt-2 w-[460px] glass-panel-elevated rounded-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="text-[11px] font-bold text-slate-400 px-2 py-1 uppercase tracking-wider border-b border-purple-500/20 mb-2 flex items-center justify-between">
-                    <span>12 หมวดหมู่ทั้งหมด</span>
+                    <span>{lang === 'en' ? '12 Categories' : '12 หมวดหมู่ทั้งหมด'}</span>
                     <span className="text-purple-400 font-mono text-[10px]">REAL-TIME SYNC</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -246,7 +246,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
             <Link
               to="/watchlist"
               className="relative p-2 text-slate-400 hover:text-cyan-400 rounded-lg hover:bg-white/[0.05] transition-colors"
-              title="รายการติดตาม & แจ้งเตือน"
+              title={t.nav?.watchlist || (lang === 'en' ? 'Watchlist & Alerts' : 'รายการติดตาม & แจ้งเตือน')}
             >
               <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
               {unreadCount > 0 && (
@@ -262,7 +262,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
               <Link
                 to="/admin"
                 className="hidden xl:flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20"
-                title="Admin Dashboard"
+                title={t.nav?.admin || "Admin Dashboard"}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Admin</span>
@@ -279,7 +279,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 <button
                   onClick={onLogout}
                   className="text-slate-400 hover:text-rose-400 ml-1 transition-colors"
-                  title="ออกจากระบบ"
+                  title={t.nav?.logout || (lang === 'en' ? 'Sign Out' : 'ออกจากระบบ')}
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -290,7 +290,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 className="flex items-center space-x-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl btn-cyber-primary"
               >
                 <UserIcon className="w-3.5 h-3.5" />
-                <span>เข้าสู่ระบบ</span>
+                <span>{t.nav?.login || (lang === 'en' ? 'Sign In' : 'เข้าสู่ระบบ')}</span>
               </button>
             )}
           </div>

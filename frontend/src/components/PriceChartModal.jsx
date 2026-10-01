@@ -42,7 +42,7 @@ ChartJS.register(
 )
 
 export default function PriceChartModal({ product, onClose, onSetAlert }) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [detail, setDetail] = useState(null)
   const [history, setHistory] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -194,10 +194,23 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   // Build Chart.js datasets
   const getChartData = () => {
     if (!history?.series || history.series.length === 0) {
-      return { labels: ['10 มี.ค.', '12 มี.ค.', '15 มี.ค.', '18 มี.ค.', '22 มี.ค.', '26 มี.ค.', 'วันนี้'], datasets: [] }
+      return { 
+        labels: lang === 'en' 
+          ? ['Mar 10', 'Mar 12', 'Mar 15', 'Mar 18', 'Mar 22', 'Mar 26', 'Today'] 
+          : ['10 มี.ค.', '12 มี.ค.', '15 มี.ค.', '18 มี.ค.', '22 มี.ค.', '26 มี.ค.', 'วันนี้'], 
+        datasets: [] 
+      }
     }
 
-    const labels = history.series[0].data_points.map(d => d.date)
+    const labels = history.series[0].data_points.map(d => {
+      if (lang === 'en') {
+        return d.date
+          .replace(' มี.ค.', ' Mar')
+          .replace('วันนี้ (Flash Deal)', 'Today (Flash Deal)')
+          .replace('วันนี้', 'Today')
+      }
+      return d.date
+    })
     const datasets = history.series.map(s => ({
       label: s.store_name,
       data: s.data_points.map(d => d.price),
@@ -228,7 +241,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         borderWidth: 1,
         padding: 10,
         callbacks: {
-          label: (context) => ` ราคา: ฿${Number(context.parsed.y).toLocaleString('th-TH')}`
+          label: (context) => (lang === 'en' ? ` Price: ฿${Number(context.parsed.y).toLocaleString()}` : ` ราคา: ฿${Number(context.parsed.y).toLocaleString('th-TH')}`)
         }
       }
     },
@@ -266,7 +279,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               <span className="font-bold text-white tracking-wider">IT PRICE</span>
               <span className="px-1.5 py-0.2 rounded bg-purple-500/30 text-purple-300 font-bold text-[9px]">PRO</span>
               <span>•</span>
-              <span className="text-slate-300">รายละเอียดสินค้า (Product Detail Modal)</span>
+              <span className="text-slate-300">{lang === 'en' ? 'Product Details Modal' : 'รายละเอียดสินค้า (Product Detail Modal)'}</span>
               <span>•</span>
               <span className="text-cyan-400 font-semibold truncate max-w-[200px]">{product.name}</span>
             </div>
@@ -352,11 +365,11 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 <div className="flex items-center justify-between text-xs">
                   <h3 className="font-bold text-white flex items-center space-x-1.5">
                     <ShoppingBag className="w-4 h-4 text-purple-400" />
-                    <span>เปรียบเทียบราคา 4 ร้านค้าชั้นนำ (Real-time)</span>
+                    <span>{lang === 'en' ? 'Compare 4 Top Retailers (Real-time)' : 'เปรียบเทียบราคา 4 ร้านค้าชั้นนำ (Real-time)'}</span>
                   </h3>
                   <span className="text-emerald-400 font-mono text-[11px] flex items-center space-x-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    <span>อัปเดตแล้ว</span>
+                    <span>{lang === 'en' ? 'Live Synced' : 'อัปเดตแล้ว'}</span>
                   </span>
                 </div>
 
@@ -391,7 +404,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                             )}
                           </div>
                           <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                            {item.perks || 'มีสต็อกพร้อมส่ง • ประกันศูนย์ไทย'}
+                            {item.perks || (lang === 'en' ? 'In Stock • Official Thai Warranty' : 'มีสต็อกพร้อมส่ง • ประกันศูนย์ไทย')}
                           </p>
                         </div>
                       </div>
@@ -413,7 +426,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                           rel="noreferrer"
                           className="px-3 py-1.5 rounded-xl btn-cyber-primary text-xs flex items-center space-x-1"
                         >
-                          <span>ไปร้าน</span>
+                          <span>{lang === 'en' ? 'Go to Store' : 'ไปร้าน'}</span>
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
@@ -432,7 +445,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-white flex items-center space-x-1.5">
                     <Activity className="w-3.5 h-3.5 text-purple-400" />
-                    <span>ภาพรวมราคาวันนี้</span>
+                    <span>{lang === 'en' ? "Today's Price Overview" : 'ภาพรวมราคาวันนี้'}</span>
                   </span>
                   <span className="text-emerald-400 font-mono text-[11px] font-bold">
                     -3.2%
@@ -441,24 +454,24 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
 
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <div className="p-3 rounded-xl bg-[#0A0314] border border-purple-500/20">
-                    <span className="text-[10px] text-slate-400 block">ต่ำสุดปัจจุบัน</span>
+                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? 'Current Lowest' : 'ต่ำสุดปัจจุบัน'}</span>
                     <span className="text-lg font-bold font-display text-emerald-400">
                       ฿{Number(lowestPrice).toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-purple-300/70 block truncate">ร้าน JIB Online</span>
+                    <span className="text-[10px] text-purple-300/70 block truncate">{lang === 'en' ? 'Store: JIB Online' : 'ร้าน JIB Online'}</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-[#0A0314] border border-purple-500/20">
-                    <span className="text-[10px] text-slate-400 block">ต่ำสุดที่เคยมี</span>
+                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? 'All-Time Low' : 'ต่ำสุดที่เคยมี'}</span>
                     <span className="text-lg font-bold font-display text-purple-400">
                       ฿{Number(allTimeLow).toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-purple-300/70 block">15 มี.ค. Payday</span>
+                    <span className="text-[10px] text-purple-300/70 block">{lang === 'en' ? 'Mar 15 Payday' : '15 มี.ค. Payday'}</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between text-xs text-slate-400 border-t border-purple-500/20 pt-2">
-                  <span>MSRP ศูนย์ไทย:</span>
+                  <span>{lang === 'en' ? 'Thailand MSRP:' : 'MSRP ศูนย์ไทย:'}</span>
                   <span className="font-display font-semibold text-slate-300">฿{Number(msrpPrice).toLocaleString()}</span>
                 </div>
               </div>
@@ -468,7 +481,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-white flex items-center space-x-1.5">
                     <TrendingDown className="w-3.5 h-3.5 text-purple-400" />
-                    <span>กราฟประวัติราคา (Total savings)</span>
+                    <span>{lang === 'en' ? 'Price History (Total Savings)' : 'กราฟประวัติราคา (Total savings)'}</span>
                   </span>
                   
                   <select
@@ -476,9 +489,9 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     onChange={(e) => setTimeframe(e.target.value)}
                     className="bg-[#0A0314] border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] text-slate-300 cursor-pointer"
                   >
-                    <option value="1week">1 สัปดาห์</option>
-                    <option value="1month">1 เดือน</option>
-                    <option value="3months">3 เดือน</option>
+                    <option value="1week">{lang === 'en' ? '1 Week' : '1 สัปดาห์'}</option>
+                    <option value="1month">{lang === 'en' ? '1 Month' : '1 เดือน'}</option>
+                    <option value="3months">{lang === 'en' ? '3 Months' : '3 เดือน'}</option>
                   </select>
                 </div>
 
@@ -492,18 +505,18 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-white flex items-center space-x-1.5">
                     <Bell className="w-3.5 h-3.5 text-purple-400" />
-                    <span>แจ้งเตือนราคาลด (Price Drop Alert)</span>
+                    <span>{lang === 'en' ? 'Price Drop Alert' : 'แจ้งเตือนราคาลด (Price Drop Alert)'}</span>
                   </span>
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                 </div>
                 <p className="text-[11px] text-slate-300">
-                  แจ้งเตือนทันทีเมื่อมีร้านลดราคาต่ำกว่าเป้าหมาย
+                  {lang === 'en' ? 'Get notified immediately when any store drops below target' : 'แจ้งเตือนทันทีเมื่อมีร้านลดราคาต่ำกว่าเป้าหมาย'}
                 </p>
 
                 {alertSuccess ? (
                   <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-medium flex items-center justify-center space-x-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>เปิดการแจ้งเตือนสำเร็จ! ระบบจะส่งเมลเมื่อราคาลดถึงเป้า</span>
+                    <span>{lang === 'en' ? 'Alert activated! We will notify you when price hits target.' : 'เปิดการแจ้งเตือนสำเร็จ! ระบบจะส่งเมลเมื่อราคาลดถึงเป้า'}</span>
                   </div>
                 ) : (
                   <form onSubmit={handleEmbeddedAlertSubmit} className="space-y-2.5 text-xs">
@@ -533,7 +546,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                           type="number"
                           value={alertTargetPrice}
                           onChange={(e) => setAlertTargetPrice(e.target.value)}
-                          placeholder="ราคาเป้าหมาย"
+                          placeholder={lang === 'en' ? 'Target Price' : 'ราคาเป้าหมาย'}
                           required
                           className="w-full bg-transparent text-white font-mono focus:outline-none text-xs"
                         />
@@ -543,7 +556,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                         type="email"
                         value={alertEmail}
                         onChange={(e) => setAlertEmail(e.target.value)}
-                        placeholder="อีเมลของคุณ (เช่น name@email.com)"
+                        placeholder={lang === 'en' ? 'Your email (e.g. name@email.com)' : 'อีเมลของคุณ (เช่น name@email.com)'}
                         required
                         className="w-full bg-[#0A0314] border border-purple-500/30 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-purple-400"
                       />
@@ -555,18 +568,18 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                       className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)] text-xs font-bold flex items-center justify-center space-x-1.5 transition-all"
                     >
                       <Bell className="w-3.5 h-3.5" />
-                      <span>{alertSubmitting ? 'กำลังบันทึก...' : 'เปิดการแจ้งเตือนราคาลด'}</span>
+                      <span>{alertSubmitting ? (lang === 'en' ? 'Saving...' : 'กำลังบันทึก...') : (lang === 'en' ? 'Enable Price Alert' : 'เปิดการแจ้งเตือนราคาลด')}</span>
                     </button>
 
                     <div className="flex items-center justify-center space-x-3 text-[10px] text-slate-400 font-mono pt-1">
                       <span className="flex items-center space-x-1">
                         <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                        <span>ไร้สแปม</span>
+                        <span>{lang === 'en' ? 'No Spam' : 'ไร้สแปม'}</span>
                       </span>
                       <span>•</span>
                       <span className="flex items-center space-x-1">
                         <Zap className="w-3 h-3 text-cyan-400" />
-                        <span>เช็คทุก 15 นาที</span>
+                        <span>{lang === 'en' ? 'Checks every 15m' : 'เช็คทุก 15 นาที'}</span>
                       </span>
                     </div>
                   </form>

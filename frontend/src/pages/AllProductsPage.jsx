@@ -201,7 +201,7 @@ const MOCK_LISTING_PRODUCTS = [
 ]
 
 export default function AllProductsPage({ user, compareList, setCompareList }) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [products, setProducts] = useState([])
@@ -225,8 +225,34 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
   const [activeChartProduct, setActiveChartProduct] = useState(null)
   const [activeAlertProduct, setActiveAlertProduct] = useState(null)
 
-  // Helper for category titles in Thai
+  // Helper for category titles in Thai/English
   const getCategoryTitle = (cat) => {
+    if (lang === 'en') {
+      switch (cat) {
+        case 'Graphics Cards (GPU)':
+          return 'Graphics Cards (GPU)'
+        case 'Processors (CPU)':
+          return 'Processors (CPU)'
+        case 'Memory (RAM)':
+          return 'Memory (RAM)'
+        case 'Storage (SSD, HDD)':
+          return 'Storage (SSD & HDD)'
+        case 'Monitors':
+          return 'Monitors'
+        case 'Motherboards':
+          return 'Motherboards'
+        case 'Power Supplies (PSU)':
+          return 'Power Supplies (PSU)'
+        case 'Case & Cooling':
+          return 'Case & Cooling'
+        case 'Accessories':
+          return 'Accessories & Gaming Gear'
+        case 'All':
+          return 'All Products'
+        default:
+          return cat
+      }
+    }
     switch (cat) {
       case 'Graphics Cards (GPU)':
         return 'การ์ดจอ (VGA / GPU)'
@@ -327,7 +353,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       setCompareList(compareList.filter(p => p.id !== product.id))
     } else {
       if (compareList.length >= 4) {
-        alert(t.compare?.maxItemsNotice || 'สามารถเปรียบเทียบได้สูงสุด 4 รายการ')
+        alert(t.compare?.maxItemsNotice || (lang === 'en' ? 'You can compare up to 4 items simultaneously.' : 'สามารถเปรียบเทียบได้สูงสุด 4 รายการ'))
         return
       }
       setCompareList([...compareList, product])
@@ -362,9 +388,9 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       <div className="space-y-4">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-xs text-slate-400">
-          <Link to="/" className="hover:text-cyan-400 transition-colors">หน้าหลัก</Link>
+          <Link to="/" className="hover:text-cyan-400 transition-colors">{lang === 'en' ? 'Home' : 'หน้าหลัก'}</Link>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-slate-400">คอมโพเนนต์พีซี</span>
+          <span className="text-slate-400">{lang === 'en' ? 'PC Components' : 'คอมโพเนนต์พีซี'}</span>
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="text-cyan-400 font-semibold">{getCategoryTitle(selectedCategory)}</span>
         </div>
@@ -374,13 +400,15 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="space-y-2">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>MARKET INTELLIGENCE • Live Sync (4 ร้านค้า)</span>
+              <span>{lang === 'en' ? 'MARKET INTELLIGENCE • Live Sync (4 Stores)' : 'MARKET INTELLIGENCE • Live Sync (4 ร้านค้า)'}</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-black font-display text-white tracking-tight">
               {getCategoryTitle(selectedCategory)}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
-              อัปเดตราคาแบบเรียลไทม์จาก JIB, iHaveCPU, BaNANA และ Advice พร้อมระบบตรวจจับส่วนลดที่ดีที่สุดในประเทศไทย
+              {lang === 'en'
+                ? 'Real-time price updates across JIB, iHaveCPU, BaNANA, and Advice with intelligent best discount detection in Thailand'
+                : 'อัปเดตราคาแบบเรียลไทม์จาก JIB, iHaveCPU, BaNANA และ Advice พร้อมระบบตรวจจับส่วนลดที่ดีที่สุดในประเทศไทย'}
             </p>
           </div>
 
@@ -391,7 +419,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
                 <Activity className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block">ราคาต่ำสุดวันนี้</span>
+                <span className="text-[11px] text-slate-400 block">{lang === 'en' ? 'Lowest Price Today' : 'ราคาต่ำสุดวันนี้'}</span>
                 <span className="text-lg sm:text-xl font-bold font-display text-emerald-400">
                   ฿{Number(lowestTodayPrice).toLocaleString()}
                 </span>
@@ -403,7 +431,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
                 <TrendingDown className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-[11px] text-slate-400 block">ลดสูงสุดรอบสัปดาห์</span>
+                <span className="text-[11px] text-slate-400 block">{lang === 'en' ? 'Weekly Max Discount' : 'ลดสูงสุดรอบสัปดาห์'}</span>
                 <span className="text-lg sm:text-xl font-bold font-display text-[#F97316]">
                   -{maxWeeklyDiscount}%
                 </span>
@@ -420,14 +448,14 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-2 rounded-xl">
             <span className="text-purple-300 flex items-center space-x-1">
               <Store className="w-3.5 h-3.5 text-purple-300" />
-              <span>ร้านค้า:</span>
+              <span>{lang === 'en' ? 'Store:' : 'ร้านค้า:'}</span>
             </span>
             <select
               value={selectedStore}
               onChange={(e) => setSelectedStore(e.target.value)}
               className="bg-transparent text-white focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-[#120826] text-white">ทุกร้านค้าไทย (4 ร้านหลัก)</option>
+              <option value="" className="bg-[#120826] text-white">{lang === 'en' ? 'All Thai Stores (4 Major Stores)' : 'ทุกร้านค้าไทย (4 ร้านหลัก)'}</option>
               <option value="advice" className="bg-[#120826] text-white">Advice IT Infinite</option>
               <option value="ihavecpu" className="bg-[#120826] text-white">iHaveCPU</option>
               <option value="jib" className="bg-[#120826] text-white">JIB Online</option>
@@ -439,13 +467,13 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-2 rounded-xl">
             <span className="text-purple-300 flex items-center space-x-1">
               <CreditCard className="w-3.5 h-3.5 text-purple-300" />
-              <span>ราคาสูงสุด (฿):</span>
+              <span>{lang === 'en' ? 'Max Price (฿):' : 'ราคาสูงสุด (฿):'}</span>
             </span>
             <input
               type="number"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="เช่น 85,000"
+              placeholder={lang === 'en' ? 'e.g. 85,000' : 'เช่น 85,000'}
               className="w-24 bg-transparent text-white font-mono focus:outline-none placeholder-slate-500"
             />
           </div>
@@ -454,14 +482,14 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-2 rounded-xl">
             <span className="text-purple-300 flex items-center space-x-1">
               <Tag className="w-3.5 h-3.5 text-purple-300" />
-              <span>แบรนด์:</span>
+              <span>{lang === 'en' ? 'Brand:' : 'แบรนด์:'}</span>
             </span>
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
               className="bg-transparent text-white focus:outline-none cursor-pointer"
             >
-              <option value="All" className="bg-[#120826] text-white">ทุกแบรนด์ (All Brands)</option>
+              <option value="All" className="bg-[#120826] text-white">{lang === 'en' ? 'All Brands' : 'ทุกแบรนด์ (All Brands)'}</option>
               <option value="ASUS" className="bg-[#120826] text-white">ASUS</option>
               <option value="MSI" className="bg-[#120826] text-white">MSI</option>
               <option value="GIGABYTE" className="bg-[#120826] text-white">GIGABYTE</option>
@@ -477,17 +505,17 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center space-x-2 bg-[#1C0F3A]/70 border border-purple-500/25 px-3 py-2 rounded-xl">
             <span className="text-purple-300 flex items-center space-x-1">
               <ArrowUpDown className="w-3.5 h-3.5 text-purple-300" />
-              <span>เรียง:</span>
+              <span>{lang === 'en' ? 'Sort:' : 'เรียง:'}</span>
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-transparent text-cyan-300 focus:outline-none cursor-pointer font-medium"
             >
-              <option value="cheapest" className="bg-[#120826] text-white">ราคาถูกที่สุดก่อน</option>
-              <option value="expensive" className="bg-[#120826] text-white">ราคาสูงสุดก่อน</option>
-              <option value="discount" className="bg-[#120826] text-white">ส่วนลดมากสุด (%)</option>
-              <option value="newest" className="bg-[#120826] text-white">อัปเดตล่าสุด</option>
+              <option value="cheapest" className="bg-[#120826] text-white">{lang === 'en' ? 'Lowest Price First' : 'ราคาถูกที่สุดก่อน'}</option>
+              <option value="expensive" className="bg-[#120826] text-white">{lang === 'en' ? 'Highest Price First' : 'ราคาสูงสุดก่อน'}</option>
+              <option value="discount" className="bg-[#120826] text-white">{lang === 'en' ? 'Highest Discount (%)' : 'ส่วนลดมากสุด (%)'}</option>
+              <option value="newest" className="bg-[#120826] text-white">{lang === 'en' ? 'Recently Updated' : 'อัปเดตล่าสุด'}</option>
             </select>
           </div>
 
@@ -498,7 +526,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
               className="text-xs text-rose-400 hover:underline ml-auto flex items-center space-x-1"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>ล้างตัวกรอง</span>
+              <span>{lang === 'en' ? 'Clear Filters' : 'ล้างตัวกรอง'}</span>
             </button>
           )}
         </div>
@@ -507,7 +535,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
           <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none text-xs">
             <span className="text-purple-300 font-mono text-[11px] uppercase mr-1 flex items-center">
-              <Layers className="w-3.5 h-3.5 mr-1 text-purple-400" /> รุ่นย่อย:
+              <Layers className="w-3.5 h-3.5 mr-1 text-purple-400" /> {lang === 'en' ? 'Sub-Series:' : 'รุ่นย่อย:'}
             </span>
             {subSeriesChips.map((chip) => {
               const active = selectedSubSeries === chip
@@ -528,7 +556,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           </div>
 
           <div className="flex items-center space-x-3 text-xs text-slate-400 self-end sm:self-center">
-            <span>แสดงสินค้า <strong className="text-white font-mono">{filteredProducts.length}</strong> รายการ</span>
+            <span>{lang === 'en' ? 'Showing' : 'แสดงสินค้า'} <strong className="text-white font-mono">{filteredProducts.length}</strong> {lang === 'en' ? 'items' : 'รายการ'}</span>
             <div className="flex items-center bg-[#120826] border border-purple-500/25 rounded-xl p-0.5">
               <button
                 onClick={() => setViewMode('grid')}
@@ -552,12 +580,12 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       {/* PRODUCTS DISPLAY GRID */}
       {filteredProducts.length === 0 ? (
         <div className="glass-card rounded-3xl p-12 text-center space-y-3">
-          <p className="text-slate-300 font-semibold">ไม่พบสินค้าตามเงื่อนไขตัวกรอง</p>
+          <p className="text-slate-300 font-semibold">{lang === 'en' ? 'No products match the selected filters' : 'ไม่พบสินค้าตามเงื่อนไขตัวกรอง'}</p>
           <button
             onClick={() => { setSelectedStore(''); setSelectedBrand('All'); setSelectedSubSeries('') }}
             className="px-4 py-2 rounded-xl btn-cyber-primary text-xs"
           >
-            ล้างตัวกรองทั้งหมด
+            {lang === 'en' ? 'Reset All Filters' : 'ล้างตัวกรองทั้งหมด'}
           </button>
         </div>
       ) : (
@@ -582,14 +610,18 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-white flex items-center space-x-1.5">
               <Activity className="w-4 h-4 text-cyan-400" />
-              <span>ความต่างราคาแต่ละร้าน</span>
+              <span>{lang === 'en' ? 'Price Spread Across Stores' : 'ความต่างราคาแต่ละร้าน'}</span>
             </span>
             <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-[10px] border border-purple-500/30">
               Average Spread
             </span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            การสำรวจพบว่าสินค้าชิ้นเดียวกันต่างร้านต่างราคาสูงสุดถึง <strong className="text-emerald-400 font-mono">฿4,250</strong> แนะนำให้เช็คราคาก่อนสั่งซื้อเสมอ
+            {lang === 'en' ? (
+              <>Survey shows identical items vary up to <strong className="text-emerald-400 font-mono">฿4,250</strong> across stores. Always compare prices before checkout.</>
+            ) : (
+              <>การสำรวจพบว่าสินค้าชิ้นเดียวกันต่างร้านต่างราคาสูงสุดถึง <strong className="text-emerald-400 font-mono">฿4,250</strong> แนะนำให้เช็คราคาก่อนสั่งซื้อเสมอ</>
+            )}
           </p>
           <div className="pt-2 text-[11px] font-mono text-purple-300/80 flex items-center justify-between border-t border-purple-500/20">
             <span>Advice (38%)</span>
@@ -604,7 +636,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-white flex items-center space-x-1.5">
               <TrendingDown className="w-4 h-4 text-emerald-400" />
-              <span>ดัชนีราคาการ์ดจอ (7 วัน)</span>
+              <span>{lang === 'en' ? 'GPU Price Index (7 Days)' : 'ดัชนีราคาการ์ดจอ (7 วัน)'}</span>
             </span>
             <span className="text-emerald-400 font-mono text-xs font-bold">
               -3.2% Trend
@@ -622,8 +654,8 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
             ))}
           </div>
           <div className="text-[11px] text-slate-400 flex items-center justify-between border-t border-purple-500/20 pt-1">
-            <span>แนวโน้มปรับลดลงต่อเนื่อง</span>
-            <span className="font-mono text-cyan-400">14:30 น.</span>
+            <span>{lang === 'en' ? 'Continuous downward trend' : 'แนวโน้มปรับลดลงต่อเนื่อง'}</span>
+            <span className="font-mono text-cyan-400">{lang === 'en' ? 'Live Sync' : '14:30 น.'}</span>
           </div>
         </div>
 
@@ -632,19 +664,19 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-white flex items-center space-x-1.5">
               <Bell className="w-4 h-4 text-[#F97316]" />
-              <span>แจ้งเตือนราคาลดต่ำสุด</span>
+              <span>{lang === 'en' ? 'Price Drop Alerts' : 'แจ้งเตือนราคาลดต่ำสุด'}</span>
             </span>
             <span className="px-2 py-0.5 rounded bg-orange-500/15 text-orange-300 font-mono text-[10px]">
               Alert System
             </span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            ไม่พลาดดีลเด็ด! กรอกอีเมลและรับแจ้งเตือนเมื่อการ์ดจอที่คุณเล็งไว้ปรับลดราคา
+            {lang === 'en' ? 'Never miss a hot deal! Enter your email to get notified when targeted GPUs drop in price.' : 'ไม่พลาดดีลเด็ด! กรอกอีเมลและรับแจ้งเตือนเมื่อการ์ดจอที่คุณเล็งไว้ปรับลดราคา'}
           </p>
           {quickAlertSubscribed ? (
             <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs text-center font-medium flex items-center justify-center space-x-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>บันทึกอีเมลสำเร็จ ระบบจะส่งแจ้งเตือนเมื่อราคาลด!</span>
+              <span>{lang === 'en' ? 'Email saved! You will be notified on price drops.' : 'บันทึกอีเมลสำเร็จ ระบบจะส่งแจ้งเตือนเมื่อราคาลด!'}</span>
             </div>
           ) : (
             <form onSubmit={handleQuickAlertSubmit} className="flex items-center space-x-2">
@@ -652,7 +684,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
                 type="email"
                 value={quickAlertEmail}
                 onChange={(e) => setQuickAlertEmail(e.target.value)}
-                placeholder="ระบุอีเมลของคุณ..."
+                placeholder={lang === 'en' ? 'Enter your email...' : 'ระบุอีเมลของคุณ...'}
                 required
                 className="flex-1 bg-[#1C0F3A]/70 border border-purple-500/30 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-purple-400"
               />
@@ -660,7 +692,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
                 type="submit"
                 className="px-4 py-2 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold whitespace-nowrap shadow-[0_0_12px_rgba(249,115,22,0.4)] transition-all"
               >
-                เปิดแจ้งเตือน
+                {lang === 'en' ? 'Set Alert' : 'เปิดแจ้งเตือน'}
               </button>
             </form>
           )}
@@ -670,7 +702,11 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       {/* PAGINATION (FROM FIGMA) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-purple-500/20 text-xs text-slate-400">
         <div>
-          แสดงรายการที่ <strong className="text-white font-mono">1 - {filteredProducts.length}</strong> จากทั้งหมด <strong className="text-white font-mono">{filteredProducts.length}</strong> รายการ
+          {lang === 'en' ? (
+            <>Showing <strong className="text-white font-mono">1 - {filteredProducts.length}</strong> of <strong className="text-white font-mono">{filteredProducts.length}</strong> items</>
+          ) : (
+            <>แสดงรายการที่ <strong className="text-white font-mono">1 - {filteredProducts.length}</strong> จากทั้งหมด <strong className="text-white font-mono">{filteredProducts.length}</strong> รายการ</>
+          )}
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -699,7 +735,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
         </div>
 
         <div className="flex items-center space-x-2">
-          <span>ไปยังหน้า:</span>
+          <span>{lang === 'en' ? 'Go to page:' : 'ไปยังหน้า:'}</span>
           <input
             type="number"
             defaultValue={1}
@@ -707,7 +743,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
             className="w-12 bg-[#140826] border border-purple-500/25 rounded-lg px-2 py-1 text-center text-white font-mono focus:outline-none"
           />
           <button className="px-3 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-white font-semibold transition-colors">
-            ไป
+            {lang === 'en' ? 'Go' : 'ไป'}
           </button>
         </div>
       </div>

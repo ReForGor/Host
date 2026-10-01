@@ -57,7 +57,7 @@ const MOCK_DEALS = [
 ]
 
 export default function DealsPage({ user }) {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [deals, setDeals] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeChartProduct, setActiveChartProduct] = useState(null)
@@ -93,11 +93,13 @@ export default function DealsPage({ user }) {
           <span>HOT FLASH SALES & PRICE DROPS</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black font-display text-white tracking-tight flex items-center space-x-2">
-          <span>ดีลเด็ดลดราคา & โปรโมชั่นแรงที่สุดวันนี้</span>
+          <span>{lang === 'en' ? "Today's Best IT Deals & Promotions" : 'ดีลเด็ดลดราคา & โปรโมชั่นแรงที่สุดวันนี้'}</span>
           <Flame className="w-7 h-7 text-orange-500 fill-orange-500/20" />
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl leading-relaxed">
-          รวบรวมฮาร์ดแวร์ไอทีที่ปรับลดราคาลงมาคุ้มค่าที่สุด เทียบราคาเรียบร้อยระหว่าง JIB, Advice, BaNANA IT และ iHaveCPU
+          {lang === 'en' 
+            ? 'Curated top hardware price drops compared across JIB, Advice, BaNANA IT, and iHaveCPU.' 
+            : 'รวบรวมฮาร์ดแวร์ไอทีที่ปรับลดราคาลงมาคุ้มค่าที่สุด เทียบราคาเรียบร้อยระหว่าง JIB, Advice, BaNANA IT และ iHaveCPU'}
         </p>
       </div>
 
@@ -110,7 +112,7 @@ export default function DealsPage({ user }) {
       ) : deals.length === 0 ? (
         <div className="text-center py-20 bg-[#120826]/80 rounded-3xl border border-purple-500/25">
           <Flame className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-white">ยังไม่มีดีลลดราคาพิเศษในขณะนี้</h3>
+          <h3 className="text-lg font-bold text-white">{lang === 'en' ? 'No special promotional deals right now' : 'ยังไม่มีดีลลดราคาพิเศษในขณะนี้'}</h3>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -145,7 +147,7 @@ export default function DealsPage({ user }) {
                         {prod.name}
                       </h3>
                       <div className="text-xs text-slate-400 mt-1">
-                        วางจำหน่ายที่: <strong className="text-cyan-400 font-semibold">{prod.best_store_name}</strong>
+                        {lang === 'en' ? 'Available at: ' : 'วางจำหน่ายที่: '}<strong className="text-cyan-400 font-semibold">{prod.best_store_name}</strong>
                       </div>
                     </div>
                   </div>
@@ -153,13 +155,13 @@ export default function DealsPage({ user }) {
 
                 <div className="pt-3 border-t border-purple-500/20 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">ราคาโปรโมชั่น</span>
+                    <span className="text-[10px] text-slate-400 block font-medium">{lang === 'en' ? 'Promo Price' : 'ราคาโปรโมชั่น'}</span>
                     <span className="text-lg font-bold font-display text-white">
                       ฿{Number(prod.lowest_price).toLocaleString()}
                     </span>
                     {savings > 0 && (
                       <span className="text-[11px] text-emerald-400 block font-semibold">
-                        ประหยัดได้ ฿{Number(savings).toLocaleString()}
+                        {lang === 'en' ? `Save ฿${Number(savings).toLocaleString()}` : `ประหยัดได้ ฿${Number(savings).toLocaleString()}`}
                       </span>
                     )}
                   </div>
@@ -168,14 +170,14 @@ export default function DealsPage({ user }) {
                     <button
                       onClick={() => setActiveChartProduct(prod)}
                       className="p-2 bg-[#1C0F3A] hover:bg-[#25154D] text-slate-300 hover:text-cyan-400 rounded-xl transition-colors border border-purple-500/30"
-                      title="ดูกราฟราคา"
+                      title={lang === 'en' ? 'View Price Chart' : 'ดูกราฟราคา'}
                     >
                       <LineChart className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setActiveAlertProduct(prod)}
                       className="p-2 bg-[#1C0F3A] hover:bg-[#25154D] text-slate-300 hover:text-amber-400 rounded-xl transition-colors border border-purple-500/30"
-                      title="ตั้งเตือนราคาลด"
+                      title={lang === 'en' ? 'Set Price Drop Alert' : 'ตั้งเตือนราคาลด'}
                     >
                       <Bell className="w-4 h-4" />
                     </button>
@@ -185,7 +187,7 @@ export default function DealsPage({ user }) {
                       rel="noreferrer"
                       className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.35)] text-xs font-bold rounded-xl flex items-center space-x-1 transition-all"
                     >
-                      <span>ซื้อทันที</span>
+                      <span>{lang === 'en' ? 'Buy Now' : 'ซื้อทันที'}</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>

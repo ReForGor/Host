@@ -64,7 +64,7 @@ const DEFAULT_PLATFORMS = [
 ]
 
 export default function PlatformsPage() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [platforms, setPlatforms] = useState([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -114,7 +114,10 @@ export default function PlatformsPage() {
       })
       setLastJob(res.data)
       await loadData()
-      alert(`ดึงข้อมูลเสร็จสิ้น! อัปเดตราคาแล้ว ${res.data.prices_updated || 0} รายการ แจ้งเตือน ${res.data.triggered_alerts || 0} ครั้ง`)
+      const msg = lang === 'en' 
+        ? `Sync complete! Updated ${res.data.prices_updated || 0} prices, triggered ${res.data.triggered_alerts || 0} alerts.`
+        : `ดึงข้อมูลเสร็จสิ้น! อัปเดตราคาแล้ว ${res.data.prices_updated || 0} รายการ แจ้งเตือน ${res.data.triggered_alerts || 0} ครั้ง`
+      alert(msg)
     } catch (e) {
       // optimistic fallback feedback
       const updated = Math.floor(Math.random() * 40) + 10
@@ -126,7 +129,11 @@ export default function PlatformsPage() {
         prices_updated: updated,
         triggered_alerts: alerts
       })
-      alert(`สั่งรันระบบดึงราคาสด${platformSlug ? ` (${platformSlug.toUpperCase()})` : 'ทุกร้านค้า'}เรียบร้อยแล้ว! อัปเดตราคาตลาดปัจจุบันสำเร็จ`)
+      const storeName = platformSlug ? ` (${platformSlug.toUpperCase()})` : (lang === 'en' ? ' for all stores' : 'ทุกร้านค้า')
+      const msg = lang === 'en'
+        ? `Live price sync triggered${storeName}! Market prices updated successfully.`
+        : `สั่งรันระบบดึงราคาสด${platformSlug ? ` (${platformSlug.toUpperCase()})` : 'ทุกร้านค้า'}เรียบร้อยแล้ว! อัปเดตราคาตลาดปัจจุบันสำเร็จ`
+      alert(msg)
     } finally {
       setSyncing(false)
     }
@@ -142,10 +149,12 @@ export default function PlatformsPage() {
             <span>REAL-TIME SCRAPER ARCHITECTURE</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black font-display text-white tracking-tight flex items-center">
-            <span>สถานะระบบดึงราคา & ร้านค้าไอที (Retailer Platforms)</span>
+            <span>{lang === 'en' ? 'Price Scraper Engine & Retailer Platforms' : 'สถานะระบบดึงราคา & ร้านค้าไอที (Retailer Platforms)'}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            ตรวจสอบความพร้อมของระบบเชื่อมต่อ และสั่งดึงข้อมูลราคาสดจาก 4 ร้านค้าฮาร์ดแวร์อันดับ 1 ของไทยแบบเรียลไทม์
+            {lang === 'en' 
+              ? "Monitor connection health and trigger real-time price synchronization from Thailand's top 4 IT hardware stores." 
+              : 'ตรวจสอบความพร้อมของระบบเชื่อมต่อ และสั่งดึงข้อมูลราคาสดจาก 4 ร้านค้าฮาร์ดแวร์อันดับ 1 ของไทยแบบเรียลไทม์'}
           </p>
         </div>
 
@@ -155,7 +164,7 @@ export default function PlatformsPage() {
           className="flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-[0_0_20px_rgba(139,92,246,0.35)] transition-all disabled:opacity-50 whitespace-nowrap self-start sm:self-auto"
         >
           <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-          <span>{syncing ? 'กำลังดึงราคาทุกร้าน...' : 'ดึงราคาสดทุกร้านเดี๋ยวนี้'}</span>
+          <span>{syncing ? (lang === 'en' ? 'Syncing all stores...' : 'กำลังดึงราคาทุกร้าน...') : (lang === 'en' ? 'Sync All Stores Now' : 'ดึงราคาสดทุกร้านเดี๋ยวนี้')}</span>
         </button>
       </div>
 
@@ -167,8 +176,8 @@ export default function PlatformsPage() {
               <Server className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 block font-medium">ร้านค้าที่เชื่อมต่อ</span>
-              <span className="text-lg sm:text-2xl font-black font-display text-white">4 ร้านหลัก</span>
+              <span className="text-[11px] text-slate-400 block font-medium">{lang === 'en' ? 'Connected Stores' : 'ร้านค้าที่เชื่อมต่อ'}</span>
+              <span className="text-lg sm:text-2xl font-black font-display text-white">{lang === 'en' ? '4 Major Stores' : '4 ร้านหลัก'}</span>
             </div>
           </div>
         </div>
@@ -179,7 +188,7 @@ export default function PlatformsPage() {
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 block font-medium">ความพร้อมระบบ</span>
+              <span className="text-[11px] text-slate-400 block font-medium">{lang === 'en' ? 'System Health' : 'ความพร้อมระบบ'}</span>
               <span className="text-lg sm:text-2xl font-black font-display text-emerald-400">100% ONLINE</span>
             </div>
           </div>
@@ -191,7 +200,7 @@ export default function PlatformsPage() {
               <Zap className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 block font-medium">ความเร็วเฉลี่ย</span>
+              <span className="text-[11px] text-slate-400 block font-medium">{lang === 'en' ? 'Avg Latency' : 'ความเร็วเฉลี่ย'}</span>
               <span className="text-lg sm:text-2xl font-black font-display text-cyan-400">~260 ms</span>
             </div>
           </div>
@@ -203,8 +212,8 @@ export default function PlatformsPage() {
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 block font-medium">รอบการตรวจสอบ</span>
-              <span className="text-lg sm:text-2xl font-black font-display text-white">ทุก 1 ชั่วโมง</span>
+              <span className="text-[11px] text-slate-400 block font-medium">{lang === 'en' ? 'Check Interval' : 'รอบการตรวจสอบ'}</span>
+              <span className="text-lg sm:text-2xl font-black font-display text-white">{lang === 'en' ? 'Every 1 Hour' : 'ทุก 1 ชั่วโมง'}</span>
             </div>
           </div>
         </div>
@@ -215,15 +224,15 @@ export default function PlatformsPage() {
         <div className="p-4 bg-[#120826]/90 border border-purple-500/30 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-xs shadow-[0_0_20px_rgba(139,92,246,0.15)]">
           <div className="flex items-center space-x-2.5">
             <Activity className="w-4 h-4 text-purple-400" />
-            <span className="text-slate-400">รอบการประมวลผลล่าสุด:</span>
+            <span className="text-slate-400">{lang === 'en' ? 'Last Processing Cycle:' : 'รอบการประมวลผลล่าสุด:'}</span>
             <span className="text-white font-semibold">
-              {lastJob.timestamp ? new Date(lastJob.timestamp).toLocaleString('th-TH') : 'เสร็จสมบูรณ์'}
+              {lastJob.timestamp ? new Date(lastJob.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'th-TH') : (lang === 'en' ? 'Completed' : 'เสร็จสมบูรณ์')}
             </span>
           </div>
           <div className="flex items-center space-x-6 text-slate-400">
-            <span>ตรวจค้นทั้งหมด: <strong className="text-white font-mono">{Number(lastJob.products_scraped || 35500).toLocaleString()}</strong> รายการ</span>
-            <span>อัปเดตราคาใหม่: <strong className="text-purple-300 font-mono font-bold">{lastJob.prices_updated || 0}</strong> จุด</span>
-            <span>แจ้งเตือนถึงเป้าหมาย: <strong className="text-amber-300 font-mono font-bold">{lastJob.triggered_alerts || 0}</strong> ครั้ง</span>
+            <span>{lang === 'en' ? 'Total Scanned: ' : 'ตรวจค้นทั้งหมด: '}<strong className="text-white font-mono">{Number(lastJob.products_scraped || 35500).toLocaleString()}</strong> {lang === 'en' ? 'items' : 'รายการ'}</span>
+            <span>{lang === 'en' ? 'Price Updates: ' : 'อัปเดตราคาใหม่: '}<strong className="text-purple-300 font-mono font-bold">{lastJob.prices_updated || 0}</strong> {lang === 'en' ? 'points' : 'จุด'}</span>
+            <span>{lang === 'en' ? 'Alerts Triggered: ' : 'แจ้งเตือนถึงเป้าหมาย: '}<strong className="text-amber-300 font-mono font-bold">{lastJob.triggered_alerts || 0}</strong> {lang === 'en' ? 'times' : 'ครั้ง'}</span>
             <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>{lastJob.status || 'SUCCESS'}</span>
@@ -274,21 +283,21 @@ export default function PlatformsPage() {
 
                 <div className="space-y-2.5 text-xs border-t border-purple-500/20 pt-3">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">สถาปัตยกรรม:</span>
+                    <span className="text-slate-400">{lang === 'en' ? 'Architecture:' : 'สถาปัตยกรรม:'}</span>
                     <span className="text-slate-200 font-mono text-[11px] truncate max-w-[150px]">{p.mode}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Response Latency:</span>
+                    <span className="text-slate-400">{lang === 'en' ? 'Response Latency:' : 'Response Latency:'}</span>
                     <span className="text-cyan-400 font-mono font-bold">{p.response_time_ms}ms</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">สินค้าในระบบ:</span>
-                    <span className="text-slate-200 font-mono">{Number(p.products_count || 8500).toLocaleString()} ชิ้น</span>
+                    <span className="text-slate-400">{lang === 'en' ? 'Catalog Items:' : 'สินค้าในระบบ:'}</span>
+                    <span className="text-slate-200 font-mono">{Number(p.products_count || 8500).toLocaleString()} {lang === 'en' ? 'items' : 'ชิ้น'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">ตรวจสอบล่าสุด:</span>
+                    <span className="text-slate-400">{lang === 'en' ? 'Last Checked:' : 'ตรวจสอบล่าสุด:'}</span>
                     <span className="text-slate-300">
-                      {p.last_scraped ? new Date(p.last_scraped).toLocaleTimeString('th-TH') : 'เพิ่งตรวจสอบ'}
+                      {p.last_scraped ? new Date(p.last_scraped).toLocaleTimeString(lang === 'en' ? 'en-US' : 'th-TH') : (lang === 'en' ? 'Just now' : 'เพิ่งตรวจสอบ')}
                     </span>
                   </div>
                 </div>
@@ -301,7 +310,7 @@ export default function PlatformsPage() {
                   className="w-full py-2 bg-[#1C0F3A] hover:bg-purple-600 hover:text-white text-slate-200 border border-purple-500/30 hover:border-purple-400 text-xs font-semibold rounded-xl transition-all flex items-center justify-center space-x-1 shadow-[0_0_10px_rgba(139,92,246,0.2)] disabled:opacity-50"
                 >
                   <Play className="w-3.5 h-3.5 mr-1" />
-                  <span>ดึงราคาเฉพาะร้านนี้</span>
+                  <span>{lang === 'en' ? 'Sync This Store' : 'ดึงราคาเฉพาะร้านนี้'}</span>
                 </button>
               </div>
             </div>
