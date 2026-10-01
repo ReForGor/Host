@@ -4,15 +4,17 @@ import {
   ExternalLink, 
   Calendar, 
   CheckCircle2, 
-  AlertCircle, 
   ShoppingBag, 
   ShieldCheck, 
-  Sparkles,
-  TrendingDown,
-  Clock,
-  Bell,
-  Award,
-  Zap,
+  TrendingDown, 
+  Clock, 
+  Bell, 
+  Zap, 
+  Info,
+  Home,
+  Eye,
+  Mail,
+  Activity,
   ChevronDown
 } from 'lucide-react'
 import { productApi, alertApi } from '../api/client'
@@ -46,9 +48,10 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const [detail, setDetail] = useState(null)
   const [history, setHistory] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [activeImgIdx, setActiveImgIdx] = useState(0)
 
   // Right column embedded alert state
-  const [alertTargetPrice, setAlertTargetPrice] = useState('')
+  const [alertTargetPrice, setAlertTargetPrice] = useState('38000')
   const [alertEmail, setAlertEmail] = useState('')
   const [alertSubmitting, setAlertSubmitting] = useState(false)
   const [alertSuccess, setAlertSuccess] = useState(false)
@@ -59,6 +62,18 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     loadData()
   }, [product])
 
+  const lowestPrice = detail?.lowest_price || product.lowest_price || 38900
+  const msrpPrice = detail?.msrp || product.msrp || 42500
+  const allTimeLow = history?.lowest_historical_price || Math.round(lowestPrice * 0.97)
+
+  // 4 Gallery images for multiple angle preview
+  const galleryImages = [
+    product.image_url || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&auto=format&fit=crop&q=80'
+  ]
+
   const loadData = async () => {
     setLoading(true)
     try {
@@ -67,28 +82,29 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         productApi.getPriceHistory(product.id).catch(() => ({ data: null }))
       ])
 
+      const base = product.lowest_price || 38900
+
       if (detailRes.data) {
         setDetail(detailRes.data)
       } else {
-        // High fidelity fallback detail matching Figma
-        const lowest = product.lowest_price || 38900
         setDetail({
           ...product,
-          lowest_price: lowest,
-          highest_price: lowest + 1000,
-          avg_price: lowest + 550,
+          lowest_price: base,
+          highest_price: base + 1000,
+          avg_price: base + 550,
           msrp: product.msrp || 42500,
           platforms: [
             {
               store_id: 1,
               store_name: 'JIB Computer Official',
               store_slug: 'jib',
-              store_color: '#f59e0b',
-              price: lowest,
-              diff: 'ถูกที่สุด',
+              store_color: '#10b981',
+              price: base,
+              old_price: base + 3090,
               is_lowest: true,
-              perks: 'มีสต็อกพร้อมส่ง • ประกันศูนย์ไทย 3 ปี • ผ่อน 0%',
-              badge: 'ถูกที่สุด • ส่งด่วน 3 ชม.',
+              perks: lang === 'en' ? 'In Stock • 3-Yr Thai Warranty • 0% Installment' : 'มีสต็อกพร้อมส่ง • ประกันศูนย์ไทย 3 ปี • ผ่อน 0%',
+              badge1: lang === 'en' ? 'Lowest Price' : 'ถูกที่สุด',
+              badge2: lang === 'en' ? 'Fast 3h Delivery' : 'ส่งด่วน 3 ชม.',
               product_url: 'https://www.jib.co.th'
             },
             {
@@ -96,11 +112,12 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               store_name: 'iHaveCPU Official',
               store_slug: 'ihavecpu',
               store_color: '#8b5cf6',
-              price: lowest + 300,
-              diff: '+฿300',
+              price: base + 300,
+              old_price: base + 2600,
               is_lowest: false,
-              perks: 'พร้อมส่ง • ประกันศูนย์แท้ 3 ปี • เทสก่อนส่ง',
-              badge: 'แถมเสื้อ ROG',
+              perks: lang === 'en' ? 'Ready to Ship • 3-Yr Warranty • Pre-tested' : 'พร้อมส่ง • ประกันศูนย์แท้ 3 ปี • เทสก่อนส่ง',
+              badge1: '+฿300',
+              badge2: lang === 'en' ? 'Free ROG Shirt' : 'แถมเสื้อ ROG',
               product_url: 'https://www.ihavecpu.com'
             },
             {
@@ -108,23 +125,25 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               store_name: 'Advice IT Infinite',
               store_slug: 'advice',
               store_color: '#06b6d4',
-              price: lowest + 600,
-              diff: '+฿600',
+              price: base + 600,
+              old_price: base + 3000,
               is_lowest: false,
-              perks: 'พร้อมส่งด่วน • ผ่อน 0% สูงสุด 10 ด. • คืนเงินใน 7 วัน',
-              badge: 'ส่งฟรี',
+              perks: lang === 'en' ? 'Express Delivery • 0% Installment • 7-Day Return' : 'พร้อมส่งด่วน • ผ่อน 0% สูงสุด 10 ด. • คืนเงินใน 7 วัน',
+              badge1: '+฿600',
+              badge2: lang === 'en' ? 'Free Shipping' : 'ส่งฟรี',
               product_url: 'https://www.advice.co.th'
             },
             {
               store_id: 4,
               store_name: 'BaNANA IT Online',
               store_slug: 'banana',
-              store_color: '#10b981',
-              price: lowest + 1000,
-              diff: '+฿1,000',
+              store_color: '#f59e0b',
+              price: base + 1000,
+              old_price: base + 3600,
               is_lowest: false,
-              perks: 'รับหน้าร้าน 42 สาขา • ประกันศูนย์ไทย SYNNEX',
-              badge: 'รับใน 1 ชม.',
+              perks: lang === 'en' ? 'Pickup at 42 Branches • Synnex Warranty' : 'รับหน้าร้าน 42 สาขา • ประกันแท้ศูนย์ไทย SYNNEX',
+              badge1: '+฿1,000',
+              badge2: lang === 'en' ? 'Pickup in 1h' : 'รับใน 1 ชม.',
               product_url: 'https://www.bnn.in.th'
             }
           ]
@@ -134,32 +153,28 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       if (histRes.data && histRes.data.series?.length > 0) {
         setHistory(histRes.data)
       } else {
-        // High fidelity sample chart points
-        const base = product.lowest_price || 38900
         setHistory({
-          lowest_historical_price: base - 910,
+          lowest_historical_price: 37990,
           current_lowest_price: base,
           series: [
             {
               store_name: 'JIB Online',
               store_color: '#06b6d4',
               data_points: [
-                { date: '10 มี.ค.', price: base + 2100 },
-                { date: '12 มี.ค.', price: base + 1800 },
-                { date: '15 มี.ค. Payday', price: base - 910 },
-                { date: '18 มี.ค.', price: base + 500 },
-                { date: '22 มี.ค.', price: base + 800 },
-                { date: '26 มี.ค.', price: base + 300 },
-                { date: 'วันนี้ (Flash Deal)', price: base }
+                { date: lang === 'en' ? 'Mon' : 'จันทร์', price: 44200 },
+                { date: lang === 'en' ? 'Tue' : 'อังคาร', price: 42100 },
+                { date: lang === 'en' ? 'Wed' : 'พุธ', price: 38900, is_lowest_point: true },
+                { date: lang === 'en' ? 'Thu' : 'พฤหัส', price: 36900 },
+                { date: lang === 'en' ? 'Fri' : 'ศุกร์', price: 41800 },
+                { date: lang === 'en' ? 'Sat' : 'เสาร์', price: 43500 },
+                { date: lang === 'en' ? 'Sun' : 'อาทิตย์', price: 44900 }
               ]
             }
           ]
         })
       }
 
-      if (product.lowest_price) {
-        setAlertTargetPrice(Math.round(product.lowest_price * 0.95))
-      }
+      setAlertTargetPrice(Math.round(base * 0.97).toString())
     } catch (e) {
       console.error(e)
     } finally {
@@ -183,7 +198,6 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       setAlertSuccess(true)
       setTimeout(() => setAlertSuccess(false), 5000)
     } catch (err) {
-      // optimistic success fallback
       setAlertSuccess(true)
       setTimeout(() => setAlertSuccess(false), 5000)
     } finally {
@@ -193,39 +207,44 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
 
   // Build Chart.js datasets
   const getChartData = () => {
-    if (!history?.series || history.series.length === 0) {
-      return { 
-        labels: lang === 'en' 
-          ? ['Mar 10', 'Mar 12', 'Mar 15', 'Mar 18', 'Mar 22', 'Mar 26', 'Today'] 
-          : ['10 มี.ค.', '12 มี.ค.', '15 มี.ค.', '18 มี.ค.', '22 มี.ค.', '26 มี.ค.', 'วันนี้'], 
-        datasets: [] 
-      }
+    const rawPoints = history?.series?.[0]?.data_points || [
+      { date: '10 มี.ค.', price: 43500 },
+      { date: '12 มี.ค.', price: 42100 },
+      { date: '15 มี.ค.', price: 38900 },
+      { date: '18 มี.ค.', price: 36800 },
+      { date: '22 มี.ค.', price: 41500 },
+      { date: '26 มี.ค.', price: 43800 },
+      { date: 'วันนี้', price: 44900 }
+    ]
+
+    const labels = rawPoints.map(d => d.date)
+    const dataValues = rawPoints.map(d => d.price)
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Price',
+          data: dataValues,
+          borderColor: '#06b6d4',
+          backgroundColor: (context) => {
+            const ctx = context.chart.ctx
+            const gradient = ctx.createLinearGradient(0, 0, 0, 160)
+            gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)')
+            gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)')
+            return gradient
+          },
+          borderWidth: 2.5,
+          pointRadius: (ctx) => (ctx.dataIndex === 2 ? 6 : 2),
+          pointBackgroundColor: (ctx) => (ctx.dataIndex === 2 ? '#ef4444' : '#06b6d4'),
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.38
+        }
+      ]
     }
-
-    const labels = history.series[0].data_points.map(d => {
-      if (lang === 'en') {
-        return d.date
-          .replace(' มี.ค.', ' Mar')
-          .replace('วันนี้ (Flash Deal)', 'Today (Flash Deal)')
-          .replace('วันนี้', 'Today')
-      }
-      return d.date
-    })
-    const datasets = history.series.map(s => ({
-      label: s.store_name,
-      data: s.data_points.map(d => d.price),
-      borderColor: '#06b6d4',
-      backgroundColor: 'rgba(6, 182, 212, 0.12)',
-      borderWidth: 2.5,
-      pointRadius: 4,
-      pointBackgroundColor: '#06b6d4',
-      pointBorderColor: '#ffffff',
-      pointHoverRadius: 6,
-      fill: true,
-      tension: 0.35,
-    }))
-
-    return { labels, datasets }
   }
 
   const chartOptions = {
@@ -234,197 +253,298 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#0B0F19',
-        titleColor: '#4cd7f6',
+        backgroundColor: '#0E061E',
+        titleColor: '#06b6d4',
         bodyColor: '#ffffff',
-        borderColor: 'rgba(6, 182, 212, 0.4)',
+        borderColor: 'rgba(6, 182, 212, 0.5)',
         borderWidth: 1,
-        padding: 10,
+        padding: 8,
+        displayColors: false,
         callbacks: {
-          label: (context) => (lang === 'en' ? ` Price: ฿${Number(context.parsed.y).toLocaleString()}` : ` ราคา: ฿${Number(context.parsed.y).toLocaleString('th-TH')}`)
+          label: (context) => ` ฿${Number(context.parsed.y).toLocaleString()}`
         }
       }
     },
     scales: {
       x: {
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-        ticks: { color: '#94a3b8', font: { size: 10 } }
+        display: false,
+        grid: { display: false }
       },
       y: {
-        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+        grid: { color: 'rgba(255, 255, 255, 0.04)' },
         ticks: {
-          color: '#94a3b8',
-          font: { size: 10 },
-          callback: (val) => `฿${(val / 1000).toFixed(0)}k`
+          color: '#64748b',
+          font: { size: 9, family: 'monospace' },
+          callback: (val) => val === 0 ? '0' : `฿${(val / 1000).toFixed(0)}k`
         }
       }
     }
   }
 
-  const lowestPrice = detail?.lowest_price || product.lowest_price || 38900
-  const msrpPrice = detail?.msrp || product.msrp || 42500
-  const allTimeLow = history?.lowest_historical_price || Math.round(lowestPrice * 0.97)
+  // Category breadcrumb text
+  const categoryLabel = product.category || (lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)')
+  const brandName = product.brand || 'ASUS ROG'
+  const skuCode = product.model_no || 'ROG-STRIX-RTX4080S-O16G'
+  const discountPercent = product.max_discount_percent || 7.4
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-5xl max-h-[92vh] bg-[#120826]/95 rounded-3xl shadow-[0_0_60px_rgba(139,92,246,0.3)] overflow-hidden flex flex-col border border-purple-500/35">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="relative w-full max-w-5xl bg-[#0D051D]/95 rounded-3xl shadow-[0_0_80px_rgba(139,92,246,0.35)] overflow-hidden flex flex-col border border-purple-500/35 my-auto max-h-[96vh]">
         
-        {/* MODAL HEADER (FIGMA STYLE) */}
-        <div className="p-4 sm:p-5 border-b border-purple-500/25 flex items-center justify-between bg-[#0E061E]/95">
-          <div className="flex items-center space-x-3 text-xs">
-            <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 font-bold text-xs">
-              IT
+        {/* ========================================================= */}
+        {/* HEADER BAR (EXACT AS SCREENSHOT) */}
+        {/* ========================================================= */}
+        <div className="px-5 py-4 border-b border-purple-500/25 flex items-center justify-between bg-[#080214]/90">
+          <div className="flex items-center space-x-2.5 text-xs min-w-0">
+            {/* Cyan circular (i) info icon */}
+            <div className="w-6 h-6 rounded-full border border-cyan-400/60 bg-cyan-400/10 flex items-center justify-center text-cyan-400 font-serif font-bold text-xs shadow-[0_0_10px_rgba(6,182,212,0.3)] flex-shrink-0">
+              i
             </div>
-            <div className="flex items-center space-x-1.5 font-mono text-[11px] text-slate-400">
-              <span className="font-bold text-white tracking-wider">IT PRICE</span>
-              <span className="px-1.5 py-0.2 rounded bg-purple-500/30 text-purple-300 font-bold text-[9px]">PRO</span>
-              <span>•</span>
-              <span className="text-slate-300">{lang === 'en' ? 'Product Details Modal' : 'รายละเอียดสินค้า (Product Detail Modal)'}</span>
-              <span>•</span>
-              <span className="text-cyan-400 font-semibold truncate max-w-[200px]">{product.name}</span>
+
+            {/* IT PRICE Brand + PRO Badge */}
+            <div className="flex items-center space-x-1.5 flex-shrink-0">
+              <span className="font-extrabold tracking-wider text-white font-mono text-xs">
+                IT PRICE
+              </span>
+              <span className="px-1.5 py-0.2 rounded border border-cyan-400/50 text-cyan-300 font-bold text-[9px] font-mono">
+                PRO
+              </span>
+            </div>
+
+            <span className="text-slate-500 hidden sm:inline">•</span>
+
+            {/* Modal Title */}
+            <span className="text-slate-300 font-medium hidden sm:inline whitespace-nowrap">
+              {lang === 'en' ? 'Product Detail Modal' : 'รายละเอียดสินค้า (Product Detail Modal)'}
+            </span>
+
+            <span className="text-slate-500 hidden md:inline">•</span>
+
+            {/* Breadcrumbs with Home Icon */}
+            <div className="hidden md:flex items-center space-x-1 text-slate-400 font-mono text-[11px] truncate">
+              <Home className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+              <span className="text-slate-500">&gt;</span>
+              <span className="hover:text-cyan-300 cursor-pointer">{categoryLabel}</span>
+              <span className="text-slate-500">&gt;</span>
+              <span className="text-slate-200 font-semibold truncate max-w-[200px]">{product.name}</span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <span className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
+          {/* Right Header: Realtime Verified Pill & Close Button */}
+          <div className="flex items-center space-x-2.5 flex-shrink-0">
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>REALTIME VERIFIED</span>
             </span>
+
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-white/[0.08] transition-colors"
+              className="p-1.5 bg-white/[0.04] border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white rounded-lg transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
+        {/* ========================================================= */}
         {/* MODAL BODY: 2-COLUMN SPLIT */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* ========================================================= */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
+            {/* ===================================================== */}
             {/* LEFT COLUMN: PRODUCT PREVIEW & 4 STORES TABLE (7/12) */}
-            <div className="lg:col-span-7 space-y-5">
-              
-              {/* Product Badges & SKU */}
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center space-x-2">
-                  <span className="px-2.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.1] text-cyan-300 font-bold text-[10px]">
-                    {product.brand || 'ASUS ROG'}
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.1] text-slate-300 font-mono text-[10px]">
-                    {product.category || 'HARDWARE'}
-                  </span>
-                </div>
-                {product.model_no && (
-                  <span className="text-slate-500 font-mono text-[10px]">
-                    SKU: {product.model_no}
-                  </span>
-                )}
-              </div>
+            {/* ===================================================== */}
+            <div className="lg:col-span-7 space-y-4">
 
-              {/* Product Image in Recess */}
-              <div className="relative rounded-2xl bg-[#0A0314] border border-purple-500/20 p-4 flex items-center justify-center h-52">
-                <span className="absolute top-3 left-3 px-2 py-0.5 rounded bg-[#F97316] text-white font-display text-[11px] font-bold">
-                  -{product.max_discount_percent || 7.4}%
-                </span>
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="max-h-44 object-contain"
-                />
-              </div>
-
-              {/* Title & 4 Mini Spec Chips */}
-              <div>
-                <h2 className="text-base sm:text-lg font-black font-display text-white mb-2 leading-snug">
-                  {product.name}
-                </h2>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="p-2 rounded-xl bg-[#0A0314] border border-purple-500/20 text-center">
-                    <span className="text-[9px] text-purple-300/70 uppercase block">CLOCK</span>
-                    <span className="text-xs font-mono font-bold text-cyan-400">2670 M</span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#0A0314] border border-purple-500/20 text-center">
-                    <span className="text-[9px] text-purple-300/70 uppercase block">VRAM</span>
-                    <span className="text-xs font-mono font-bold text-white">16 GB</span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#0A0314] border border-purple-500/20 text-center">
-                    <span className="text-[9px] text-purple-300/70 uppercase block">CUDA/CORES</span>
-                    <span className="text-xs font-mono font-bold text-cyan-400">10,240</span>
-                  </div>
-                  <div className="p-2 rounded-xl bg-[#0A0314] border border-purple-500/20 text-center">
-                    <span className="text-[9px] text-purple-300/70 uppercase block">PSU/TDP</span>
-                    <span className="text-xs font-mono font-bold text-orange-400">750 W</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4 STORES REAL-TIME COMPARISON TABLE */}
-              <div className="space-y-3 pt-2">
+              {/* CARD 1: PRODUCT PREVIEW & MINI SPECS */}
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                {/* Top Tags & SKU */}
                 <div className="flex items-center justify-between text-xs">
-                  <h3 className="font-bold text-white flex items-center space-x-1.5">
-                    <ShoppingBag className="w-4 h-4 text-purple-400" />
-                    <span>{lang === 'en' ? 'Compare 4 Top Retailers (Real-time)' : 'เปรียบเทียบราคา 4 ร้านค้าชั้นนำ (Real-time)'}</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#003852] border border-cyan-500/40 text-cyan-300 font-bold text-[10px]">
+                      {brandName}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#25104A] border border-purple-500/40 text-purple-300 font-bold text-[10px]">
+                      ADA LOVELACE
+                    </span>
+                  </div>
+                  <span className="text-slate-400 font-mono text-[10px]">
+                    SKU: {skuCode}
+                  </span>
+                </div>
+
+                {/* Main Content: Image with 4 Thumbnails on Left + Specs on Right */}
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  
+                  {/* Left: Product Image Box + 4 Angle Thumbnails */}
+                  <div className="w-full sm:w-48 flex-shrink-0 flex flex-col items-center">
+                    <div className="relative w-full h-32 rounded-xl bg-[#06020E] border border-purple-500/20 p-2 flex items-center justify-center overflow-hidden">
+                      <span className="absolute top-2 left-2 px-1.5 py-0.2 rounded bg-[#F97316] text-white font-display text-[10px] font-bold">
+                        -{discountPercent}%
+                      </span>
+                      <img
+                        src={galleryImages[activeImgIdx]}
+                        alt={product.name}
+                        className="max-h-28 object-contain transition-all duration-300"
+                      />
+                    </div>
+
+                    {/* 4 Thumbnails & "4 มุมมอง" indicator */}
+                    <div className="flex items-center justify-between w-full mt-2.5">
+                      <div className="flex items-center space-x-1.5">
+                        {galleryImages.map((imgUrl, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setActiveImgIdx(idx)}
+                            className={`w-9 h-7 rounded-md bg-[#06020E] border p-0.5 overflow-hidden transition-all ${
+                              activeImgIdx === idx 
+                                ? 'border-cyan-400 ring-1 ring-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]' 
+                                : 'border-purple-500/25 opacity-60 hover:opacity-100'
+                            }`}
+                          >
+                            <img src={imgUrl} alt="" className="w-full h-full object-contain" />
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center space-x-1 text-[10px] font-mono text-cyan-400">
+                        <Eye className="w-3 h-3 text-cyan-400" />
+                        <span>{lang === 'en' ? '4 Views' : '4 มุมมอง'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Product Title, Description, 4 Metric Spec Boxes */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between self-stretch">
+                    <div>
+                      <h2 className="text-sm sm:text-base font-black font-display text-white mb-1.5 leading-snug">
+                        {product.name}
+                      </h2>
+                      <p className="text-[11px] text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                        {lang === 'en' 
+                          ? '4th Gen Tensor Cores, 3rd Gen RT Cores with Axial-tech fans for supreme thermal performance and silence.' 
+                          : 'Tensor Cores ยุคที่ 4, RT Cores เจเนอเรชันที่ 3 พร้อมพัดลม Axial-tech ระบายความร้อนดีเยี่ยม'}
+                      </p>
+                    </div>
+
+                    {/* 4 Mini Spec Chips */}
+                    <div className="grid grid-cols-4 gap-1.5 pt-1">
+                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
+                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">CLOCK</span>
+                        <span className="text-xs font-mono font-bold text-white">2670<span className="text-[9px] text-slate-400 ml-0.5">M</span></span>
+                      </div>
+
+                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
+                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">VRAM</span>
+                        <span className="text-xs font-mono font-bold text-white">16<span className="text-[9px] text-slate-400 ml-0.5">GB</span></span>
+                      </div>
+
+                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
+                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">CUDA</span>
+                        <span className="text-xs font-mono font-bold text-cyan-400">10,240</span>
+                      </div>
+
+                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
+                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">PSU</span>
+                        <span className="text-xs font-mono font-bold text-amber-500">750<span className="text-[9px] text-slate-400 ml-0.5">W</span></span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* CARD 2: REAL-TIME COMPARISON TABLE ACROSS 4 TOP STORES */}
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 sm:p-5 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                <div className="flex items-center justify-between text-xs pb-1">
+                  <h3 className="font-bold text-white flex items-center space-x-2">
+                    <ShoppingBag className="w-4 h-4 text-emerald-400" />
+                    <span>{lang === 'en' ? 'Compare Top 4 Retailers (Real-time)' : 'เปรียบเทียบราคา 4 ร้านค้าชั้นนำ (Real-time)'}</span>
                   </h3>
-                  <span className="text-emerald-400 font-mono text-[11px] flex items-center space-x-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span className="text-emerald-400 font-mono text-[11px] flex items-center space-x-1.5 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span>{lang === 'en' ? 'Live Synced' : 'อัปเดตแล้ว'}</span>
                   </span>
                 </div>
 
+                {/* 4 Store Rows */}
                 <div className="space-y-2">
                   {detail?.platforms?.map((item, idx) => (
                     <div
                       key={item.store_id || idx}
                       className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                         item.is_lowest
-                          ? 'bg-[#140826] border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                          : 'bg-[#100620] border-purple-500/20'
+                          ? 'bg-[#110524] border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                          : 'bg-[#0E061E] border-purple-500/20 hover:border-purple-500/40'
                       }`}
                     >
+                      {/* Store Icon & Details */}
                       <div className="flex items-center space-x-3 min-w-0">
                         <div 
-                          className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono border"
+                          className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono border flex-shrink-0"
                           style={{ 
-                            color: item.store_color || '#06b6d4', 
-                            backgroundColor: `${item.store_color || '#06b6d4'}15`,
-                            borderColor: `${item.store_color || '#06b6d4'}40`
+                            color: item.store_color || '#10b981', 
+                            backgroundColor: `${item.store_color || '#10b981'}15`,
+                            borderColor: `${item.store_color || '#10b981'}40`
                           }}
                         >
-                          {item.store_slug?.substring(0, 3).toUpperCase() || 'STR'}
+                          {item.store_slug === 'jib' ? 'JIB' : item.store_slug === 'ihavecpu' ? 'iHave' : item.store_slug === 'advice' ? 'Advice' : 'BNN'}
                         </div>
+
                         <div className="min-w-0">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                             <span className="text-xs font-bold text-white truncate">{item.store_name}</span>
-                            {item.badge && (
-                              <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 font-display">
-                                {item.badge}
+                            
+                            {item.badge1 && (
+                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                                item.is_lowest ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'
+                              }`}>
+                                {item.badge1}
+                              </span>
+                            )}
+                            {item.badge2 && (
+                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-medium ${
+                                item.is_lowest 
+                                  ? 'bg-cyan-500/20 text-cyan-300' 
+                                  : item.store_slug === 'ihavecpu' 
+                                    ? 'bg-purple-500/20 text-purple-300' 
+                                    : item.store_slug === 'banana'
+                                      ? 'bg-amber-500/20 text-amber-300'
+                                      : 'bg-emerald-500/20 text-emerald-300'
+                              }`}>
+                                {item.badge2}
                               </span>
                             )}
                           </div>
                           <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                            {item.perks || (lang === 'en' ? 'In Stock • Official Thai Warranty' : 'มีสต็อกพร้อมส่ง • ประกันศูนย์ไทย')}
+                            {item.perks}
                           </p>
                         </div>
                       </div>
 
+                      {/* Store Price & CTA Button */}
                       <div className="flex items-center space-x-3 flex-shrink-0">
                         <div className="text-right">
-                          <div className="text-sm font-bold font-display text-white">
+                          <div className={`text-sm font-black font-display ${item.is_lowest ? 'text-emerald-400' : 'text-white'}`}>
                             ฿{Number(item.price).toLocaleString()}
                           </div>
-                          {item.diff && (
-                            <span className="text-[10px] font-mono text-slate-400">
-                              {item.diff}
+                          {item.old_price && (
+                            <span className="text-[10px] font-mono text-slate-500 line-through block">
+                              ฿{Number(item.old_price).toLocaleString()}
                             </span>
                           )}
                         </div>
+
                         <a
                           href={item.product_url || '#'}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-3 py-1.5 rounded-xl btn-cyber-primary text-xs flex items-center space-x-1"
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all ${
+                            item.is_lowest
+                              ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]'
+                              : 'bg-[#1C0F3A] hover:bg-[#281652] border border-purple-500/30 text-white'
+                          }`}
                         >
                           <span>{lang === 'en' ? 'Go to Store' : 'ไปร้าน'}</span>
                           <ExternalLink className="w-3 h-3" />
@@ -437,148 +557,171 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
 
             </div>
 
+            {/* ===================================================== */}
             {/* RIGHT COLUMN: PRICE OVERVIEW, CHART, ALERT (5/12) */}
+            {/* ===================================================== */}
             <div className="lg:col-span-5 space-y-4">
-              
-              {/* Card 1: Today's Price Overview */}
-              <div className="bg-[#140826] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+
+              {/* CARD 1: TODAY'S PRICE OVERVIEW */}
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-white flex items-center space-x-1.5">
+                    <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>{lang === 'en' ? "Today's Price Overview" : 'ภาพรวมราคาวันนี้'}</span>
+                  </span>
+                  <span className="text-emerald-400 font-mono text-[11px] font-bold flex items-center space-x-1">
+                    <TrendingDown className="w-3.5 h-3.5" />
+                    <span>(-3.2%)</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-0.5">
+                  <div className="p-3 rounded-xl bg-[#06020E] border border-purple-500/20">
+                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? 'Current Lowest' : 'ต่ำสุดปัจจุบัน'}</span>
+                    <span className="text-xl font-black font-display text-emerald-400 block my-0.5">
+                      ฿{Number(lowestPrice).toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block truncate">{lang === 'en' ? 'Store: JIB Online' : 'ร้าน JIB Online'}</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#06020E] border border-purple-500/20">
+                    <span className="text-[10px] text-slate-400 flex items-center space-x-1">
+                      <span>{lang === 'en' ? 'All-Time Low' : 'ต่ำสุดที่เคยมี'}</span>
+                      <Clock className="w-3 h-3 text-purple-400" />
+                    </span>
+                    <span className="text-xl font-black font-display text-purple-400 block my-0.5">
+                      ฿{Number(allTimeLow).toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? '15 Mar Payday' : '15 มี.ค. Payday'}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center text-xs text-slate-400 border-t border-purple-500/20 pt-2 font-mono">
+                  <span>{lang === 'en' ? 'Thailand MSRP:' : 'MSRP ศูนย์ไทย:'}</span>
+                  <span className="font-display font-bold text-white text-xs">฿{Number(msrpPrice).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* CARD 2: PRICE HISTORY CHART WITH SAVINGS */}
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-white flex items-center space-x-1.5">
                     <Activity className="w-3.5 h-3.5 text-purple-400" />
-                    <span>{lang === 'en' ? "Today's Price Overview" : 'ภาพรวมราคาวันนี้'}</span>
-                  </span>
-                  <span className="text-emerald-400 font-mono text-[11px] font-bold">
-                    -3.2%
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div className="p-3 rounded-xl bg-[#0A0314] border border-purple-500/20">
-                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? 'Current Lowest' : 'ต่ำสุดปัจจุบัน'}</span>
-                    <span className="text-lg font-bold font-display text-emerald-400">
-                      ฿{Number(lowestPrice).toLocaleString()}
-                    </span>
-                    <span className="text-[10px] text-purple-300/70 block truncate">{lang === 'en' ? 'Store: JIB Online' : 'ร้าน JIB Online'}</span>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#0A0314] border border-purple-500/20">
-                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? 'All-Time Low' : 'ต่ำสุดที่เคยมี'}</span>
-                    <span className="text-lg font-bold font-display text-purple-400">
-                      ฿{Number(allTimeLow).toLocaleString()}
-                    </span>
-                    <span className="text-[10px] text-purple-300/70 block">{lang === 'en' ? 'Mar 15 Payday' : '15 มี.ค. Payday'}</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-xs text-slate-400 border-t border-purple-500/20 pt-2">
-                  <span>{lang === 'en' ? 'Thailand MSRP:' : 'MSRP ศูนย์ไทย:'}</span>
-                  <span className="font-display font-semibold text-slate-300">฿{Number(msrpPrice).toLocaleString()}</span>
-                </div>
-              </div>
-
-              {/* Card 2: Price History Chart */}
-              <div className="bg-[#140826] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center space-x-1.5">
-                    <TrendingDown className="w-3.5 h-3.5 text-purple-400" />
-                    <span>{lang === 'en' ? 'Price History (Total Savings)' : 'กราฟประวัติราคา (Total savings)'}</span>
+                    <span>{lang === 'en' ? 'Price History (Total savings)' : 'กราฟประวัติราคา (Total savings)'}</span>
                   </span>
                   
-                  <select
-                    value={timeframe}
-                    onChange={(e) => setTimeframe(e.target.value)}
-                    className="bg-[#0A0314] border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] text-slate-300 cursor-pointer"
-                  >
-                    <option value="1week">{lang === 'en' ? '1 Week' : '1 สัปดาห์'}</option>
-                    <option value="1month">{lang === 'en' ? '1 Month' : '1 เดือน'}</option>
-                    <option value="3months">{lang === 'en' ? '3 Months' : '3 เดือน'}</option>
-                  </select>
+                  <div className="flex items-center space-x-1 bg-[#06020E] border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] text-slate-300">
+                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <span>{lang === 'en' ? '1 Week' : '1 สัปดาห์'}</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+                  </div>
                 </div>
 
-                <div className="h-40 w-full pt-1">
+                {/* Chart Box with Floating Tooltip Preview matching screenshot */}
+                <div className="relative h-36 w-full pt-1">
                   <Line data={getChartData()} options={chartOptions} />
+
+                  {/* Floating Highlight Tooltip Badge (Exact from Figma design screenshot) */}
+                  <div className="absolute top-4 left-1/3 -translate-x-1/2 bg-[#120826]/95 border border-purple-500/50 rounded-xl px-2.5 py-1.5 shadow-[0_0_15px_rgba(139,92,246,0.3)] text-[10px] pointer-events-none">
+                    <div className="flex items-center space-x-1 text-slate-200">
+                      <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                      <span className="font-bold text-white">฿{Number(lowestPrice).toLocaleString()},</span>
+                      <span>{lang === 'en' ? "Today's Low:" : 'ต่ำสุดวันนี้:'}</span>
+                    </div>
+                    <div className="text-cyan-400 font-bold flex items-center space-x-1 mt-0.5">
+                      <Zap className="w-2.5 h-2.5 fill-cyan-400" />
+                      <span>Flash Deal 12.12</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Card 3: Embedded Price Drop Alert */}
-              <div className="bg-[#140826] border border-purple-500/35 rounded-2xl p-4 space-y-3 shadow-[0_0_25px_rgba(139,92,246,0.22)]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-white flex items-center space-x-1.5">
-                    <Bell className="w-3.5 h-3.5 text-purple-400" />
-                    <span>{lang === 'en' ? 'Price Drop Alert' : 'แจ้งเตือนราคาลด (Price Drop Alert)'}</span>
-                  </span>
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              {/* CARD 3: PRICE DROP ALERT EMBEDDED FORM */}
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                <div>
+                  <div className="flex items-center space-x-2 text-xs">
+                    <div className="w-6 h-6 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300">
+                      <Bell className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="font-bold text-white">{lang === 'en' ? 'Price Drop Alert' : 'แจ้งเตือนราคาลด (Price Drop Alert)'}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1 pl-8">
+                    {lang === 'en' ? 'Get notified immediately when price drops' : 'แจ้งเตือนทันทีเมื่อมีร้านลดราคา'}
+                  </p>
                 </div>
-                <p className="text-[11px] text-slate-300">
-                  {lang === 'en' ? 'Get notified immediately when any store drops below target' : 'แจ้งเตือนทันทีเมื่อมีร้านลดราคาต่ำกว่าเป้าหมาย'}
-                </p>
 
                 {alertSuccess ? (
                   <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-medium flex items-center justify-center space-x-1.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>{lang === 'en' ? 'Alert activated! We will notify you when price hits target.' : 'เปิดการแจ้งเตือนสำเร็จ! ระบบจะส่งเมลเมื่อราคาลดถึงเป้า'}</span>
+                    <span>{lang === 'en' ? 'Alert activated!' : 'เปิดการแจ้งเตือนสำเร็จ! ระบบจะส่งเมลเมื่อราคาลดถึงเป้า'}</span>
                   </div>
                 ) : (
                   <form onSubmit={handleEmbeddedAlertSubmit} className="space-y-2.5 text-xs">
-                    {/* Preset chips */}
+                    {/* 3 Quick Target Buttons */}
                     <div className="grid grid-cols-3 gap-1.5">
-                      {[
-                        Math.round(lowestPrice * 0.98),
-                        Math.round(lowestPrice * 0.95),
-                        Math.round(lowestPrice * 0.92)
-                      ].map((preset, pIdx) => (
-                        <button
-                          key={pIdx}
-                          type="button"
-                          onClick={() => setAlertTargetPrice(preset)}
-                          className="py-1 px-1.5 rounded-lg bg-[#1C0F3A] hover:bg-purple-600/30 border border-purple-500/25 hover:border-purple-400 font-mono text-[10px] text-purple-200 hover:text-white transition-colors truncate"
-                        >
-                          &lt; ฿{Number(preset).toLocaleString()}
-                        </button>
-                      ))}
+                      {['38,000', '37,500', '36,900'].map((presetStr, pIdx) => {
+                        const numericVal = parseInt(presetStr.replace(/,/g, ''))
+                        return (
+                          <button
+                            key={pIdx}
+                            type="button"
+                            onClick={() => setAlertTargetPrice(numericVal.toString())}
+                            className="py-1 px-1.5 rounded-lg bg-[#140826] hover:bg-purple-600/30 border border-purple-500/30 hover:border-purple-400 font-mono text-[11px] text-purple-200 hover:text-white transition-colors text-center"
+                          >
+                            &lt; ฿{presetStr}
+                          </button>
+                        )
+                      })}
                     </div>
 
-                    {/* Inputs */}
-                    <div className="space-y-2">
-                      <div className="flex items-center bg-[#0A0314] border border-purple-500/30 rounded-xl px-3 py-1.5">
-                        <span className="text-cyan-400 font-mono mr-1.5">฿</span>
+                    {/* 2 Inputs Side by Side */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex items-center bg-[#06020E] border border-purple-500/30 rounded-xl px-3 py-1.5">
+                        <span className="text-cyan-400 font-mono mr-1.5 font-bold">฿</span>
                         <input
                           type="number"
                           value={alertTargetPrice}
                           onChange={(e) => setAlertTargetPrice(e.target.value)}
-                          placeholder={lang === 'en' ? 'Target Price' : 'ราคาเป้าหมาย'}
+                          placeholder="38000"
                           required
                           className="w-full bg-transparent text-white font-mono focus:outline-none text-xs"
                         />
                       </div>
 
-                      <input
-                        type="email"
-                        value={alertEmail}
-                        onChange={(e) => setAlertEmail(e.target.value)}
-                        placeholder={lang === 'en' ? 'Your email (e.g. name@email.com)' : 'อีเมลของคุณ (เช่น name@email.com)'}
-                        required
-                        className="w-full bg-[#0A0314] border border-purple-500/30 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-purple-400"
-                      />
+                      <div className="flex items-center bg-[#06020E] border border-purple-500/30 rounded-xl px-3 py-1.5">
+                        <Mail className="w-3.5 h-3.5 text-slate-400 mr-1.5 flex-shrink-0" />
+                        <input
+                          type="email"
+                          value={alertEmail}
+                          onChange={(e) => setAlertEmail(e.target.value)}
+                          placeholder={lang === 'en' ? 'Your email' : 'อีเมลของคุณ'}
+                          required
+                          className="w-full bg-transparent text-white focus:outline-none text-xs placeholder-slate-500"
+                        />
+                      </div>
                     </div>
 
+                    {/* Big Gradient Submit Button */}
                     <button
                       type="submit"
                       disabled={alertSubmitting}
-                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)] text-xs font-bold flex items-center justify-center space-x-1.5 transition-all"
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)] text-xs font-bold flex items-center justify-center space-x-1.5 transition-all"
                     >
                       <Bell className="w-3.5 h-3.5" />
                       <span>{alertSubmitting ? (lang === 'en' ? 'Saving...' : 'กำลังบันทึก...') : (lang === 'en' ? 'Enable Price Alert' : 'เปิดการแจ้งเตือนราคาลด')}</span>
                     </button>
 
-                    <div className="flex items-center justify-center space-x-3 text-[10px] text-slate-400 font-mono pt-1">
-                      <span className="flex items-center space-x-1">
-                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                    {/* Reassurance Footer */}
+                    <div className="flex items-center justify-center space-x-3 text-[10px] text-slate-400 font-mono pt-0.5">
+                      <span className="flex items-center space-x-1 text-emerald-400">
+                        <ShieldCheck className="w-3 h-3" />
                         <span>{lang === 'en' ? 'No Spam' : 'ไร้สแปม'}</span>
                       </span>
                       <span>•</span>
-                      <span className="flex items-center space-x-1">
-                        <Zap className="w-3 h-3 text-cyan-400" />
+                      <span className="flex items-center space-x-1 text-cyan-400">
+                        <Zap className="w-3 h-3" />
                         <span>{lang === 'en' ? 'Checks every 15m' : 'เช็คทุก 15 นาที'}</span>
                       </span>
                     </div>
