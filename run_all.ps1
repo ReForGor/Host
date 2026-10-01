@@ -11,11 +11,18 @@ if (-not (Test-Path $pythonExe)) {
     $pythonExe = "python"
 }
 
-# Detect npm
-$npmCmd = (Get-Command npm.cmd -ErrorAction SilentlyContinue)?.Source
-if (-not $npmCmd) {
-    $npmCmd = (Get-Command npm -ErrorAction SilentlyContinue)?.Source
-    if (-not $npmCmd) { $npmCmd = "npm" }
+# Detect npm (PowerShell 5.1 and 7+ compatible)
+$npmCmd = $null
+$cmdObj = Get-Command npm.cmd -ErrorAction SilentlyContinue
+if ($cmdObj) {
+    $npmCmd = $cmdObj.Source
+} else {
+    $cmdObj2 = Get-Command npm -ErrorAction SilentlyContinue
+    if ($cmdObj2) {
+        $npmCmd = $cmdObj2.Source
+    } else {
+        $npmCmd = "npm"
+    }
 }
 
 $frontendDir = Join-Path $ROOT_DIR "frontend"
