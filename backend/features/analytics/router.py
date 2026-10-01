@@ -32,7 +32,7 @@ async def record_visit(
     metric_res = await db.execute(
         select(SystemMetric).where(SystemMetric.metric_key == "total_pageviews")
     )
-    metric = metric_res.scalar_one_or_none()
+    metric = metric_res.scalars().first()
     if not metric:
         # Initial launch baseline count for KPTM PRICE
         metric = SystemMetric(metric_key="total_pageviews", metric_value=158420, updated_at=now)
@@ -44,7 +44,7 @@ async def record_visit(
     rec_res = await db.execute(
         select(VisitorRecord).where(VisitorRecord.session_id == data.session_id)
     )
-    visitor = rec_res.scalar_one_or_none()
+    visitor = rec_res.scalars().first()
     if visitor:
         visitor.last_seen_at = now
         visitor.path = data.path or "/"
