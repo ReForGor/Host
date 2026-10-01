@@ -141,6 +141,62 @@ const MOCK_LISTING_PRODUCTS = [
     store_count: 4,
     image_url: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&auto=format&fit=crop&q=80',
     best_product_url: 'https://www.bnn.in.th'
+  },
+  {
+    id: 387,
+    name: 'AMD Ryzen 7 7800X3D 8-Core 16-Thread Gaming Processor',
+    category: 'Processors (CPU)',
+    brand: 'AMD',
+    model_no: '100-100000910WOF',
+    lowest_price: 12390,
+    msrp: 15900,
+    max_discount_percent: 8.3,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 388,
+    name: 'Intel Core i5-12400F 6-Core 12-Thread Processor',
+    category: 'Processors (CPU)',
+    brand: 'Intel',
+    model_no: 'BX8071512400F',
+    lowest_price: 4390,
+    msrp: 5500,
+    max_discount_percent: 8.3,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 395,
+    name: 'Kingston FURY Beast DDR4 16GB (8GBx2) 3200MHz Black',
+    category: 'Memory (RAM)',
+    brand: 'Kingston',
+    model_no: 'KF432C16BBK2/16',
+    lowest_price: 4990,
+    msrp: 6000,
+    max_discount_percent: 8.3,
+    best_store_name: 'iHaveCPU',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1562976540-1502c2145186?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.ihavecpu.com'
+  },
+  {
+    id: 396,
+    name: 'Kingston FURY Beast DDR5 32GB (16GBx2) 5600MHz Black',
+    category: 'Memory (RAM)',
+    brand: 'Kingston',
+    model_no: 'KF556C40BBK2-32',
+    lowest_price: 10290,
+    msrp: 18500,
+    max_discount_percent: 8.3,
+    best_store_name: 'BaNANA IT',
+    store_count: 4,
+    image_url: 'https://images.unsplash.com/photo-1562976540-1502c2145186?w=500&auto=format&fit=crop&q=80',
+    best_product_url: 'https://www.bnn.in.th'
   }
 ]
 
@@ -154,7 +210,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'Graphics Cards (GPU)')
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All')
   const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || 'All')
   const [selectedStore, setSelectedStore] = useState(searchParams.get('store') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'cheapest')
@@ -169,20 +225,62 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
   const [activeChartProduct, setActiveChartProduct] = useState(null)
   const [activeAlertProduct, setActiveAlertProduct] = useState(null)
 
-  // Popular chip tags
-  const subSeriesChips = [
-    'RTX 4070 SUPER',
-    'RTX 4060 Ti',
-    'RX 7800 XT',
-    'RTX 4080 SUPER',
-    'RX 7700 XT',
-    'RTX 4090'
-  ]
+  // Helper for category titles in Thai
+  const getCategoryTitle = (cat) => {
+    switch (cat) {
+      case 'Graphics Cards (GPU)':
+        return 'การ์ดจอ (VGA / GPU)'
+      case 'Processors (CPU)':
+        return 'ซีพียู (CPU)'
+      case 'Memory (RAM)':
+        return 'แรม (RAM)'
+      case 'Storage (SSD, HDD)':
+        return 'ที่เก็บข้อมูล (SSD & HDD)'
+      case 'Monitors':
+        return 'จอมอนิเตอร์ (Monitor)'
+      case 'Motherboards':
+        return 'เมนบอร์ด (Mainboard)'
+      case 'Power Supplies (PSU)':
+        return 'พาวเวอร์ซัพพลาย (PSU)'
+      case 'Case & Cooling':
+        return 'เคส & ชุดระบายความร้อน'
+      case 'Accessories':
+        return 'อุปกรณ์เสริม & เกมมิ่งเกียร์'
+      case 'All':
+        return 'สินค้าทั้งหมด (All Products)'
+      default:
+        return cat
+    }
+  }
+
+  // Popular chip tags based on category
+  const subSeriesChips = selectedCategory === 'Processors (CPU)'
+    ? ['Ryzen 7 7800X3D', 'Ryzen 5 5600', 'Core i5-12400F', 'Ryzen 5 5500', 'Core i7', 'Ryzen 9']
+    : selectedCategory === 'Memory (RAM)'
+    ? ['DDR4', 'DDR5', '16GB', '32GB', '3200MHz', '5600MHz']
+    : selectedCategory === 'All'
+    ? ['RTX 4070', 'RTX 4060', 'Ryzen 7', 'Core i5', 'DDR5', 'DDR4']
+    : [
+        'RTX 4070 SUPER',
+        'RTX 4060 Ti',
+        'RX 7800 XT',
+        'RTX 4080 SUPER',
+        'RX 7700 XT',
+        'RTX 4090'
+      ]
 
   useEffect(() => {
     const cat = searchParams.get('category')
-    if (cat && cat !== selectedCategory) {
-      setSelectedCategory(cat)
+    if (cat) {
+      if (cat !== selectedCategory) {
+        setSelectedCategory(cat)
+        setSelectedSubSeries('')
+      }
+    } else {
+      if (selectedCategory !== 'All') {
+        setSelectedCategory('All')
+        setSelectedSubSeries('')
+      }
     }
   }, [searchParams])
 
@@ -207,11 +305,17 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       if (res.data && res.data.length > 0) {
         setProducts(res.data)
       } else {
-        setProducts(MOCK_LISTING_PRODUCTS)
+        const fallback = selectedCategory === 'All'
+          ? MOCK_LISTING_PRODUCTS
+          : MOCK_LISTING_PRODUCTS.filter(p => p.category === selectedCategory)
+        setProducts(fallback.length > 0 ? fallback : MOCK_LISTING_PRODUCTS)
       }
     } catch (e) {
       console.warn('Backend products notice, using listing fallback:', e)
-      setProducts(MOCK_LISTING_PRODUCTS)
+      const fallback = selectedCategory === 'All'
+        ? MOCK_LISTING_PRODUCTS
+        : MOCK_LISTING_PRODUCTS.filter(p => p.category === selectedCategory)
+      setProducts(fallback.length > 0 ? fallback : MOCK_LISTING_PRODUCTS)
     } finally {
       setLoading(false)
     }
@@ -262,7 +366,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="text-slate-400">คอมโพเนนต์พีซี</span>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-cyan-400 font-semibold">{selectedCategory}</span>
+          <span className="text-cyan-400 font-semibold">{getCategoryTitle(selectedCategory)}</span>
         </div>
 
         {/* Title row with stats */}
@@ -273,7 +377,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
               <span>MARKET INTELLIGENCE • Live Sync (4 ร้านค้า)</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-black font-display text-white tracking-tight">
-              {selectedCategory === 'Graphics Cards (GPU)' ? 'การ์ดจอ (VGA / GPU)' : selectedCategory}
+              {getCategoryTitle(selectedCategory)}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
               อัปเดตราคาแบบเรียลไทม์จาก JIB, iHaveCPU, BaNANA และ Advice พร้อมระบบตรวจจับส่วนลดที่ดีที่สุดในประเทศไทย

@@ -75,9 +75,41 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
   ]
 
   const isLinkActive = (path) => {
-    if (path === '/') return location.pathname === '/' && !location.search
-    if (path.includes('?')) return location.pathname + location.search === path
-    return location.pathname === path
+    const currentPath = location.pathname
+    const currentSearch = location.search
+    const currentParams = new URLSearchParams(currentSearch)
+
+    if (path === '/') {
+      return currentPath === '/' && (!currentSearch || currentSearch === '')
+    }
+
+    const [targetPath, targetSearch] = path.split('?')
+
+    if (currentPath !== targetPath) {
+      return false
+    }
+
+    if (targetSearch) {
+      const targetParams = new URLSearchParams(targetSearch)
+      const targetCategory = targetParams.get('category')
+      const currentCategory = currentParams.get('category')
+
+      if (targetCategory) {
+        return currentCategory === targetCategory
+      }
+
+      for (const [key, value] of targetParams.entries()) {
+        if (currentParams.get(key) !== value) return false
+      }
+      return true
+    }
+
+    if (targetPath === '/products') {
+      const currentCategory = currentParams.get('category')
+      return !currentCategory || currentCategory === 'All'
+    }
+
+    return true
   }
 
   return (
@@ -273,7 +305,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 key={item.path}
                 to={item.path}
                 className={`px-3 py-1 whitespace-nowrap rounded-lg text-xs font-medium transition-colors ${
-                  active ? 'bg-cyan-500/20 text-cyan-400 font-bold border border-cyan-500/40' : 'text-slate-400 hover:text-white'
+                  active ? 'bg-purple-600/25 text-purple-300 font-bold border border-purple-500/40 shadow-[0_0_10px_rgba(139,92,246,0.3)]' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {item.name}
