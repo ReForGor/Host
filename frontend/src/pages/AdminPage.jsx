@@ -343,10 +343,10 @@ export default function AdminPage({ user }) {
                 <Activity className="w-5 h-5 text-purple-400" />
               </div>
               <div className="text-3xl font-extrabold text-white font-mono">
-                {(analytics?.total_visitors || 158421).toLocaleString()} <span className="text-xs font-normal text-slate-400">ครั้ง</span>
+                {(analytics?.total_visitors ?? 0).toLocaleString()} <span className="text-xs font-normal text-slate-400">ครั้ง</span>
               </div>
               <p className="text-[11px] text-purple-400 mt-2">
-                ผู้เข้าชมไม่ซ้ำ: {analytics?.unique_visitors || 1} คน
+                ผู้เข้าชมไม่ซ้ำ: {(analytics?.unique_visitors ?? 0).toLocaleString()} คน
               </p>
             </div>
 

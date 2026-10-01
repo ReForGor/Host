@@ -34,8 +34,7 @@ async def record_visit(
     )
     metric = metric_res.scalars().first()
     if not metric:
-        # Initial launch baseline count for KPTM PRICE
-        metric = SystemMetric(metric_key="total_pageviews", metric_value=158420, updated_at=now)
+        metric = SystemMetric(metric_key="total_pageviews", metric_value=0, updated_at=now)
         db.add(metric)
     metric.metric_value += 1
     metric.updated_at = now
@@ -99,7 +98,7 @@ async def get_analytics_stats(db: AsyncSession = Depends(get_db)):
         select(SystemMetric).where(SystemMetric.metric_key == "total_pageviews")
     )
     metric = metric_res.scalar_one_or_none()
-    total_visits = metric.metric_value if metric else 158420
+    total_visits = metric.metric_value if metric else 0
 
     # 2. Unique visitors
     unique_res = await db.execute(

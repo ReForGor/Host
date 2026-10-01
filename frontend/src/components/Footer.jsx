@@ -6,18 +6,18 @@ import { useLanguage } from '../i18n/LanguageContext'
 
 export default function Footer() {
   const { lang, t } = useLanguage()
-  const [visitorCount, setVisitorCount] = useState(1428590)
-  const [onlineCount, setOnlineCount] = useState(3420)
+  const [visitorCount, setVisitorCount] = useState(0)
+  const [uniqueVisitors, setUniqueVisitors] = useState(0)
+  const [onlineCount, setOnlineCount] = useState(1)
 
   useEffect(() => {
     const fetchRealStats = async () => {
       try {
         const res = await analyticsApi.getStats()
-        if (res.data?.total_visitors) {
-          setVisitorCount(Math.max(1428590, res.data.total_visitors))
-        }
-        if (res.data?.online_now !== undefined) {
-          setOnlineCount(Math.max(12, res.data.online_now))
+        if (res.data) {
+          setVisitorCount(res.data.total_visitors || 0)
+          setUniqueVisitors(res.data.unique_visitors || 0)
+          setOnlineCount(res.data.online_now || 1)
         }
       } catch (e) {
         // keep current
@@ -105,7 +105,13 @@ export default function Footer() {
             </h4>
             <div className="bg-[#120826] border border-purple-500/25 rounded-xl p-3.5 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-purple-300">{lang === 'en' ? 'Total Pageviews:' : 'ผู้เข้าชมทั้งหมด:'}</span>
+                <span className="text-purple-300">{lang === 'en' ? 'Unique Visitors:' : 'ผู้เข้าชมจริง (ไม่ซ้ำ):'}</span>
+                <span className="font-mono font-bold text-white">
+                  {uniqueVisitors.toLocaleString()} <span className="text-[10px] text-purple-400/70 font-sans">{lang === 'en' ? 'visitors' : 'คน'}</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-purple-300">{lang === 'en' ? 'Total Pageviews:' : 'ยอดเข้าชมสะสม:'}</span>
                 <span className="font-mono font-bold text-cyan-400">
                   {visitorCount.toLocaleString()} <span className="text-[10px] text-purple-400/70 font-sans">{lang === 'en' ? 'views' : 'ครั้ง'}</span>
                 </span>
@@ -118,8 +124,8 @@ export default function Footer() {
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs border-t border-purple-500/20 pt-2">
-                <span className="text-purple-300">{lang === 'en' ? 'Price Live Sync:' : 'อัปเดตราคาล่าสุด:'}</span>
-                <span className="text-slate-300 font-mono text-[11px]">{lang === 'en' ? '1 min ago' : '1 นาทีที่แล้ว'}</span>
+                <span className="text-purple-300">{lang === 'en' ? 'Data Source:' : 'แหล่งข้อมูล:'}</span>
+                <span className="text-slate-300 font-mono text-[11px]">{lang === 'en' ? 'PostgreSQL Neon DB' : 'ฐานข้อมูลจริง Neon DB'}</span>
               </div>
             </div>
           </div>
