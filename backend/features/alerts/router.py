@@ -30,12 +30,21 @@ async def create_price_alert(
 
     user_id = current_user.id if current_user else None
     
-    # Calculate current lowest price
+    # Calculate current lowest price and best store listing
     list_res = await db.execute(
-        select(PriceListing.price).where(PriceListing.product_id == prod.id, PriceListing.is_available == True)
+        select(PriceListing)
+        .options(selectinload(PriceListing.store))
+        .where(PriceListing.product_id == prod.id, PriceListing.is_available == True)
+        .order_by(PriceListing.price.asc())
     )
-    prices = list_res.scalars().all()
-    current_lowest = min(prices) if prices else prod.msrp
+    listings = list_res.scalars().all()
+    best_listing = listings[0] if listings else None
+    current_lowest = best_listing.price if best_listing else prod.msrp
+    best_store_name = best_listing.store.name if best_listing and best_listing.store else "IT PRICE Partner Store"
+    best_product_url = best_listing.product_url if best_listing else prod.image_url
+
+    # Check if price has already reached or dropped below target price
+    is_price_reached = (current_lowest is not None and current_lowest <= req.target_price)
 
     alert = PriceAlert(
         user_id=user_id,
@@ -44,23 +53,63 @@ async def create_price_alert(
         target_price=req.target_price,
         currency=req.currency or "THB",
         current_lowest_price=current_lowest,
+        last_notified_price=current_lowest if is_price_reached else None,
+        triggered_at=datetime.utcnow() if is_price_reached else None,
         is_active=True,
         created_at=datetime.utcnow()
     )
     db.add(alert)
-    await db.commit()
-    await db.refresh(alert)
+    await db.flush()
 
-    # Send confirmation email in background
-    background_tasks.add_task(
-        email_service.send_alert_confirmation,
-        to_email=req.email,
-        product_name=prod.name,
-        target_price=req.target_price,
-        current_lowest_price=current_lowest or req.target_price,
-        product_image=prod.image_url,
-        product_id=prod.id
-    )
+    if is_price_reached:
+        # Price is ALREADY at or below target -> Send Price Drop / Reached Alert immediately!
+        notif = Notification(
+            user_id=user_id,
+            email=req.email,
+            product_id=prod.id,
+            alert_id=alert.id,
+            title=f"🔥 ราคาถึงเป้าหมายแล้ว: {prod.name}",
+            message=(
+                f"ยินดีด้วย! {prod.name} ราคาปัจจุบันอยู่ที่ ฿{current_lowest:,.2f} ที่ {best_store_name} "
+                f"ถึงราคาเป้าหมาย ฿{req.target_price:,.2f} ของคุณแล้ว!"
+            ),
+            old_price=prod.msrp or current_lowest,
+            new_price=current_lowest,
+            store_name=best_store_name,
+            product_url=best_product_url,
+            currency="THB",
+            is_read=False,
+            created_at=datetime.utcnow()
+        )
+        db.add(notif)
+        await db.commit()
+        await db.refresh(alert)
+
+        background_tasks.add_task(
+            email_service.send_price_drop_alert,
+            to_email=req.email,
+            product_name=prod.name,
+            new_price=current_lowest,
+            target_price=req.target_price,
+            store_name=best_store_name,
+            product_url=best_product_url,
+            product_image=prod.image_url,
+            product_id=prod.id
+        )
+    else:
+        # Price is above target -> Save alert and send confirmation that we are monitoring
+        await db.commit()
+        await db.refresh(alert)
+
+        background_tasks.add_task(
+            email_service.send_alert_confirmation,
+            to_email=req.email,
+            product_name=prod.name,
+            target_price=req.target_price,
+            current_lowest_price=current_lowest or req.target_price,
+            product_image=prod.image_url,
+            product_id=prod.id
+        )
 
     return AlertOut(
         id=alert.id,

@@ -64,11 +64,11 @@ async def record_visit(
 
     await db.commit()
 
-    # 3. Calculate live stats
-    fifteen_mins_ago = now - timedelta(minutes=15)
+    # 3. Calculate live stats (Real-time active window: 2 minutes)
+    active_window = now - timedelta(minutes=2)
     online_count_res = await db.execute(
         select(func.count(func.distinct(VisitorRecord.session_id))).where(
-            VisitorRecord.last_seen_at >= fifteen_mins_ago
+            VisitorRecord.last_seen_at >= active_window
         )
     )
     online_now = max(1, online_count_res.scalar() or 1)
@@ -93,7 +93,6 @@ async def record_visit(
 @router.get("/stats")
 async def get_analytics_stats(db: AsyncSession = Depends(get_db)):
     now = datetime.utcnow()
-    fifteen_mins_ago = now - timedelta(minutes=15)
 
     # 1. Total visits
     metric_res = await db.execute(
@@ -108,10 +107,11 @@ async def get_analytics_stats(db: AsyncSession = Depends(get_db)):
     )
     unique_visitors = unique_res.scalar() or 1
 
-    # 3. Online now
+    # 3. Online now (Real-time active window: 2 minutes)
+    active_window = now - timedelta(minutes=2)
     online_res = await db.execute(
         select(func.count(func.distinct(VisitorRecord.session_id))).where(
-            VisitorRecord.last_seen_at >= fifteen_mins_ago
+            VisitorRecord.last_seen_at >= active_window
         )
     )
     online_now = max(1, online_res.scalar() or 1)

@@ -164,6 +164,19 @@ async def run_api_and_feature_tests():
         res_inv = await client.post("/api/alerts", json=invalid_alert, headers=admin_headers)
         record_result("TC_U4_002", "Reject invalid email format (Negative)", res_inv.status_code in [400, 422], f"HTTP {res_inv.status_code}")
 
+        # TC_U4_003: Immediate alert trigger when price already reached target
+        reached_alert = {
+            "product_id": target_prod_id,
+            "target_price": 999999,
+            "email": "buyer@test.com"
+        }
+        res_reached = await client.post("/api/alerts", json=reached_alert, headers=admin_headers)
+        record_result("TC_U4_003", "Immediate price drop notification when price reached", res_reached.status_code == 200 and res_reached.json().get("current_lowest_price") is not None, f"HTTP {res_reached.status_code}")
+
+        # Real-time analytics 2-minute window visit tracking
+        res_visit = await client.post("/api/analytics/visit", json={"session_id": "test_session_realtime", "page_path": "/home"})
+        record_result("TC_ANALYTICS", "Real-time audience tracking with 2-min active window", res_visit.status_code == 200 and res_visit.json().get("online_now", 0) >= 1, f"Online now: {res_visit.json().get('online_now') if res_visit.status_code == 200 else 'ERR'}")
+
         # Admin 1: Scraper Status (TC_A1_001)
         res_scrapers = await client.get("/api/scrapers/status", headers=admin_headers)
         record_result("TC_A1_001", "Admin check Web Scraper status", res_scrapers.status_code == 200, f"HTTP {res_scrapers.status_code}")

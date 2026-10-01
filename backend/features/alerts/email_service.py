@@ -104,7 +104,7 @@ class EmailService:
         product_id: Optional[int] = None
     ) -> Dict[str, Any]:
         savings = max(0.0, target_price - new_price)
-        subject = f"🔥 [TechPrice] ราคาลดแล้ว! {product_name[:35]}... เหลือเพียง ฿{new_price:,.2f} ที่ {store_name}"
+        subject = f"🔥 [IT PRICE] ราคาลดแล้ว! {product_name[:35]}... เหลือเพียง ฿{new_price:,.2f} ที่ {store_name}"
 
         img_html = f'<img src="{product_image}" alt="{product_name}" style="max-height: 180px; max-width: 100%; border-radius: 8px; margin: 0 auto; display: block; object-fit: contain;">' if product_image else ''
 
@@ -134,7 +134,7 @@ class EmailService:
 <body>
 <div class="container">
     <div class="header">
-        <h1>⚡ TechPrice Thailand</h1>
+        <h1>⚡ IT PRICE Thailand</h1>
         <div class="badge-deal">🔥 แจ้งเตือนราคาลดพิเศษ (Price Drop Alert)</div>
     </div>
     <div class="content">
@@ -158,13 +158,13 @@ class EmailService:
             <a href="{product_url}" class="btn-buy" target="_blank">👉 สั่งซื้อราคานี้ทันทีที่ {store_name}</a>
         </div>
     </div>
-    <div class="footer">TechPrice Thailand - ระบบติดตามราคาฮาร์ดแวร์ไอที 4 ร้านค้าหลัก (JIB, Advice, iHaveCPU, BaNANA IT)</div>
+    <div class="footer">IT PRICE Thailand - ระบบติดตามราคาฮาร์ดแวร์ไอที 4 ร้านค้าหลัก (JIB, Advice, iHaveCPU, BaNANA IT)</div>
 </div>
 </body>
 </html>
 """
         plain_text = (
-            f"⚡ TechPrice แจ้งเตือนราคาลดพิเศษ!\n\n"
+            f"⚡ IT PRICE แจ้งเตือนราคาลดพิเศษ!\n\n"
             f"สินค้า: {product_name}\n"
             f"ราคาเป้าหมาย: ฿{target_price:,.2f}\n"
             f"ราคาใหม่พิเศษ: ฿{new_price:,.2f} (ประหยัดได้ ฿{savings:,.2f})\n"
@@ -189,7 +189,7 @@ class EmailService:
         product_image: Optional[str] = None,
         product_id: Optional[int] = None
     ) -> Dict[str, Any]:
-        subject = f"✅ [TechPrice] ยืนยันการตั้งค่าแจ้งเตือนราคา: {product_name[:35]}..."
+        subject = f"✅ [IT PRICE] ยืนยันการตั้งค่าแจ้งเตือนราคา: {product_name[:35]}..."
         img_html = f'<img src="{product_image}" alt="{product_name}" style="max-height: 140px; max-width: 100%; border-radius: 8px; margin: 0 auto; display: block; object-fit: contain;">' if product_image else ''
 
         html_body = f"""
@@ -210,7 +210,7 @@ class EmailService:
 <body>
 <div class="container">
     <div class="header">
-        <h2 style="color: #06b6d4; margin: 0;">⚡ TechPrice Thailand</h2>
+        <h2 style="color: #06b6d4; margin: 0;">⚡ IT PRICE Thailand</h2>
         <p style="color: #10b981; font-size: 13px; font-weight: bold; margin: 6px 0 0 0;">✅ ยืนยันการเริ่มติดตามราคาเรียบร้อยแล้ว</p>
     </div>
     <div class="content">
@@ -224,13 +224,13 @@ class EmailService:
             <p style="font-size: 14px; color: #f3f4f6;">เป้าหมายที่คุณต้องการ: <span class="price-highlight">฿{target_price:,.2f}</span></p>
         </div>
     </div>
-    <div class="footer">TechPrice Thailand - ระบบติดตามราคาฮาร์ดแวร์ไอที</div>
+    <div class="footer">IT PRICE Thailand - ระบบติดตามราคาฮาร์ดแวร์ไอที</div>
 </div>
 </body>
 </html>
 """
         plain_text = (
-            f"✅ [TechPrice] ยืนยันการตั้งค่าแจ้งเตือนราคา\n\n"
+            f"✅ [IT PRICE] ยืนยันการตั้งค่าแจ้งเตือนราคา\n\n"
             f"สินค้า: {product_name}\n"
             f"ราคาต่ำสุดปัจจุบัน: ฿{current_lowest_price:,.2f}\n"
             f"ราคาเป้าหมายของคุณ: ฿{target_price:,.2f}\n"
