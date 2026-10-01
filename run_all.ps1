@@ -27,8 +27,8 @@ if ($cmdObj) {
 
 $frontendDir = Join-Path $ROOT_DIR "frontend"
 
-# Check if Backend is already running
-$checkPort8000 = Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue
+# Check if Backend is already running (Listening)
+$checkPort8000 = Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue
 $backendProc = $null
 
 if ($checkPort8000) {
@@ -39,15 +39,16 @@ if ($checkPort8000) {
     Start-Sleep -Seconds 2
 }
 
-# Check if Frontend is already running
-$checkPort3000 = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
+# Check if Frontend is already running (Listening)
+$checkPort3000 = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
 $frontendProc = $null
 
 if ($checkPort3000) {
     Write-Host "🎨 [2/2] Frontend dev server is already running on http://localhost:3000" -ForegroundColor Yellow
 } else {
     Write-Host "🎨 [2/2] Starting React + Vite Frontend on http://localhost:3000 ..." -ForegroundColor Cyan
-    $frontendProc = Start-Process -FilePath $npmCmd -ArgumentList "run", "dev" -WorkingDirectory $frontendDir -PassThru -NoNewWindow
+    $frontendProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "npm run dev" -WorkingDirectory $frontendDir -PassThru -NoNewWindow
+    Start-Sleep -Seconds 2
 }
 
 Write-Host "`n✅ System is LIVE:" -ForegroundColor Green
