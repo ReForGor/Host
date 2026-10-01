@@ -31,7 +31,7 @@ export default function Footer() {
     <footer className="bg-[#070312]/95 border-t border-purple-500/25 mt-24 text-slate-400 text-xs relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-purple-600/10 blur-[100px] pointer-events-none" />
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           
           {/* Column 1: Brand Info & Supported Stores */}
           <div className="space-y-4">
@@ -65,37 +65,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Tools & Developers */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-wide">
-              เครื่องมือและนักพัฒนา
-            </h4>
-            <ul className="space-y-2 text-slate-400">
-              <li>
-                <Link to="/products" className="hover:text-cyan-400 transition-colors">
-                  ส่งออกไฟล์ CSV
-                </Link>
-              </li>
-              <li>
-                <a href="/api/docs" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition-colors flex items-center space-x-1">
-                  <span>JSON API (Realtime Feed)</span>
-                  <span className="text-[10px] text-cyan-400 font-mono">v1</span>
-                </a>
-              </li>
-              <li>
-                <a href="/api/redoc" target="_blank" rel="noreferrer" className="hover:text-cyan-400 transition-colors">
-                  เอกสาร OpenAPI Specification
-                </a>
-              </li>
-              <li>
-                <Link to="/platforms" className="hover:text-cyan-400 transition-colors">
-                  เงื่อนไขการใช้งาน & ข้อตกลง
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Popular Categories */}
+          {/* Column 2: Popular Categories */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white tracking-wide">
               หมวดสินค้ายอดนิยม
@@ -124,7 +94,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: System Status & Visitors */}
+          {/* Column 3: System Status & Visitors */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white tracking-wide">
               สถานะระบบ & ผู้เข้าชม
