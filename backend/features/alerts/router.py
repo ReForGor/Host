@@ -1,6 +1,8 @@
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
+from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from sqlalchemy.orm import selectinload
@@ -40,8 +42,8 @@ async def create_price_alert(
     listings = list_res.scalars().all()
     best_listing = listings[0] if listings else None
     current_lowest = best_listing.price if best_listing else prod.msrp
-    best_store_name = best_listing.store.name if best_listing and best_listing.store else "IT PRICE Partner Store"
-    best_product_url = best_listing.product_url if best_listing else prod.image_url
+    best_store_name = best_listing.store.name if best_listing and best_listing.store else "Advice IT Infinite"
+    best_product_url = (best_listing.product_url if best_listing and best_listing.product_url else f"http://localhost:3000/products/{prod.id}")
 
     # Check if price has already reached or dropped below target price
     is_price_reached = (current_lowest is not None and current_lowest <= req.target_price)
@@ -49,7 +51,7 @@ async def create_price_alert(
     alert = PriceAlert(
         user_id=user_id,
         product_id=req.product_id,
-        email=req.email,
+        email=req.email.strip().lower(),
         target_price=req.target_price,
         currency=req.currency or "THB",
         current_lowest_price=current_lowest,
@@ -65,7 +67,7 @@ async def create_price_alert(
         # Price is ALREADY at or below target -> Send Price Drop / Reached Alert immediately!
         notif = Notification(
             user_id=user_id,
-            email=req.email,
+            email=req.email.strip().lower(),
             product_id=prod.id,
             alert_id=alert.id,
             title=f"🔥 ราคาถึงเป้าหมายแล้ว: {prod.name}",
@@ -87,14 +89,16 @@ async def create_price_alert(
 
         background_tasks.add_task(
             email_service.send_price_drop_alert,
-            to_email=req.email,
+            to_email=req.email.strip().lower(),
             product_name=prod.name,
             new_price=current_lowest,
             target_price=req.target_price,
             store_name=best_store_name,
             product_url=best_product_url,
             product_image=prod.image_url,
-            product_id=prod.id
+            product_id=prod.id,
+            alert_id=alert.id,
+            original_price=prod.msrp
         )
     else:
         # Price is above target -> Save alert and send confirmation that we are monitoring
@@ -207,3 +211,139 @@ async def list_email_logs(
         select(EmailLog).order_by(desc(EmailLog.created_at)).limit(limit)
     )
     return res.scalars().all()
+
+
+class TestEmailRequest(BaseModel):
+    email: str
+    product_id: Optional[int] = 390
+
+
+@router.get("/alerts/email/preview")
+async def preview_price_drop_email(
+    product_id: Optional[int] = Query(390),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Returns the raw rendered HTML for the price drop alert email template (matches Figma / screenshot design).
+    Can be previewed directly in browser or embedded in an iframe.
+    """
+    from fastapi.responses import HTMLResponse
+    from backend.features.products.models import Product, PriceListing, Store
+
+    prod = await db.get(Product, product_id)
+    if not prod:
+        # Fallback to first product or mock
+        first_prod = (await db.execute(select(Product).limit(1))).scalars().first()
+        prod = first_prod
+
+    p_name = prod.name if prod else "AMD Ryzen 5 5500 6-Core 12-Thread Processor"
+    p_img = prod.image_url if prod else "https://www.jib.co.th/img_master/product/original/2022040514004252535_1.jpg"
+    p_msrp = prod.msrp if prod else 3690.0
+    p_specs = prod.specs or {} if prod else {}
+
+    # Query listings if available
+    store_comparisons = []
+    lowest_price = 3120.0
+    best_store_name = "Advice IT Infinite"
+    best_url = "https://www.advice.co.th"
+
+    if prod:
+        listings_res = await db.execute(
+            select(PriceListing, Store)
+            .join(Store, PriceListing.store_id == Store.id)
+            .where(PriceListing.product_id == prod.id)
+            .order_by(PriceListing.price.asc())
+        )
+        rows = listings_res.all()
+        if rows:
+            lowest_price = rows[0][0].price
+            best_store_name = rows[0][1].name
+            best_url = rows[0][0].product_url or "https://www.advice.co.th"
+            for l, s in rows:
+                store_comparisons.append({
+                    "name": s.name,
+                    "price": l.price,
+                    "diff": max(0.0, l.price - lowest_price),
+                    "is_best": l.price == lowest_price,
+                    "in_stock": l.stock_status == "in_stock"
+                })
+
+    target_price = lowest_price  # Matched target
+
+    badge = "AM4"
+    specs_str = "Socket: AM4 | Base 3.6 GHz / Boost 4.2 GHz"
+    if p_specs:
+        if "Socket" in p_specs:
+            badge = p_specs["Socket"]
+            specs_str = f"Socket: {p_specs.get('Socket')} | Base {p_specs.get('Base Clock', '3.6 GHz')} / Boost {p_specs.get('Boost Clock', '4.2 GHz')}"
+        elif "VRAM" in p_specs:
+            badge = p_specs.get("VRAM", "GPU")
+            specs_str = f"VRAM: {p_specs.get('VRAM')} | Interface: {p_specs.get('Memory Interface', 'PCIe 4.0')}"
+
+    html = email_service.render_price_drop_html(
+        product_name=p_name,
+        new_price=lowest_price,
+        target_price=target_price,
+        store_name=best_store_name,
+        product_url=best_url,
+        product_image=p_img,
+        specs_text=specs_str,
+        badge_text=badge,
+        original_price=p_msrp or (lowest_price + 370.0),
+        store_comparisons=store_comparisons or None,
+        alert_id=prod.id if prod else 883921
+    )
+    return HTMLResponse(content=html)
+
+
+@router.post("/alerts/email/send-test")
+async def send_test_price_drop_email(
+    data: TestEmailRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sends the price drop alert email to the specified email address for testing and verification.
+    """
+    if not data.email or "@" not in data.email:
+        raise HTTPException(status_code=400, detail="Invalid email address")
+
+    from backend.features.products.models import Product, PriceListing, Store
+
+    prod = await db.get(Product, data.product_id or 390)
+    p_name = prod.name if prod else "AMD Ryzen 5 5500 6-Core 12-Thread Processor"
+    p_img = prod.image_url if prod else "https://www.jib.co.th/img_master/product/original/2022040514004252535_1.jpg"
+
+    lowest_price = 3120.0
+    best_store = "Advice IT Infinite"
+    best_url = "https://www.advice.co.th"
+
+    if prod:
+        listings_res = await db.execute(
+            select(PriceListing, Store)
+            .join(Store, PriceListing.store_id == Store.id)
+            .where(PriceListing.product_id == prod.id)
+            .order_by(PriceListing.price.asc())
+        )
+        rows = listings_res.all()
+        if rows:
+            lowest_price = rows[0][0].price
+            best_store = rows[0][1].name
+            best_url = rows[0][0].product_url or "https://www.advice.co.th"
+
+    res = await email_service.send_price_drop_alert(
+        to_email=data.email.strip().lower(),
+        product_name=p_name,
+        new_price=lowest_price,
+        target_price=lowest_price,
+        store_name=best_store,
+        product_url=best_url,
+        product_image=p_img,
+        product_id=prod.id if prod else 390,
+        original_price=prod.msrp if (prod and prod.msrp) else (lowest_price + 370.0)
+    )
+
+    return {
+        "status": "success",
+        "message": f"Test price drop email dispatched to {data.email}",
+        "result": res
+    }

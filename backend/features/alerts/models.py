@@ -2,6 +2,8 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from backend.core.database import Base
+import backend.features.auth.models
+import backend.features.products.models
 
 class PriceAlert(Base):
     __tablename__ = "price_alerts"

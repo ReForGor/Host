@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Lock, Mail, User, ShieldCheck, Zap, Cpu } from 'lucide-react'
+import { X, Lock, Mail, User, Zap, Cpu } from 'lucide-react'
 import { authApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
 
@@ -56,11 +56,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     }
   }
 
-  const fillDemo = (demoEmail, demoPass) => {
-    setIsRegister(false)
-    setEmailOrUser(demoEmail)
-    setPassword(demoPass)
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
@@ -150,7 +145,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
                 type="text"
                 value={emailOrUser}
                 onChange={(e) => setEmailOrUser(e.target.value)}
-                placeholder="admin@techprice.com / gamer@demo.com"
+                placeholder={lang === 'en' ? 'Enter email or username' : 'กรอกอีเมล หรือ ชื่อผู้ใช้'}
                 className="w-full bg-[#070312] border border-purple-500/30 rounded-xl p-2.5 text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
                 required
               />
@@ -176,28 +171,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
           </form>
         )}
 
-        {/* Demo Fast Login Buttons */}
-        <div className="mt-6 pt-5 border-t border-purple-500/25 text-xs">
-          <p className="text-slate-400 mb-2 font-medium">{lang === 'en' ? 'Instant 1-Click Demo Accounts:' : 'กดปุ่มเพื่อทดสอบระบบทันที (Demo Accounts):'}</p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => fillDemo('admin@techprice.com', 'admin123')}
-              className="p-2 rounded-xl bg-[#160B2E] hover:bg-[#231248] text-amber-300 font-semibold border border-amber-500/30 text-center transition-all shadow-[0_0_10px_rgba(245,158,11,0.15)] flex items-center justify-center space-x-1.5"
-            >
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
-              <span>{lang === 'en' ? 'Admin Demo' : 'บัญชี Admin'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('gamer@demo.com', 'demo1234')}
-              className="p-2 rounded-xl bg-[#160B2E] hover:bg-[#231248] text-purple-300 font-semibold border border-purple-500/30 text-center transition-all shadow-[0_0_10px_rgba(139,92,246,0.15)] flex items-center justify-center space-x-1.5"
-            >
-              <User className="w-4 h-4 text-purple-400" />
-              <span>{lang === 'en' ? 'User Demo' : 'บัญชี User ทั่วไป'}</span>
-            </button>
-          </div>
-        </div>
 
         {/* Switch Login / Register */}
         <div className="mt-4 text-center text-xs text-slate-400">

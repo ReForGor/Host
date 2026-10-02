@@ -55,6 +55,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const [alertEmail, setAlertEmail] = useState('')
   const [alertSubmitting, setAlertSubmitting] = useState(false)
   const [alertSuccess, setAlertSuccess] = useState(false)
+  const [alertError, setAlertError] = useState(null)
   const [timeframe, setTimeframe] = useState('1week')
 
   useEffect(() => {
@@ -186,7 +187,11 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
 
   const handleEmbeddedAlertSubmit = async (e) => {
     e.preventDefault()
-    if (!alertEmail || !alertEmail.includes('@') || !alertTargetPrice) return
+    setAlertError(null)
+    if (!alertEmail || !alertEmail.includes('@') || !alertTargetPrice) {
+      setAlertError(lang === 'en' ? 'Please enter a valid email and target price.' : 'กรุณากรอกอีเมลและราคาเป้าหมายให้ถูกต้อง')
+      return
+    }
     setAlertSubmitting(true)
     try {
       await alertApi.createAlert({
@@ -195,11 +200,13 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         target_price: parseFloat(alertTargetPrice),
         currency: 'THB'
       })
+      localStorage.setItem('techprice_alert_email', alertEmail.trim())
       setAlertSuccess(true)
       setTimeout(() => setAlertSuccess(false), 5000)
     } catch (err) {
-      setAlertSuccess(true)
-      setTimeout(() => setAlertSuccess(false), 5000)
+      console.error(err)
+      const detail = err.response?.data?.detail || (lang === 'en' ? 'Failed to create price alert.' : 'ไม่สามารถบันทึกการแจ้งเตือนได้ ตรวจสอบเซิร์ฟเวอร์')
+      setAlertError(detail)
     } finally {
       setAlertSubmitting(false)
     }
@@ -702,6 +709,12 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                         />
                       </div>
                     </div>
+
+                    {alertError && (
+                      <div className="p-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[11px] text-center font-medium animate-fade-in">
+                        {alertError}
+                      </div>
+                    )}
 
                     {/* Big Gradient Submit Button */}
                     <button

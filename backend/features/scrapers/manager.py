@@ -190,7 +190,9 @@ class ScraperManager:
                                             store_name=store.name,
                                             product_url=listing.product_url,
                                             product_image=prod.image_url,
-                                            product_id=prod.id
+                                            product_id=prod.id,
+                                            original_price=prod.msrp,
+                                            alert_id=alert.id
                                         )
                                     except Exception as mail_err:
                                         logger.error(f"Failed to dispatch price drop email to {alert.email}: {mail_err}")

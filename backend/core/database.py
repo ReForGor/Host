@@ -27,6 +27,12 @@ AsyncSessionLocal = async_sessionmaker(
 class Base(DeclarativeBase):
     pass
 
+# Ensure all relationship mappers are registered cleanly
+import backend.features.auth.models
+import backend.features.products.models
+import backend.features.alerts.models
+import backend.features.analytics.models
+
 async def get_db():
     async with AsyncSessionLocal() as session:
         try:

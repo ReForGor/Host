@@ -39,6 +39,8 @@ export const alertApi = {
   getNotifications: () => api.get('/notifications'),
   markRead: (id) => api.post(`/notifications/${id}/read`),
   getEmailLogs: () => api.get('/emails/logs'),
+  sendTestEmail: (data) => api.post('/alerts/email/send-test', data),
+  getEmailPreviewUrl: (productId) => `/api/alerts/email/preview?product_id=${productId || 390}`,
 }
 
 export const scraperApi = {

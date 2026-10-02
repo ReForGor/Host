@@ -2,8 +2,14 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+
+# Load .env from project root first, then backend/.env with override
+if (PROJECT_ROOT / ".env").exists():
+    load_dotenv(PROJECT_ROOT / ".env", override=True)
+if (BASE_DIR / ".env").exists():
+    load_dotenv(BASE_DIR / ".env", override=True)
 
 class Settings:
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "KPTM PRICE - ระบบเปรียบเทียบราคาอุปกรณ์ไอที")
@@ -60,8 +66,9 @@ class Settings:
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
     SMTP_USER: str = os.getenv("SMTP_USER", "")
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
-    SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "alerts@techprice.in.th")
-    SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "TechPrice IT Alerts")
+    SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "pjxmsx@gmail.com")
+    SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "IT PRICE Thailand")
+    SMTP_REPLY_TO: str = os.getenv("SMTP_REPLY_TO", "itprice@noreply.com")
     SMTP_TLS: bool = os.getenv("SMTP_TLS", "true").lower() in ("true", "1", "yes")
     EMAIL_DEV_MODE: bool = os.getenv("EMAIL_DEV_MODE", "true").lower() in ("true", "1", "yes")
 
