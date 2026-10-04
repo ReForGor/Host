@@ -46,20 +46,20 @@ import { Helmet } from 'react-helmet-async'
 
 // 14 Recommended Official Hardware Brands (2 rows x 7 cols) per SUMMARY_CHANGES.md
 const RECOMMENDED_BRANDS = [
-  { name: 'Kingston', url: 'https://www.kingston.com/th', logoText: 'Kingston', logoUrl: '/brands/kingston.svg' },
-  { name: 'Logitech', url: 'https://www.logitech.com/th-th', logoText: 'logitech', logoUrl: 'https://cdn.worldvectorlogo.com/logos/logitech-2-1.svg' },
-  { name: 'AMD', url: 'https://www.amd.com/th', logoText: 'AMD', logoUrl: 'https://cdn.worldvectorlogo.com/logos/amd-logo-1.svg' },
-  { name: 'Corsair', url: 'https://www.corsair.com', logoText: 'CORSAIR', logoUrl: 'https://cdn.worldvectorlogo.com/logos/corsair-2.svg' },
-  { name: 'GIGABYTE', url: 'https://www.gigabyte.com/th', logoText: 'GIGABYTE', logoUrl: '/brands/gigabyte.svg' },
-  { name: 'Razer', url: 'https://www.razer.com/th-th', logoText: 'RAZER', logoUrl: 'https://cdn.worldvectorlogo.com/logos/razer.svg' },
-  { name: 'ASUS', url: 'https://www.asus.com/th/', logoText: 'ASUS', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg' },
-  { name: 'Intel', url: 'https://www.intel.co.th', logoText: 'intel', logoUrl: 'https://cdn.worldvectorlogo.com/logos/intel.svg' },
-  { name: 'MSI', url: 'https://th.msi.com', logoText: 'msi', logoUrl: '/brands/msi.svg' },
-  { name: 'ASRock', url: 'https://www.asrock.com', logoText: 'ASRock', logoUrl: '/brands/asrock.svg' },
-  { name: 'Western Digital', url: 'https://www.westerndigital.com/th-th', logoText: 'Western Digital', logoUrl: '/brands/westerndigital.svg' },
-  { name: 'NZXT', url: 'https://nzxt.com', logoText: 'NZXT', logoUrl: '/brands/nzxt.svg' },
-  { name: 'LG', url: 'https://www.lg.com/th', logoText: 'LG', logoUrl: 'https://cdn.worldvectorlogo.com/logos/lg.svg' },
-  { name: 'Dahua', url: 'https://www.dahuasecurity.com/th', logoText: 'dahua', logoUrl: '/brands/dahua.svg' }
+  { name: 'Kingston', url: 'https://www.kingston.com/th', logoText: 'Kingston', logoUrl: '/brands/kingston.png' },
+  { name: 'Logitech', url: 'https://www.logitech.com/th-th', logoText: 'logitech', logoUrl: '/brands/logitech.png' },
+  { name: 'AMD', url: 'https://www.amd.com/th', logoText: 'AMD', logoUrl: '/brands/amd.png' },
+  { name: 'Corsair', url: 'https://www.corsair.com', logoText: 'CORSAIR', logoUrl: '/brands/corsair.png' },
+  { name: 'GIGABYTE', url: 'https://www.gigabyte.com/th', logoText: 'GIGABYTE', logoUrl: '/brands/gigabyte.png' },
+  { name: 'Razer', url: 'https://www.razer.com/th-th', logoText: 'RAZER', logoUrl: '/brands/razer.png' },
+  { name: 'ASUS', url: 'https://www.asus.com/th/', logoText: 'ASUS', logoUrl: '/brands/asus.png' },
+  { name: 'Intel', url: 'https://www.intel.co.th', logoText: 'intel', logoUrl: '/brands/intel.png' },
+  { name: 'MSI', url: 'https://th.msi.com', logoText: 'msi', logoUrl: '/brands/msi.png' },
+  { name: 'ASRock', url: 'https://www.asrock.com', logoText: 'ASRock', logoUrl: '/brands/asrock.png' },
+  { name: 'Western Digital', url: 'https://www.westerndigital.com/th-th', logoText: 'Western Digital', logoUrl: '/brands/westerndigital.png' },
+  { name: 'NZXT', url: 'https://nzxt.com', logoText: 'NZXT', logoUrl: '/brands/nzxt.png' },
+  { name: 'LG', url: 'https://www.lg.com/th', logoText: 'LG', logoUrl: '/brands/lg.png' },
+  { name: 'Dahua', url: 'https://www.dahuasecurity.com/th', logoText: 'dahua', logoUrl: '/brands/dahua.png' }
 ]
 
 // 4 Leading Thai IT Stores per SUMMARY_CHANGES.md
@@ -70,7 +70,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.advice.co.th',
     color: '#06B6D4',
     badge: 'ADVICE',
-    logoUrl: 'https://logo.clearbit.com/advice.co.th',
+    logoUrl: '/stores/advice.png',
     descEn: 'Over 350 branches nationwide • Express 3-hr delivery',
     descTh: 'กว่า 350 สาขาทั่วประเทศ • จัดส่งด่วน 3 ชม. • สต็อกครบ'
   },
@@ -80,7 +80,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.jib.co.th',
     color: '#F59E0B',
     badge: 'JIB',
-    logoUrl: 'https://logo.clearbit.com/jib.co.th',
+    logoUrl: '/stores/jib.png',
     descEn: 'Online stock 99.4% • Instant store pickup & delivery',
     descTh: 'สต็อกออนไลน์เรียลไทม์ 99.4% • รับสินค้าที่สาขาใน 2 ชม.'
   },
@@ -90,7 +90,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.ihavecpu.com',
     color: '#8B5CF6',
     badge: 'iHAVE',
-    logoUrl: 'https://logo.clearbit.com/ihavecpu.com',
+    logoUrl: '/stores/ihavecpu.png',
     descEn: 'Premier PC build specialist • Expert hardware testing',
     descTh: 'ผู้เชี่ยวชาญการจัดสเปกคอมพิวเตอร์ • เทสอุปกรณ์ก่อนส่ง'
   },
@@ -100,7 +100,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.bnn.in.th',
     color: '#10B981',
     badge: 'BNN',
-    logoUrl: 'https://logo.clearbit.com/bnn.in.th',
+    logoUrl: '/stores/banana.png',
     descEn: '600+ store branches • 0% installment up to 24 months',
     descTh: 'สาขาครอบคลุมทั่วไทย • โปรโมชั่นผ่อน 0% นานสูงสุด 24 ด.'
   }
@@ -573,50 +573,33 @@ export default function HomePage({ user, compareList, setCompareList }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {RECOMMENDED_STORES.map((s) => (
             <a
               key={s.slug}
               href={s.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#120826]/85 rounded-2xl p-4 flex items-center justify-between border border-purple-500/25 hover:border-purple-400/60 hover:shadow-[0_4px_25px_rgba(139,92,246,0.3)] transition-all group"
+              className="bg-white rounded-2xl p-4 sm:p-5 h-20 sm:h-24 flex items-center justify-center text-center shadow-[0_4px_15px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_25px_rgba(255,255,255,0.4)] hover:scale-105 transition-all duration-300 group"
+              title={`Visit ${s.name} Official Website`}
             >
-              <div className="flex items-center space-x-3.5">
-                <div 
-                  className="w-16 h-12 rounded-xl flex items-center justify-center font-bold text-xs font-mono border overflow-hidden bg-white"
-                  style={{ 
-                    borderColor: `${s.color}40`,
-                    color: s.color 
-                  }}
-                >
-                  <img
-                    src={s.logoUrl}
-                    alt={s.badge}
-                    className="w-full h-full object-contain p-1"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  <div className="w-full h-full hidden items-center justify-center" style={{ backgroundColor: `${s.color}15` }}>
-                    {s.badge}
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center space-x-1">
-                    <span>{s.name}</span>
-                    <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-cyan-400" />
-                  </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">
-                    {lang === 'en' ? s.descEn : s.descTh}
-                  </p>
-                </div>
+              <img 
+                src={s.logoUrl} 
+                alt={s.badge} 
+                className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <div className="hidden w-full h-full items-center justify-center font-bold text-xl text-slate-800 uppercase font-display group-hover:text-blue-600 transition-colors">
+                {s.badge}
               </div>
             </a>
           ))}
         </div>
       </section>
+
 
       {/* SECTION 7: RECOMMENDED BRANDS (2 Rows of 7 = 14 Brands with White Rounded Backgrounds) */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
