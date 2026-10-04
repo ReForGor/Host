@@ -118,19 +118,30 @@ export default function HomePage({ user, compareList, setCompareList }) {
   const [activeChartProduct, setActiveChartProduct] = useState(null)
   const [activeAlertProduct, setActiveAlertProduct] = useState(null)
 
-  // 10 Main Categories Grid from Figma
-  const figmaCategories = [
-    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, count: lang === 'en' ? '540 Items' : '540 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, count: lang === 'en' ? '218 Items' : '218 รายการ', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
-    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, count: lang === 'en' ? '325 Items' : '325 รายการ', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
-    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, count: lang === 'en' ? '410 Items' : '410 รายการ', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
-    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: '/products?category=Monitors', icon: Tv, count: lang === 'en' ? '280 Items' : '280 รายการ', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
-    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: '/products?category=Motherboards', icon: Server, count: lang === 'en' ? '195 Items' : '195 รายการ', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: '/products?category=Power Supplies (PSU)', icon: Zap, count: lang === 'en' ? '160 Items' : '160 รายการ', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
-    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: '/products?category=Case & Cooling', icon: Wind, count: lang === 'en' ? '310 Items' : '310 รายการ', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
-    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: '/products?category=Accessories', icon: MousePointer, count: lang === 'en' ? '480 Items' : '480 รายการ', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
-    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: '/products?category=Notebooks', icon: Laptop, count: lang === 'en' ? '230 Items' : '230 รายการ', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
+  // Categories Grid mapping real product counts
+  const allCategoriesDef = [
+    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, dbKey: 'Graphics Cards (GPU)', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, dbKey: 'Processors (CPU)', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
+    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, dbKey: 'Memory (RAM)', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
+    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: '/products?category=Storage (SSD & HDD)', icon: HardDrive, dbKey: 'Storage (SSD & HDD)', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
+    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: '/products?category=Monitors & Displays', icon: Tv, dbKey: 'Monitors & Displays', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
+    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: '/products?category=Motherboards', icon: Server, dbKey: 'Motherboards', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: '/products?category=Power Supplies (PSU)', icon: Zap, dbKey: 'Power Supplies (PSU)', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
+    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: '/products?category=PC Cases & Cooling', icon: Wind, dbKey: 'PC Cases & Cooling', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
+    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: '/products?category=Gaming Peripherals', icon: MousePointer, dbKey: 'Gaming Peripherals', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
+    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: '/products?category=Laptops & Notebooks', icon: Laptop, dbKey: 'Laptops & Notebooks', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
   ]
+
+  const figmaCategories = allCategoriesDef
+    .map(c => {
+      const realCount = products.filter(p => p.category === c.dbKey).length;
+      return {
+        ...c,
+        realCount,
+        count: lang === 'en' ? `${realCount} Items` : `${realCount} รายการ`
+      }
+    })
+    .filter(c => c.realCount > 0);
 
   // Category filter tabs for the Deals/Products section
   const dealCategoryTabs = [
