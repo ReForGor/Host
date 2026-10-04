@@ -46,20 +46,20 @@ import { Helmet } from 'react-helmet-async'
 
 // 14 Recommended Official Hardware Brands (2 rows x 7 cols) per SUMMARY_CHANGES.md
 const RECOMMENDED_BRANDS = [
-  { name: 'Kingston', url: 'https://www.kingston.com/th', logoText: 'Kingston', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/23/Kingston_Technology_logo.svg' },
+  { name: 'Kingston', url: 'https://www.kingston.com/th', logoText: 'Kingston', logoUrl: '/brands/kingston.svg' },
   { name: 'Logitech', url: 'https://www.logitech.com/th-th', logoText: 'logitech', logoUrl: 'https://cdn.worldvectorlogo.com/logos/logitech-2-1.svg' },
   { name: 'AMD', url: 'https://www.amd.com/th', logoText: 'AMD', logoUrl: 'https://cdn.worldvectorlogo.com/logos/amd-logo-1.svg' },
   { name: 'Corsair', url: 'https://www.corsair.com', logoText: 'CORSAIR', logoUrl: 'https://cdn.worldvectorlogo.com/logos/corsair-2.svg' },
-  { name: 'GIGABYTE', url: 'https://www.gigabyte.com/th', logoText: 'GIGABYTE', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Gigabyte_Technology_logo_2008.svg' },
+  { name: 'GIGABYTE', url: 'https://www.gigabyte.com/th', logoText: 'GIGABYTE', logoUrl: '/brands/gigabyte.svg' },
   { name: 'Razer', url: 'https://www.razer.com/th-th', logoText: 'RAZER', logoUrl: 'https://cdn.worldvectorlogo.com/logos/razer.svg' },
   { name: 'ASUS', url: 'https://www.asus.com/th/', logoText: 'ASUS', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg' },
   { name: 'Intel', url: 'https://www.intel.co.th', logoText: 'intel', logoUrl: 'https://cdn.worldvectorlogo.com/logos/intel.svg' },
-  { name: 'MSI', url: 'https://th.msi.com', logoText: 'msi', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b1/MSI_wordmark.svg' },
-  { name: 'ASRock', url: 'https://www.asrock.com', logoText: 'ASRock', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/ASRock_logo.svg' },
-  { name: 'Western Digital', url: 'https://www.westerndigital.com/th-th', logoText: 'Western Digital', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Western_Digital_logo.svg' },
-  { name: 'NZXT', url: 'https://nzxt.com', logoText: 'NZXT', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/NZXT_logo.svg' },
+  { name: 'MSI', url: 'https://th.msi.com', logoText: 'msi', logoUrl: '/brands/msi.svg' },
+  { name: 'ASRock', url: 'https://www.asrock.com', logoText: 'ASRock', logoUrl: '/brands/asrock.svg' },
+  { name: 'Western Digital', url: 'https://www.westerndigital.com/th-th', logoText: 'Western Digital', logoUrl: '/brands/westerndigital.svg' },
+  { name: 'NZXT', url: 'https://nzxt.com', logoText: 'NZXT', logoUrl: '/brands/nzxt.svg' },
   { name: 'LG', url: 'https://www.lg.com/th', logoText: 'LG', logoUrl: 'https://cdn.worldvectorlogo.com/logos/lg.svg' },
-  { name: 'Dahua', url: 'https://www.dahuasecurity.com/th', logoText: 'dahua', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Dahua_Technology_logo.svg' }
+  { name: 'Dahua', url: 'https://www.dahuasecurity.com/th', logoText: 'dahua', logoUrl: '/brands/dahua.svg' }
 ]
 
 // 4 Leading Thai IT Stores per SUMMARY_CHANGES.md
