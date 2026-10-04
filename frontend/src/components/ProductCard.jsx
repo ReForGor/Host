@@ -30,7 +30,28 @@ export default function ProductCard({
     return { name: 'Advice IT Infinite', color: 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30' }
   }
 
+  const getBrandLogo = (brandName) => {
+    if (!brandName) return null;
+    const b = brandName.toLowerCase();
+    if (b.includes('kingston')) return 'https://cdn.worldvectorlogo.com/logos/kingston-technology.svg';
+    if (b.includes('logitech')) return 'https://cdn.worldvectorlogo.com/logos/logitech-2-1.svg';
+    if (b.includes('amd')) return 'https://cdn.worldvectorlogo.com/logos/amd-logo-1.svg';
+    if (b.includes('corsair')) return 'https://cdn.worldvectorlogo.com/logos/corsair-2.svg';
+    if (b.includes('gigabyte')) return 'https://logo.clearbit.com/gigabyte.com';
+    if (b.includes('razer')) return 'https://cdn.worldvectorlogo.com/logos/razer.svg';
+    if (b.includes('asus')) return 'https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg';
+    if (b.includes('intel')) return 'https://cdn.worldvectorlogo.com/logos/intel.svg';
+    if (b.includes('msi')) return 'https://logo.clearbit.com/msi.com';
+    if (b.includes('asrock')) return 'https://logo.clearbit.com/asrock.com';
+    if (b.includes('western digital') || b === 'wd') return 'https://logo.clearbit.com/westerndigital.com';
+    if (b.includes('nzxt')) return 'https://cdn.worldvectorlogo.com/logos/nzxt-1.svg';
+    if (b.includes('lg')) return 'https://cdn.worldvectorlogo.com/logos/lg.svg';
+    if (b.includes('dahua')) return 'https://logo.clearbit.com/dahuasecurity.com';
+    return null;
+  }
+
   const storeInfo = getStoreBadge(product.best_store_name)
+  const brandLogoUrl = getBrandLogo(product.brand)
   const discountPercent = product.max_discount_percent || 
     (product.msrp && product.lowest_price && product.msrp > product.lowest_price
       ? Math.round(((product.msrp - product.lowest_price) / product.msrp) * 100)
@@ -43,16 +64,19 @@ export default function ProductCard({
         : 'border-purple-500/20 hover:border-purple-400 hover:shadow-[0_8px_30px_rgba(0,0,0,0.8),0_0_25px_rgba(139,92,246,0.3)]'
     }`}>
       
-      {/* Top Bar: Category Tag & Discount Pill */}
-      <div className="pt-3 px-3.5 flex items-center justify-between z-10">
-        <span className="text-[11px] font-medium text-slate-400 tracking-wide truncate max-w-[170px]">
+      {/* Top Bar: Category Tag & Badges (Trend & Discount) */}
+      <div className="pt-3 px-3.5 flex items-center justify-between z-10 gap-1.5 flex-wrap">
+        <span className="text-[11px] font-medium text-slate-400 tracking-wide truncate max-w-[130px]">
           {product.category || (lang === 'en' ? 'PC Hardware' : 'อุปกรณ์คอมพิวเตอร์')}
         </span>
-        {discountPercent > 0 && (
-          <span className="px-2 py-0.5 rounded-full bg-[#F97316] text-white font-display text-[11px] font-bold shadow-[0_0_10px_rgba(249,115,22,0.4)]">
-            -{discountPercent}%
-          </span>
-        )}
+        <div className="flex items-center space-x-1">
+          {product.price_trend === 'down' ? (
+            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-display text-[10px] font-bold shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+              <TrendingDown className="w-3 h-3 text-emerald-400" />
+              <span>{lang === 'en' ? 'Buy Now' : 'แนะนำซื้อ'}</span>
+            </span>
+          ) : null}
+        </div>
       </div>
 
       {/* Illuminated Product Image Recess */}
@@ -82,7 +106,21 @@ export default function ProductCard({
         <div>
           {/* Brand & Model Code */}
           <div className="flex items-center space-x-2 text-[10px] font-mono tracking-wider text-slate-400 mb-1">
-            <span className="font-bold text-cyan-400 uppercase">{product.brand || 'IT'}</span>
+            {brandLogoUrl ? (
+              <img 
+                src={brandLogoUrl} 
+                alt={product.brand || 'Brand'} 
+                className="h-4 object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity" 
+                title={product.brand}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'inline';
+                }}
+              />
+            ) : null}
+            <span className={`${brandLogoUrl ? 'hidden' : ''} font-bold text-cyan-400 uppercase`}>
+              {product.brand || 'IT'}
+            </span>
             {product.model_no && (
               <span className="text-slate-500 truncate">{product.model_no}</span>
             )}
@@ -109,17 +147,19 @@ export default function ProductCard({
                 {formatPrice(product.lowest_price)}
               </span>
             </div>
-            {product.msrp && product.msrp > (product.lowest_price || 0) && (
-              <div className="text-right">
-                <span className="text-[10px] text-slate-500 block">
-                  {t.productCard?.msrp || (lang === 'en' ? 'MSRP' : 'ราคาเปิดตัว')}
-                </span>
-                <span className="text-xs text-slate-500 line-through font-display">
-                  {formatPrice(product.msrp)}
-                </span>
-              </div>
-            )}
           </div>
+
+          {/* Savings vs Highest Retailer */}
+          {product.savings_amount > 0 && (
+            <div className="flex items-center justify-between text-[10px] text-cyan-300 bg-cyan-950/30 px-2 py-0.5 rounded-md border border-cyan-500/20">
+              <span className="text-slate-300">
+                {lang === 'en' ? 'Max Savings:' : 'ประหยัดได้สูงสุด:'}
+              </span>
+              <span className="font-bold text-emerald-400 font-mono">
+                ฿{Number(product.savings_amount).toLocaleString('th-TH')} ({product.savings_percent}%)
+              </span>
+            </div>
+          )}
 
           {/* Best Store Tag + Quick Cart Action */}
           <div className="flex items-center justify-between text-xs pt-1">
