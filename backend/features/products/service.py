@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc, asc
 from sqlalchemy.orm import selectinload
@@ -24,7 +24,7 @@ async def list_products_service(
     sort_by: str = "cheapest",
     limit: int = 500,
     offset: int = 0
-) -> (List[ProductSummaryOut], int):
+) -> Tuple[List[ProductSummaryOut], int]:
     query = select(Product).options(
         selectinload(Product.listings).selectinload(PriceListing.store)
     )
@@ -83,6 +83,21 @@ async def list_products_service(
         if max_price is not None and lowest_p is not None and lowest_p > max_price:
             continue
 
+        savings_amt = round(highest_p - lowest_p, 2)
+        savings_pct = round((savings_amt / highest_p * 100), 1) if highest_p > 0 else 0.0
+
+        if prod.msrp and lowest_p < prod.msrp * 0.95:
+            price_trend = "down"
+            price_trend_text = "Trend ขาลง (แนะนำซื้อ)"
+        elif prod.msrp and lowest_p > prod.msrp * 1.02:
+            price_trend = "up"
+            price_trend_text = "Trend ขาขึ้น"
+        else:
+            price_trend = "stable"
+            price_trend_text = "ราคาคงที่"
+
+        suggested_target = round(lowest_p * 0.95, -1) if lowest_p else None
+
         item = ProductSummaryOut(
             id=prod.id,
             name=prod.name,
@@ -113,7 +128,13 @@ async def list_products_service(
                 if best_listing and best_listing.store
                 else None
             ),
-            max_discount_percent=round(max_discount, 1)
+            max_discount_percent=round(max_discount, 1),
+            savings_amount=savings_amt,
+            savings_percent=savings_pct,
+            price_trend=price_trend,
+            price_trend_text=price_trend_text,
+            volatility_score=savings_pct,
+            suggested_target_price=suggested_target
         )
         results.append(item)
 
@@ -202,6 +223,19 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
             )
         )
 
+    savings_pct = round((max_savings / highest_price * 100), 1) if highest_price > 0 else 0.0
+    if prod.msrp and lowest_raw_price < prod.msrp * 0.95:
+        price_trend = "down"
+        price_trend_text = "Trend ขาลง (แนะนำซื้อ)"
+    elif prod.msrp and lowest_raw_price > prod.msrp * 1.02:
+        price_trend = "up"
+        price_trend_text = "Trend ขาขึ้น"
+    else:
+        price_trend = "stable"
+        price_trend_text = "ราคาคงที่"
+
+    suggested_target = round(lowest_raw_price * 0.95, -1) if lowest_raw_price else None
+
     return ProductDetailOut(
         id=prod.id,
         name=prod.name,
@@ -219,7 +253,12 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
         highest_price=highest_price,
         avg_price=avg_price,
         total_savings=max_savings,
+        savings_percent=savings_pct,
         best_store=sorted_listings[0].store.name if sorted_listings[0].store else None,
+        price_trend=price_trend,
+        price_trend_text=price_trend_text,
+        volatility_score=savings_pct,
+        suggested_target_price=suggested_target,
         platforms=platform_items
     )
 
@@ -237,12 +276,18 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
     res = await db.execute(query)
     records = res.scalars().all()
 
-    # Group records by store
+    # Group records by store and date
     store_map: Dict[int, Dict[str, Any]] = {}
+    date_prices: Dict[str, List[float]] = {}
     all_prices = []
 
     for rec in records:
         all_prices.append(rec.price)
+        d_str = rec.timestamp.strftime("%Y-%m-%d")
+        if d_str not in date_prices:
+            date_prices[d_str] = []
+        date_prices[d_str].append(rec.price)
+
         st = rec.store
         if not st:
             continue
@@ -254,13 +299,33 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
                 "data_points": []
             }
         store_map[st.id]["data_points"].append({
-            "date": rec.timestamp.strftime("%Y-%m-%d"),
+            "date": d_str,
             "price": rec.price
         })
 
     lowest_hist = min(all_prices) if all_prices else (prod.msrp or 0)
     highest_hist = max(all_prices) if all_prices else (prod.msrp or 0)
     current_lowest = lowest_hist
+
+    # Calculate Market Average Line (daily average across all stores)
+    market_average_series = [
+        {
+            "date": d,
+            "price": round(sum(plist) / len(plist), 2)
+        }
+        for d, plist in sorted(date_prices.items())
+    ]
+
+    # Calculate Price Volatility Score (Coefficient of Variation: CV %)
+    if len(all_prices) > 1:
+        mean_p = sum(all_prices) / len(all_prices)
+        variance = sum((x - mean_p) ** 2 for x in all_prices) / (len(all_prices) - 1)
+        stdev_p = variance ** 0.5
+        cv_pct = round((stdev_p / mean_p) * 100, 2) if mean_p > 0 else 0.0
+    else:
+        cv_pct = 0.0
+
+    suggested_target = round(lowest_hist * 0.95, -1) if lowest_hist else None
 
     series_list = [
         StoreHistorySeries(
@@ -278,7 +343,10 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
         lowest_historical_price=lowest_hist,
         highest_historical_price=highest_hist,
         current_lowest_price=current_lowest,
-        series=series_list
+        series=series_list,
+        market_average_series=market_average_series,
+        suggested_target_price=suggested_target,
+        volatility_cv_percent=cv_pct
     )
 
 async def search_suggestions_service(q: str, limit: int, db: AsyncSession):

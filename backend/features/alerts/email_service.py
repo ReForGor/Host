@@ -109,7 +109,9 @@ class EmailService:
         status = "sent"
         error_msg = None
 
-        has_smtp = bool(settings.SMTP_HOST and (settings.SMTP_USER or settings.SMTP_PORT == 25))
+        is_dummy_domain = any(to_email.lower().endswith(d) for d in ["@test.com", "@example.com", "@kptm.com", ".local", ".test"])
+        has_smtp = bool(settings.SMTP_HOST and (settings.SMTP_USER or settings.SMTP_PORT == 25)) and not is_dummy_domain and not getattr(settings, "EMAIL_DEV_MODE", False)
+
 
         if has_smtp:
             try:
@@ -511,18 +513,19 @@ class EmailService:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
 
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            for url in candidate_urls:
-                try:
-                    resp = await client.get(url, headers=headers)
-                    if resp.status_code == 200 and resp.content and len(resp.content) > 500:
-                        inline_images["product_image"] = resp.content
-                        email_img_src = "cid:product_image"
-                        break
-                    else:
-                        logger.warning(f"Image candidate {url} returned HTTP {resp.status_code}, trying next fallback...")
-                except Exception as dl_err:
-                    logger.warning(f"Could not download candidate image {url}: {dl_err}")
+        try:
+            async with httpx.AsyncClient(timeout=1.0) as client:
+                for url in candidate_urls:
+                    try:
+                        resp = await client.get(url, headers=headers)
+                        if resp.status_code == 200 and resp.content and len(resp.content) > 500:
+                            inline_images["product_image"] = resp.content
+                            email_img_src = "cid:product_image"
+                            break
+                    except Exception:
+                        pass
+        except Exception:
+            pass
 
         # If for any reason CID could not be attached, ensure email_img_src is a valid public HTTP URL
         if not inline_images.get("product_image"):
@@ -584,16 +587,19 @@ class EmailService:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
 
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            for url in candidate_urls:
-                try:
-                    resp = await client.get(url, headers=headers)
-                    if resp.status_code == 200 and resp.content and len(resp.content) > 500:
-                        inline_images["product_image"] = resp.content
-                        email_img_src = "cid:product_image"
-                        break
-                except Exception as dl_err:
-                    logger.warning(f"Could not download candidate image {url}: {dl_err}")
+        try:
+            async with httpx.AsyncClient(timeout=1.0) as client:
+                for url in candidate_urls:
+                    try:
+                        resp = await client.get(url, headers=headers)
+                        if resp.status_code == 200 and resp.content and len(resp.content) > 500:
+                            inline_images["product_image"] = resp.content
+                            email_img_src = "cid:product_image"
+                            break
+                    except Exception:
+                        pass
+        except Exception:
+            pass
 
         if not inline_images.get("product_image"):
             email_img_src = candidate_urls[0] if candidate_urls else "https://www.jib.co.th/img_master/product/original/2022040514004252535_1.jpg"

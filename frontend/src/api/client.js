@@ -18,6 +18,18 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Handle 401 Unauthorized globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('techprice_token')
+      window.dispatchEvent(new Event('techprice_auth_expired'))
+    }
+    return Promise.reject(error)
+  }
+)
+
 export const productApi = {
   getProducts: (params = {}) => api.get('/products', { params }),
   getProductDetail: (id) => api.get(`/products/${id}`),
@@ -73,6 +85,8 @@ export const authApi = {
 export const analyticsApi = {
   pingVisit: (data) => api.post('/analytics/visit', data),
   getStats: () => api.get('/analytics/stats'),
+  getStoreDominance: () => api.get('/analysis/store-dominance'),
+  getMarketSummary: () => api.get('/analysis/market-summary'),
 }
 
 export default api

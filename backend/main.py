@@ -10,7 +10,7 @@ from backend.features.compare.router import router as compare_router
 from backend.features.alerts.router import router as alerts_router
 from backend.features.auth.router import router as auth_router
 from backend.features.admin.router import router as admin_router
-from backend.features.analytics.router import router as analytics_router
+from backend.features.analytics.router import router as analytics_router, analysis_router
 from backend.features.analytics.models import VisitorRecord, SystemMetric
 from backend.features.scrapers.scheduler import scheduler
 
@@ -38,8 +38,6 @@ app = FastAPI(
 
 # CORS configuration for Frontend SPA (Vite dev server & production)
 ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8000",
@@ -49,7 +47,7 @@ ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=r"https://.*", # Allow any HTTPS origin for Vercel/Render compatibility
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,6 +62,7 @@ app.include_router(alerts_router)
 app.include_router(scrapers_router)
 app.include_router(admin_router)
 app.include_router(analytics_router)
+app.include_router(analysis_router)
 
 
 @app.get("/health", tags=["Health"])

@@ -12,3 +12,5 @@ class MultiProductCompareResponse(BaseModel):
     spec_matrix: List[SpecRow]
     price_winner_id: Optional[int] = None
     value_score_leader_id: Optional[int] = None
+    value_score_reason: Optional[str] = None
+    value_scores: Optional[Dict[int, str]] = None

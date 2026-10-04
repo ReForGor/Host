@@ -71,7 +71,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
     { name: lang === 'en' ? 'RAM' : 'แรม', path: '/products?category=Memory (RAM)' },
     { name: t.nav?.compare || (lang === 'en' ? 'Compare' : 'เปรียบเทียบสเปก'), path: '/compare' },
     { name: t.nav?.deals || 'Hot Deals', path: '/deals', isHotDeal: true },
-    { name: t.nav?.stores || (lang === 'en' ? 'Stores' : 'สถานะร้านค้า'), path: '/platforms' },
+    ...(user?.is_admin ? [{ name: t.nav?.stores || (lang === 'en' ? 'Stores' : 'สถานะร้านค้า'), path: '/platforms' }] : []),
   ]
 
   const isLinkActive = (path) => {
@@ -137,6 +137,8 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
             {/* Mega Menu Button */}
             <div className="relative">
               <button
+                aria-label="Toggle Mega Menu"
+                aria-expanded={isMegaMenuOpen}
                 onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
                 onBlur={() => setTimeout(() => setIsMegaMenuOpen(false), 250)}
                 className={`hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
@@ -210,17 +212,13 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
             })}
           </nav>
 
-          {/* Right: Currency + Language Toggle + Alerts + User */}
+          {/* Right: Language Toggle + Alerts + User */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Currency Badge */}
-            <div className="hidden sm:flex items-center px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-300">
-              <span className="text-cyan-400 font-mono mr-1">฿</span>
-              <span>THB</span>
-            </div>
-
             {/* Language Switcher */}
-            <div className="flex items-center bg-[#0B0F19] border border-white/[0.08] rounded-full p-0.5">
+
+            <div className="flex items-center bg-[#0B0F19] border border-white/[0.08] rounded-full p-0.5" role="group" aria-label="Language Toggles">
               <button
+                aria-label="Switch to Thai Language"
                 onClick={() => lang !== 'th' && toggleLanguage()}
                 className={`px-2 py-0.5 text-[11px] font-bold rounded-full transition-all ${
                   lang === 'th'
@@ -231,6 +229,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 TH
               </button>
               <button
+                aria-label="Switch to English Language"
                 onClick={() => lang !== 'en' && toggleLanguage()}
                 className={`px-2 py-0.5 text-[11px] font-bold rounded-full transition-all ${
                   lang === 'en'
@@ -245,6 +244,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
             {/* Notification Bell */}
             <Link
               to="/watchlist"
+              aria-label="View Watchlist and Alerts"
               className="relative p-2 text-slate-400 hover:text-cyan-400 rounded-lg hover:bg-white/[0.05] transition-colors"
               title={t.nav?.watchlist || (lang === 'en' ? 'Watchlist & Alerts' : 'รายการติดตาม & แจ้งเตือน')}
             >
@@ -277,6 +277,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 </div>
                 <span className="text-slate-200 font-semibold max-w-[90px] truncate">{user.username}</span>
                 <button
+                  aria-label="Sign Out"
                   onClick={onLogout}
                   className="text-slate-400 hover:text-rose-400 ml-1 transition-colors"
                   title={t.nav?.logout || (lang === 'en' ? 'Sign Out' : 'ออกจากระบบ')}
@@ -286,6 +287,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
               </div>
             ) : (
               <button
+                aria-label="Open Login Modal"
                 onClick={onOpenLogin}
                 className="flex items-center space-x-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl btn-cyber-primary"
               >

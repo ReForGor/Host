@@ -138,10 +138,14 @@ async def list_alerts(
     db: AsyncSession = Depends(get_db)
 ):
     query = select(PriceAlert).options(selectinload(PriceAlert.product)).order_by(desc(PriceAlert.created_at))
-    if current_user:
+    if current_user and current_user.is_admin:
+        pass # Admin sees all
+    elif current_user:
         query = query.where(PriceAlert.user_id == current_user.id)
     elif email:
         query = query.where(PriceAlert.email == email)
+    else:
+        query = query.where(PriceAlert.id == -1) # No user, no email -> empty
 
     res = await db.execute(query)
     alerts = res.scalars().all()
@@ -186,11 +190,18 @@ async def toggle_alert(alert_id: int, db: AsyncSession = Depends(get_db)):
 @router.get("/notifications", response_model=List[NotificationOut])
 async def list_notifications(
     limit: int = Query(50, ge=1, le=100),
+    current_user = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db)
 ):
-    res = await db.execute(
-        select(Notification).order_by(desc(Notification.created_at)).limit(limit)
-    )
+    query = select(Notification).order_by(desc(Notification.created_at)).limit(limit)
+    if current_user and current_user.is_admin:
+        pass
+    elif current_user:
+        query = query.where(Notification.user_id == current_user.id)
+    else:
+        query = query.where(Notification.id == -1)
+        
+    res = await db.execute(query)
     return res.scalars().all()
 
 @router.post("/notifications/{notif_id}/read")

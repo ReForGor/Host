@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
 import { useSearchParams, Link } from 'react-router-dom'
 import { 
   Scale, 
@@ -245,7 +246,7 @@ export default function ComparePage({ compareList, setCompareList }) {
     const current = compareData.products.map(p => p.id)
     if (current.includes(productId)) return
     if (current.length >= 4) {
-      alert(t.compare?.maxItemsNotice || (lang === 'en' ? 'You can compare up to 4 items simultaneously.' : 'เปรียบเทียบได้สูงสุด 4 รายการ'))
+      toast.error(t.compare?.maxItemsNotice || (lang === 'en' ? 'You can compare up to 4 items simultaneously.' : 'เปรียบเทียบได้สูงสุด 4 รายการ'))
       return
     }
     const updated = [...current, productId]
@@ -254,7 +255,7 @@ export default function ComparePage({ compareList, setCompareList }) {
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href)
-    alert(lang === 'en' ? 'Comparison link copied to clipboard!' : 'คัดลอกลิงก์การเปรียบเทียบสเปกแล้ว!')
+    toast.success(lang === 'en' ? 'Comparison link copied to clipboard!' : 'คัดลอกลิงก์การเปรียบเทียบสเปกแล้ว!')
   }
 
   const handleAlertSubmit = (e) => {
@@ -378,6 +379,36 @@ export default function ComparePage({ compareList, setCompareList }) {
           )}
         </div>
       </div>
+
+      {/* VALUE SCORE CHAMPION BANNER (Spec-to-Price Analysis from analysis.md) */}
+      {compareData?.value_score_leader_id && (
+        <div className="bg-gradient-to-r from-amber-500/15 via-purple-500/20 to-cyan-500/15 border border-amber-400/35 rounded-3xl p-5 shadow-[0_4px_30px_rgba(245,158,11,0.15)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.3)] flex-shrink-0">
+              <Sparkles className="w-6 h-6 text-amber-400 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                <span className="text-xs font-black text-amber-300 uppercase tracking-wider font-mono">
+                  {lang === 'en' ? 'VALUE SCORE WINNER (SPEC-TO-PRICE)' : 'ผู้นำคะแนนความคุ้มค่า (VALUE SCORE WINNER)'}
+                </span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 border border-amber-400/30 font-medium">
+                  {compareData.value_score_reason || (lang === 'en' ? 'Best cost per spec unit' : 'ต้นทุนต่อหน่วยสเปกคุ้มค่าที่สุด')}
+                </span>
+              </div>
+              <p className="text-sm font-bold text-white mt-1">
+                {compareData.products.find(p => p.id === compareData.value_score_leader_id)?.name}
+              </p>
+            </div>
+          </div>
+          <div className="sm:text-right bg-[#0A0314]/60 px-4 py-2 rounded-2xl border border-amber-400/20 flex sm:flex-col justify-between items-center sm:items-end">
+            <span className="text-[10px] text-slate-400 block font-mono">{lang === 'en' ? 'Value Metric Ratio' : 'อัตราส่วนความคุ้มค่า'}</span>
+            <span className="text-base font-mono font-black text-emerald-400">
+              {compareData.value_scores?.[compareData.value_score_leader_id] || 'คุ้มค่าที่สุด'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* SIDE-BY-SIDE PRODUCT HEADER CARDS (FIGMA STYLE) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -665,13 +696,13 @@ export default function ComparePage({ compareList, setCompareList }) {
           <span className="text-slate-400">{lang === 'en' ? 'Live Stock Check across 4 stores:' : 'ตรวจสอบสต็อกทั้ง 4 ร้านค้าแบบสด:'}</span>
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => alert(lang === 'en' ? 'Stock Check 7800X3D: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 7800X3D: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
+              onClick={() => toast.success(lang === 'en' ? 'Stock Check 7800X3D: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 7800X3D: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
               className="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-semibold"
             >
               {lang === 'en' ? 'Check 7800X3D Stock' : 'ดูราคา 7800X3D ทุกร้าน'}
             </button>
             <button
-              onClick={() => alert(lang === 'en' ? 'Stock Check 14700K: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 14700K: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
+              onClick={() => toast.success(lang === 'en' ? 'Stock Check 14700K: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 14700K: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
               className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 font-semibold"
             >
               {lang === 'en' ? 'Check 14700K Stock' : 'ดูราคา 14700K ทุกร้าน'}

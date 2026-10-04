@@ -87,6 +87,12 @@ class ProductSummaryOut(ProductBase):
     best_store_logo: Optional[str] = None
     best_product_url: Optional[str] = None
     max_discount_percent: float = 0.0
+    savings_amount: Optional[float] = 0.0
+    savings_percent: Optional[float] = 0.0
+    price_trend: Optional[str] = "stable"
+    price_trend_text: Optional[str] = "ราคาคงที่"
+    volatility_score: Optional[float] = 0.0
+    suggested_target_price: Optional[float] = None
     model_config = ConfigDict(from_attributes=True)
 
 class ProductDetailOut(ProductBase):
@@ -97,7 +103,12 @@ class ProductDetailOut(ProductBase):
     highest_price: Optional[float] = None
     avg_price: Optional[float] = None
     total_savings: Optional[float] = None
+    savings_percent: Optional[float] = 0.0
     best_store: Optional[str] = None
+    price_trend: Optional[str] = "stable"
+    price_trend_text: Optional[str] = "ราคาคงที่"
+    volatility_score: Optional[float] = 0.0
+    suggested_target_price: Optional[float] = None
     platforms: List[PlatformComparisonItem] = []
     model_config = ConfigDict(from_attributes=True)
 
@@ -114,3 +125,6 @@ class ProductPriceHistoryOut(BaseModel):
     highest_historical_price: float
     current_lowest_price: float
     series: List[StoreHistorySeries]
+    market_average_series: Optional[List[Dict[str, Any]]] = []
+    suggested_target_price: Optional[float] = None
+    volatility_cv_percent: Optional[float] = 0.0

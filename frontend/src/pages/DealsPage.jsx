@@ -5,57 +5,6 @@ import PriceChartModal from '../components/PriceChartModal'
 import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
 
-const MOCK_DEALS = [
-  {
-    id: 301,
-    name: 'ASUS TUF Gaming GeForce RTX 4070 SUPER 12GB GDDR6X OC',
-    category: 'Graphics Cards (GPU)',
-    brand: 'ASUS',
-    lowest_price: 25650,
-    msrp: 29900,
-    max_discount_percent: 14.2,
-    best_store_name: 'Advice IT Infinite',
-    image_url: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.advice.co.th'
-  },
-  {
-    id: 302,
-    name: 'GIGABYTE Radeon RX 7800 XT GAMING OC 16GB GDDR6',
-    category: 'Graphics Cards (GPU)',
-    brand: 'GIGABYTE',
-    lowest_price: 18650,
-    msrp: 22900,
-    max_discount_percent: 18.6,
-    best_store_name: 'JIB Online',
-    image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.jib.co.th'
-  },
-  {
-    id: 303,
-    name: 'AMD Ryzen 7 7800X3D 8-Core 16-Thread AM5',
-    category: 'Processors (CPU)',
-    brand: 'AMD',
-    lowest_price: 14900,
-    msrp: 16900,
-    max_discount_percent: 11.8,
-    best_store_name: 'iHaveCPU',
-    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.ihavecpu.com'
-  },
-  {
-    id: 304,
-    name: 'Sapphire PULSE AMD Radeon RX 7600 8GB GDDR6',
-    category: 'Graphics Cards (GPU)',
-    brand: 'SAPPHIRE',
-    lowest_price: 8630,
-    msrp: 10500,
-    max_discount_percent: 17.8,
-    best_store_name: 'BaNANA IT',
-    image_url: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.bnn.in.th'
-  }
-]
-
 export default function DealsPage({ user }) {
   const { t, lang } = useLanguage()
   const [deals, setDeals] = useState([])
@@ -74,11 +23,11 @@ export default function DealsPage({ user }) {
       if (res.data && res.data.length > 0) {
         setDeals(res.data)
       } else {
-        setDeals(MOCK_DEALS)
+        setDeals([])
       }
     } catch (e) {
-      console.warn('Deals notice, using mock fallback:', e)
-      setDeals(MOCK_DEALS)
+      console.warn('Deals notice:', e)
+      setDeals([])
     } finally {
       setLoading(false)
     }

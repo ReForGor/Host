@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
 import { 
   ShieldCheck, 
   Package, 
@@ -135,21 +136,45 @@ export default function AdminPage({ user }) {
       setNewProdMsrp('')
       setNewProdImage('')
       await loadData()
-      alert('เพิ่มสินค้าสำเร็จ และสร้างราคาเริ่มต้นใน 4 ร้านค้าเรียบร้อยแล้ว!')
+      toast.success('เพิ่มสินค้าสำเร็จ และสร้างราคาเริ่มต้นใน 4 ร้านค้าเรียบร้อยแล้ว!')
     } catch (err) {
-      alert('เกิดข้อผิดพลาดในการเพิ่มสินค้า: ' + (err.response?.data?.detail || err.message))
+      toast.error('เกิดข้อผิดพลาดในการเพิ่มสินค้า: ' + (err.response?.data?.detail || err.message))
     }
   }
 
   const handleDeleteProduct = async (id) => {
-    if (!window.confirm('คุณแน่ใจว่าต้องการลบสินค้านี้ออกจากระบบใช่หรือไม่?')) return
-    try {
-      await adminApi.deleteProduct(id)
-      setProducts(products.filter(p => p.id !== id))
-      await loadData()
-    } catch (err) {
-      alert('เกิดข้อผิดพลาดในการลบสินค้า')
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <p className="font-medium text-sm text-white">คุณแน่ใจว่าต้องการลบสินค้านี้ออกจากระบบใช่หรือไม่?</p>
+        <div className="flex gap-2 justify-end">
+          <button 
+            className="px-3 py-1.5 text-xs bg-[#1C0F3A] hover:bg-purple-900/40 border border-purple-500/30 rounded-lg text-white transition-colors"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            ยกเลิก
+          </button>
+          <button 
+            className="px-3 py-1.5 text-xs bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold transition-colors shadow-[0_0_10px_rgba(225,29,72,0.4)]"
+            onClick={async () => {
+              toast.dismiss(t.id)
+              try {
+                await adminApi.deleteProduct(id)
+                setProducts((prev) => prev.filter(p => p.id !== id))
+                await loadData()
+                toast.success('ลบสินค้าสำเร็จ')
+              } catch (err) {
+                toast.error('เกิดข้อผิดพลาดในการลบสินค้า')
+              }
+            }}
+          >
+            ลบเลย
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 8000,
+      id: `confirm-delete-product-${id}`,
+    });
   }
 
   const handleBroadcast = async (e) => {
@@ -160,22 +185,23 @@ export default function AdminPage({ user }) {
         message: broadcastMessage,
         store_name: broadcastStore
       })
-      alert(`ส่งการแจ้งเตือนแบบ Broadcast สำเร็จไปยังผู้ใช้ทั้งหมด ${res.data.dispatched_count} รายการ`)
+      toast.success(`ส่งการแจ้งเตือนแบบ Broadcast สำเร็จไปยังผู้ใช้ทั้งหมด ${res.data.dispatched_count} รายการ`)
       setBroadcastTitle('')
       setBroadcastMessage('')
       await loadData()
     } catch (err) {
-      alert('เกิดข้อผิดพลาดในการส่งข้อความ')
+      toast.error('เกิดข้อผิดพลาดในการส่งข้อความ')
     }
   }
 
   const handleTriggerScraper = async (slug) => {
     try {
-      alert(`เริ่มรัน Scraper สำหรับร้านค้า ${slug.toUpperCase()} ในเบื้องหลังแล้ว...`)
+      toast.success(`เริ่มรัน Scraper สำหรับร้านค้า ${slug.toUpperCase()} ในเบื้องหลังแล้ว...`)
       await scraperApi.runScraper({ platform_slug: slug, simulate_live: true })
       await loadData()
+      toast.success('รัน Scraper เรียบร้อยแล้ว')
     } catch (e) {
-      alert('รัน Scraper เรียบร้อยแล้ว')
+      toast.error('เกิดข้อผิดพลาดในการรัน Scraper')
     }
   }
 
@@ -189,10 +215,10 @@ export default function AdminPage({ user }) {
     setTriggeringScheduler(true)
     try {
       await scraperApi.triggerScheduler()
-      alert('สั่งเริ่มรันรอบเวลาดึงราคาทันที (JIB, Advice, BaNANA, iHaveCPU) ในเบื้องหลังแล้ว!')
+      toast.success('สั่งเริ่มรันรอบเวลาดึงราคาทันที (JIB, Advice, BaNANA, iHaveCPU) ในเบื้องหลังแล้ว!')
       await loadData()
     } catch (e) {
-      alert('เริ่มรันรอบดึงราคาเรียบร้อยแล้ว')
+      toast.success('เริ่มรันรอบดึงราคาเรียบร้อยแล้ว')
     } finally {
       setTriggeringScheduler(false)
     }
@@ -206,14 +232,14 @@ export default function AdminPage({ user }) {
         slug: newStoreSlug.trim().toLowerCase(),
         base_url: newStoreUrl.trim()
       })
-      alert(`เพิ่มแพลตฟอร์มร้านค้า ${newStoreName} เข้าสู่ระบบและฐานข้อมูลเรียบร้อยแล้ว!`)
+      toast.success(`เพิ่มแพลตฟอร์มร้านค้า ${newStoreName} เข้าสู่ระบบและฐานข้อมูลเรียบร้อยแล้ว!`)
       setShowAddStoreModal(false)
       setNewStoreName('')
       setNewStoreSlug('')
       setNewStoreUrl('')
       await loadData()
     } catch (err) {
-      alert('เกิดข้อผิดพลาดในการเพิ่มร้านค้า: ' + (err.response?.data?.detail || err.message))
+      toast.error('เกิดข้อผิดพลาดในการเพิ่มร้านค้า: ' + (err.response?.data?.detail || err.message))
     }
   }
 

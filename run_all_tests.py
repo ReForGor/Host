@@ -177,6 +177,15 @@ async def run_api_and_feature_tests():
         res_visit = await client.post("/api/analytics/visit", json={"session_id": "test_session_realtime", "page_path": "/home"})
         record_result("TC_ANALYTICS", "Real-time audience tracking with 2-min active window", res_visit.status_code == 200 and res_visit.json().get("online_now", 0) >= 1, f"Online now: {res_visit.json().get('online_now') if res_visit.status_code == 200 else 'ERR'}")
 
+        # Market Analysis & Store Dominance Ranking (analysis.md)
+        res_analysis = await client.get("/api/analysis/store-dominance")
+        is_analysis_valid = (
+            res_analysis.status_code == 200 and 
+            len(res_analysis.json().get("store_rankings", [])) >= 4 and
+            res_analysis.json().get("price_spread", {}).get("avg_spread_percent") is not None
+        )
+        record_result("TC_ANALYSIS", "4-Dimension Market Analysis & Store Dominance API", is_analysis_valid, f"HTTP {res_analysis.status_code}")
+
         # Admin 1: Scraper Status (TC_A1_001)
         res_scrapers = await client.get("/api/scrapers/status", headers=admin_headers)
         record_result("TC_A1_001", "Admin check Web Scraper status", res_scrapers.status_code == 200, f"HTTP {res_scrapers.status_code}")

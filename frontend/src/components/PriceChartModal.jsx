@@ -15,7 +15,8 @@ import {
   Eye,
   Mail,
   Activity,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from 'lucide-react'
 import { productApi, alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -212,7 +213,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     }
   }
 
-  // Build Chart.js datasets
+  // Build Chart.js datasets with Market Average Line
   const getChartData = () => {
     const rawPoints = history?.series?.[0]?.data_points || [
       { date: '10 มี.ค.', price: 43500 },
@@ -227,30 +228,45 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     const labels = rawPoints.map(d => d.date)
     const dataValues = rawPoints.map(d => d.price)
 
+    const datasets = [
+      {
+        label: lang === 'en' ? 'Lowest Store Price' : 'ราคาต่ำสุดของร้าน',
+        data: dataValues,
+        borderColor: '#06b6d4',
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx
+          const gradient = ctx.createLinearGradient(0, 0, 0, 160)
+          gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)')
+          gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)')
+          return gradient
+        },
+        borderWidth: 2.5,
+        pointRadius: 2,
+        pointBackgroundColor: '#06b6d4',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 1.5,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.38
+      }
+    ]
+
+    if (history?.market_average_series && history.market_average_series.length > 0) {
+      datasets.push({
+        label: lang === 'en' ? 'Market Average (4 Stores)' : 'ค่าเฉลี่ยตลาด (4 ร้าน)',
+        data: history.market_average_series.map(d => d.price),
+        borderColor: '#f59e0b',
+        borderDash: [4, 4],
+        borderWidth: 1.8,
+        pointRadius: 0,
+        fill: false,
+        tension: 0.38
+      })
+    }
+
     return {
       labels,
-      datasets: [
-        {
-          label: 'Price',
-          data: dataValues,
-          borderColor: '#06b6d4',
-          backgroundColor: (context) => {
-            const ctx = context.chart.ctx
-            const gradient = ctx.createLinearGradient(0, 0, 0, 160)
-            gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)')
-            gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)')
-            return gradient
-          },
-          borderWidth: 2.5,
-          pointRadius: (ctx) => (ctx.dataIndex === 2 ? 6 : 2),
-          pointBackgroundColor: (ctx) => (ctx.dataIndex === 2 ? '#ef4444' : '#06b6d4'),
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointHoverRadius: 6,
-          fill: true,
-          tension: 0.38
-        }
-      ]
+      datasets
     }
   }
 
@@ -258,7 +274,17 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: {
+        display: true,
+        position: 'top',
+        align: 'end',
+        labels: {
+          color: '#94a3b8',
+          font: { size: 9 },
+          boxWidth: 12,
+          boxHeight: 2
+        }
+      },
       tooltip: {
         backgroundColor: '#0E061E',
         titleColor: '#06b6d4',
@@ -266,9 +292,9 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         borderColor: 'rgba(6, 182, 212, 0.5)',
         borderWidth: 1,
         padding: 8,
-        displayColors: false,
+        displayColors: true,
         callbacks: {
-          label: (context) => ` ฿${Number(context.parsed.y).toLocaleString()}`
+          label: (context) => ` ${context.dataset.label}: ฿${Number(context.parsed.y).toLocaleString()}`
         }
       }
     },
@@ -576,10 +602,6 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <Activity className="w-3.5 h-3.5 text-cyan-400" />
                     <span>{lang === 'en' ? "Today's Price Overview" : 'ภาพรวมราคาวันนี้'}</span>
                   </span>
-                  <span className="text-emerald-400 font-mono text-[11px] font-bold flex items-center space-x-1">
-                    <TrendingDown className="w-3.5 h-3.5" />
-                    <span>(-3.2%)</span>
-                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 pt-0.5">
@@ -603,10 +625,18 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center text-xs text-slate-400 border-t border-purple-500/20 pt-2 font-mono">
-                  <span>{lang === 'en' ? 'Thailand MSRP:' : 'MSRP ศูนย์ไทย:'}</span>
-                  <span className="font-display font-bold text-white text-xs">฿{Number(msrpPrice).toLocaleString()}</span>
+                {/* Analysis Indicators: Trend & Volatility */}
+                <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
+                  <div className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium truncate flex items-center space-x-1">
+                    <TrendingDown className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                    <span className="truncate">{detail?.price_trend_text || (lang === 'en' ? 'Downward Trend (Buy)' : 'Trend ขาลง (แนะนำซื้อ)')}</span>
+                  </div>
+                  <div className="px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 font-medium truncate flex items-center space-x-1">
+                    <Activity className="w-3 h-3 text-cyan-400 flex-shrink-0" />
+                    <span className="truncate">{history?.volatility_cv_percent ? `ผันผวน: ${history.volatility_cv_percent}% (CV)` : 'เสถียรภาพราคา: สูง'}</span>
+                  </div>
                 </div>
+
               </div>
 
               {/* CARD 2: PRICE HISTORY CHART WITH SAVINGS */}
@@ -628,19 +658,6 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 <div className="relative h-36 w-full pt-1">
                   <Line data={getChartData()} options={chartOptions} />
 
-                  {/* Floating Highlight Tooltip Badge (Exact from Figma design screenshot) */}
-                  <div className="absolute top-4 left-1/3 -translate-x-1/2 bg-[#120826]/95 border border-purple-500/50 rounded-xl px-2.5 py-1.5 shadow-[0_0_15px_rgba(139,92,246,0.3)] text-[10px] pointer-events-none">
-                    <div className="flex items-center space-x-1 text-slate-200">
-                      <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                      <span className="font-bold text-white">฿{Number(lowestPrice).toLocaleString()},</span>
-                      <span>{lang === 'en' ? "Today's Low:" : 'ต่ำสุดวันนี้:'}</span>
-                    </div>
-                    <div className="text-cyan-400 font-bold flex items-center space-x-1 mt-0.5">
-                      <Zap className="w-2.5 h-2.5 fill-cyan-400" />
-                      <span>Flash Deal 12.12</span>
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -681,6 +698,24 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                           </button>
                         )
                       })}
+                    </div>
+
+                    {/* Suggested Target Price based on Historical Low (Item 4 in analysis.md) */}
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-purple-950/40 border border-purple-500/30 text-[11px]">
+                      <div className="flex items-center space-x-1.5 text-cyan-300">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{lang === 'en' ? 'Suggested Target:' : 'ราคาแนะนำ (อิงสถิติต่ำสุด):'}</span>
+                        <span className="font-bold font-mono text-emerald-400">
+                          ฿{Number(detail?.suggested_target_price || history?.suggested_target_price || Math.round(lowestPrice * 0.95)).toLocaleString()}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAlertTargetPrice(String(detail?.suggested_target_price || history?.suggested_target_price || Math.round(lowestPrice * 0.95)))}
+                        className="px-2 py-0.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 text-[10px] font-bold transition-all"
+                      >
+                        {lang === 'en' ? 'Apply' : 'ใช้ราคานี้'}
+                      </button>
                     </div>
 
                     {/* 2 Inputs Side by Side */}

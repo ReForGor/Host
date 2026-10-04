@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
 import { useSearchParams, Link } from 'react-router-dom'
 import { 
   Search, 
@@ -27,6 +28,7 @@ import ProductCard from '../components/ProductCard'
 import PriceChartModal from '../components/PriceChartModal'
 import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
+import { Helmet } from 'react-helmet-async'
 
 // Rich sample mock fallback if backend is empty
 const MOCK_LISTING_PRODUCTS = [
@@ -353,7 +355,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       setCompareList(compareList.filter(p => p.id !== product.id))
     } else {
       if (compareList.length >= 4) {
-        alert(t.compare?.maxItemsNotice || (lang === 'en' ? 'You can compare up to 4 items simultaneously.' : 'สามารถเปรียบเทียบได้สูงสุด 4 รายการ'))
+        toast.error(t.compare?.maxItemsNotice || (lang === 'en' ? 'You can compare up to 4 items simultaneously.' : 'สามารถเปรียบเทียบได้สูงสุด 4 รายการ'))
         return
       }
       setCompareList([...compareList, product])
@@ -383,6 +385,10 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
+      <Helmet>
+        <title>{lang === 'en' ? `All Products - ${getCategoryTitle(selectedCategory)} | IT PRICE` : `สินค้าทั้งหมด - ${getCategoryTitle(selectedCategory)} | IT PRICE`}</title>
+        <meta name="description" content={lang === 'en' ? `Browse and compare prices for ${getCategoryTitle(selectedCategory)} across top Thai IT stores.` : `เปรียบเทียบราคา ${getCategoryTitle(selectedCategory)} จากร้านไอทีชั้นนำทั่วไทย`} />
+      </Helmet>
 
       {/* TOP HEADER & BREADCRUMB */}
       <div className="space-y-4">

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Bookmark, Bell, Trash2, ToggleLeft, ToggleRight, CheckCircle2, ArrowRight, ExternalLink, Mail } from 'lucide-react'
 import { alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
+import { toast } from 'react-hot-toast'
+import { Helmet } from 'react-helmet-async'
 
 const SAMPLE_ALERTS = [
   {
@@ -57,7 +59,7 @@ const SAMPLE_NOTIFICATIONS = [
   }
 ]
 
-export default function WatchlistPage({ user }) {
+export default function WatchlistPage({ user, onOpenLogin }) {
   const { t, lang } = useLanguage()
   const [alerts, setAlerts] = useState([])
   const [notifications, setNotifications] = useState([])
@@ -78,17 +80,17 @@ export default function WatchlistPage({ user }) {
       if (alertsRes.data && alertsRes.data.length > 0) {
         setAlerts(alertsRes.data)
       } else {
-        setAlerts(SAMPLE_ALERTS)
+        setAlerts([])
       }
       if (notifsRes.data && notifsRes.data.length > 0) {
         setNotifications(notifsRes.data)
       } else {
-        setNotifications(SAMPLE_NOTIFICATIONS)
+        setNotifications([])
       }
     } catch (e) {
-      console.warn('Watchlist fallback applied:', e)
-      setAlerts(SAMPLE_ALERTS)
-      setNotifications(SAMPLE_NOTIFICATIONS)
+      console.warn('Watchlist fetch error:', e)
+      setAlerts([])
+      setNotifications([])
     } finally {
       setLoading(false)
     }
@@ -98,21 +100,47 @@ export default function WatchlistPage({ user }) {
     const confirmMsg = lang === 'en' 
       ? 'Are you sure you want to stop tracking this product?' 
       : 'คุณต้องการยกเลิกการติดตามสินค้ารายการนี้ใช่หรือไม่?'
-    if (!window.confirm(confirmMsg)) return
-    try {
-      await alertApi.deleteAlert(id)
-      setAlerts(alerts.filter(a => a.id !== id))
-    } catch (e) {
-      alert(lang === 'en' ? 'Unable to delete alert' : 'ไม่สามารถลบการแจ้งเตือนได้')
-    }
+
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <p className="font-medium text-sm text-white">{confirmMsg}</p>
+        <div className="flex gap-2 justify-end">
+          <button 
+            className="px-3 py-1.5 text-xs bg-[#1C0F3A] hover:bg-purple-900/40 border border-purple-500/30 rounded-lg text-white transition-colors"
+            onClick={() => toast.dismiss(t.id)}
+          >
+            {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
+          </button>
+          <button 
+            className="px-3 py-1.5 text-xs bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold transition-colors shadow-[0_0_10px_rgba(225,29,72,0.4)]"
+            onClick={async () => {
+              toast.dismiss(t.id)
+              try {
+                await alertApi.deleteAlert(id)
+                setAlerts((prev) => prev.filter(a => a.id !== id))
+                toast.success(lang === 'en' ? 'Alert deleted successfully' : 'ลบการแจ้งเตือนสำเร็จ')
+              } catch (e) {
+                toast.error(lang === 'en' ? 'Unable to delete alert' : 'ไม่สามารถลบการแจ้งเตือนได้')
+              }
+            }}
+          >
+            {lang === 'en' ? 'Yes, Delete' : 'ลบเลย'}
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 8000,
+      id: `confirm-delete-${id}`,
+    });
   }
 
   const handleToggleAlert = async (id) => {
     try {
       const res = await alertApi.toggleAlert(id)
       setAlerts(alerts.map(a => a.id === id ? { ...a, is_active: res.data.is_active } : a))
+      toast.success(lang === 'en' ? 'Alert status changed' : 'เปลี่ยนสถานะสำเร็จ')
     } catch (e) {
-      alert(lang === 'en' ? 'Unable to change alert status' : 'ไม่สามารถเปลี่ยนสถานะการแจ้งเตือนได้')
+      toast.error(lang === 'en' ? 'Unable to change alert status' : 'ไม่สามารถเปลี่ยนสถานะการแจ้งเตือนได้')
     }
   }
 
@@ -125,8 +153,38 @@ export default function WatchlistPage({ user }) {
     }
   }
 
+  if (!user) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center animate-fade-in flex flex-col items-center justify-center min-h-[50vh]">
+        <Helmet>
+          <title>{lang === 'en' ? 'Watchlist | IT PRICE' : 'รายการติดตาม | IT PRICE'}</title>
+        </Helmet>
+        <Bookmark className="w-16 h-16 text-purple-400/50 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-white mb-2">
+          {lang === 'en' ? 'Login Required' : 'ต้องเข้าสู่ระบบก่อน'}
+        </h2>
+        <p className="text-slate-400 mb-8 max-w-md">
+          {lang === 'en' 
+            ? 'Your watchlist is waiting for you.' 
+            : 'คุณสามารถบันทึกสินค้าที่สนใจและตั้งค่าให้ระบบแจ้งเตือนเมื่อราคาลดลงได้'}
+        </p>
+        <button
+          onClick={onOpenLogin}
+          className="px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] transition-all flex items-center gap-2"
+        >
+          {lang === 'en' ? 'Log in to view Watchlist' : 'กรุณาเข้าสู่ระบบเพื่อดูรายการติดตาม'}
+          <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+      <Helmet>
+        <title>{lang === 'en' ? 'Watchlist & Alerts | IT PRICE' : 'รายการติดตามและการแจ้งเตือน | IT PRICE'}</title>
+        <meta name="description" content={lang === 'en' ? 'Manage your saved products and track real-time price drop notifications.' : 'จัดการสินค้ารอซื้อ และดูประวัติการลดราคาที่ระบบแจ้งเตือนมาถึงคุณ'} />
+      </Helmet>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-purple-500/25 gap-4 mb-8">
         <div>
