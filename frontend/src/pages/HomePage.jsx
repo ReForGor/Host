@@ -46,20 +46,20 @@ import { Helmet } from 'react-helmet-async'
 
 // 14 Recommended Official Hardware Brands (2 rows x 7 cols) per SUMMARY_CHANGES.md
 const RECOMMENDED_BRANDS = [
-  { name: 'Kingston', url: 'https://www.kingston.com/th', logoText: 'Kingston' },
-  { name: 'Logitech', url: 'https://www.logitech.com/th-th', logoText: 'logitech' },
-  { name: 'AMD', url: 'https://www.amd.com/th', logoText: 'AMD' },
-  { name: 'Corsair', url: 'https://www.corsair.com', logoText: 'CORSAIR' },
-  { name: 'GIGABYTE', url: 'https://www.gigabyte.com/th', logoText: 'GIGABYTE' },
-  { name: 'Razer', url: 'https://www.razer.com/th-th', logoText: 'RAZER' },
-  { name: 'ASUS', url: 'https://www.asus.com/th/', logoText: 'ASUS' },
-  { name: 'Intel', url: 'https://www.intel.co.th', logoText: 'intel' },
-  { name: 'MSI', url: 'https://th.msi.com', logoText: 'msi' },
-  { name: 'ASRock', url: 'https://www.asrock.com', logoText: 'ASRock' },
-  { name: 'Western Digital', url: 'https://www.westerndigital.com/th-th', logoText: 'Western Digital' },
-  { name: 'NZXT', url: 'https://nzxt.com', logoText: 'NZXT' },
-  { name: 'LG', url: 'https://www.lg.com/th', logoText: 'LG' },
-  { name: 'Dahua', url: 'https://www.dahuasecurity.com/th', logoText: 'dahua' }
+  { name: 'Kingston', url: 'https://www.kingston.com/th', logoText: 'Kingston', logoUrl: 'https://cdn.worldvectorlogo.com/logos/kingston-technology.svg' },
+  { name: 'Logitech', url: 'https://www.logitech.com/th-th', logoText: 'logitech', logoUrl: 'https://cdn.worldvectorlogo.com/logos/logitech-2-1.svg' },
+  { name: 'AMD', url: 'https://www.amd.com/th', logoText: 'AMD', logoUrl: 'https://cdn.worldvectorlogo.com/logos/amd-logo-1.svg' },
+  { name: 'Corsair', url: 'https://www.corsair.com', logoText: 'CORSAIR', logoUrl: 'https://cdn.worldvectorlogo.com/logos/corsair-2.svg' },
+  { name: 'GIGABYTE', url: 'https://www.gigabyte.com/th', logoText: 'GIGABYTE', logoUrl: 'https://logo.clearbit.com/gigabyte.com' },
+  { name: 'Razer', url: 'https://www.razer.com/th-th', logoText: 'RAZER', logoUrl: 'https://cdn.worldvectorlogo.com/logos/razer.svg' },
+  { name: 'ASUS', url: 'https://www.asus.com/th/', logoText: 'ASUS', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/ASUS_Logo.svg' },
+  { name: 'Intel', url: 'https://www.intel.co.th', logoText: 'intel', logoUrl: 'https://cdn.worldvectorlogo.com/logos/intel.svg' },
+  { name: 'MSI', url: 'https://th.msi.com', logoText: 'msi', logoUrl: 'https://logo.clearbit.com/msi.com' },
+  { name: 'ASRock', url: 'https://www.asrock.com', logoText: 'ASRock', logoUrl: 'https://logo.clearbit.com/asrock.com' },
+  { name: 'Western Digital', url: 'https://www.westerndigital.com/th-th', logoText: 'Western Digital', logoUrl: 'https://logo.clearbit.com/westerndigital.com' },
+  { name: 'NZXT', url: 'https://nzxt.com', logoText: 'NZXT', logoUrl: 'https://cdn.worldvectorlogo.com/logos/nzxt-1.svg' },
+  { name: 'LG', url: 'https://www.lg.com/th', logoText: 'LG', logoUrl: 'https://cdn.worldvectorlogo.com/logos/lg.svg' },
+  { name: 'Dahua', url: 'https://www.dahuasecurity.com/th', logoText: 'dahua', logoUrl: 'https://logo.clearbit.com/dahuasecurity.com' }
 ]
 
 // 4 Leading Thai IT Stores per SUMMARY_CHANGES.md
@@ -70,6 +70,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.advice.co.th',
     color: '#06B6D4',
     badge: 'ADVICE',
+    logoUrl: 'https://logo.clearbit.com/advice.co.th',
     descEn: 'Over 350 branches nationwide • Express 3-hr delivery',
     descTh: 'กว่า 350 สาขาทั่วประเทศ • จัดส่งด่วน 3 ชม. • สต็อกครบ'
   },
@@ -79,6 +80,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.jib.co.th',
     color: '#F59E0B',
     badge: 'JIB',
+    logoUrl: 'https://logo.clearbit.com/jib.co.th',
     descEn: 'Online stock 99.4% • Instant store pickup & delivery',
     descTh: 'สต็อกออนไลน์เรียลไทม์ 99.4% • รับสินค้าที่สาขาใน 2 ชม.'
   },
@@ -88,6 +90,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.ihavecpu.com',
     color: '#8B5CF6',
     badge: 'iHAVE',
+    logoUrl: 'https://logo.clearbit.com/ihavecpu.com',
     descEn: 'Premier PC build specialist • Expert hardware testing',
     descTh: 'ผู้เชี่ยวชาญการจัดสเปกคอมพิวเตอร์ • เทสอุปกรณ์ก่อนส่ง'
   },
@@ -97,6 +100,7 @@ const RECOMMENDED_STORES = [
     url: 'https://www.bnn.in.th',
     color: '#10B981',
     badge: 'BNN',
+    logoUrl: 'https://logo.clearbit.com/bnn.in.th',
     descEn: '600+ store branches • 0% installment up to 24 months',
     descTh: 'สาขาครอบคลุมทั่วไทย • โปรโมชั่นผ่อน 0% นานสูงสุด 24 ด.'
   }
@@ -580,14 +584,24 @@ export default function HomePage({ user, compareList, setCompareList }) {
             >
               <div className="flex items-center space-x-3.5">
                 <div 
-                  className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xs font-mono border"
+                  className="w-16 h-12 rounded-xl flex items-center justify-center font-bold text-xs font-mono border overflow-hidden bg-white"
                   style={{ 
-                    backgroundColor: `${s.color}15`, 
                     borderColor: `${s.color}40`,
                     color: s.color 
                   }}
                 >
-                  {s.badge}
+                  <img
+                    src={s.logoUrl}
+                    alt={s.badge}
+                    className="w-full h-full object-contain p-1"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="w-full h-full hidden items-center justify-center" style={{ backgroundColor: `${s.color}15` }}>
+                    {s.badge}
+                  </div>
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center space-x-1">
@@ -629,7 +643,16 @@ export default function HomePage({ user, compareList, setCompareList }) {
               className="bg-white rounded-2xl p-3 sm:p-4 h-16 sm:h-20 flex items-center justify-center text-center shadow-[0_4px_15px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_25px_rgba(255,255,255,0.4)] hover:scale-105 transition-all duration-300 group"
               title={`Visit ${b.name} Official Website`}
             >
-              <span className="text-slate-900 font-extrabold text-xs sm:text-sm tracking-tight group-hover:text-blue-600 transition-colors uppercase font-display">
+              <img 
+                src={b.logoUrl} 
+                alt={b.logoText} 
+                className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'inline';
+                }}
+              />
+              <span className="hidden text-slate-900 font-extrabold text-xs sm:text-sm tracking-tight group-hover:text-blue-600 transition-colors uppercase font-display">
                 {b.logoText}
               </span>
             </a>
@@ -638,62 +661,52 @@ export default function HomePage({ user, compareList, setCompareList }) {
       </section>
 
 
-      {/* SECTION 9: SEO & BUYING GUIDE SECTION (Item 6 in SUMMARY_CHANGES.md) */}
+      {/* SECTION 9: SEO & BUYING GUIDE SECTION */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-purple-500/25 bg-[#120826]/80 p-6 sm:p-10 space-y-8 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
-          <div className="flex items-center space-x-3 pb-4 border-b border-purple-500/20">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-              <Info className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold font-display text-white">
-                {lang === 'en' ? 'IT Hardware Price Comparison & Buying Guide in Thailand' : 'คู่มือการเลือกซื้อและเปรียบเทียบราคาฮาร์ดแวร์ไอทีในประเทศไทย (IT PRICE)'}
+          <div className="space-y-6 text-sm text-slate-300 leading-relaxed">
+            
+            {/* Block 1 */}
+            <div className="space-y-3">
+              <h2 className="text-base sm:text-lg font-bold font-display text-white">
+                {lang === 'en' ? 'IT PRICE: Compare PC Hardware & IT Products Before Buying Online' : 'IT PRICE เปรียบเทียบสินค้าไอทีและอุปกรณ์คอมพิวเตอร์ก่อนช้อปปิ้งออนไลน์'}
               </h2>
-              <p className="text-xs text-slate-400">
-                {lang === 'en' ? 'Empirical market insights, price-to-performance recommendations, and smart alerts' : 'ระบบวิเคราะห์เปรียบเทียบราคาเพื่อผู้บริโภค ประหยัดเงินได้จริงทุกครั้งที่อัปเกรดคอมพิวเตอร์'}
+              <p className="text-slate-400">
+                {lang === 'en' 
+                  ? 'IT PRICE is a centralized platform for comparing real-time prices of IT products, hardware, and PC components. Check prices, update stock, and find the most cost-effective deals linked with special promotions from leading IT stores nationwide, such as Advice, JIB, iHaveCPU, and BaNANA, helping you save money instantly before making a purchase.'
+                  : 'IT PRICE แพลตฟอร์มศูนย์รวมบริการเปรียบเทียบราคาสินค้าไอที ฮาร์ดแวร์ และอุปกรณ์คอมพิวเตอร์แบบเรียลไทม์ เช็คราคา อัปเดตสต็อก และค้นหาราคาที่คุ้มค่าที่สุด พร้อมเชื่อมโยงดีลและโปรโมชั่นพิเศษจากร้านค้าไอทีชั้นนำทั่วประเทศ เช่น Advice, JIB, iHaveCPU และ BaNANA ให้คุณประหยัดเงินในกระเป๋าได้ทันทีก่อนตัดสินใจซื้อ'}
               </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300 leading-relaxed">
-            {/* Column 1 */}
-            <div className="space-y-3 p-4 rounded-2xl bg-[#090314] border border-purple-500/20">
-              <div className="flex items-center space-x-2 font-bold text-white text-sm">
-                <Check className="w-4 h-4 text-emerald-400" />
-                <span>{lang === 'en' ? 'Real-Time Price Spread' : 'เปรียบเทียบราคาเรียลไทม์ 4 ร้าน'}</span>
-              </div>
               <p className="text-slate-400">
                 {lang === 'en'
-                  ? 'Hardware prices in Thailand can vary by 5% to 25% across retailers on any given day. IT PRICE crawls verified listings from JIB, Advice, BaNANA, and iHaveCPU to highlight the single best store with instant stock.'
-                  : 'สินค้าไอทีในตลาดไทยมีส่วนต่างราคาระหว่างร้านค้าตั้งแต่ 5% ถึง 25% จากการจัดโปรโมชั่นที่แตกต่างกัน ระบบ IT PRICE รวบรวมข้อมูลราคาจริงจาก Advice, JIB, iHaveCPU และ BaNANA ช่วยให้คุณทราบทันทีว่าร้านไหนขายถูกที่สุด'}
+                  ? 'We gather popular IT products across all categories, whether it\'s Graphics Cards (GPUs), Processors (CPUs), Memory (RAM DDR4/DDR5), Storage (SSD / HDD), Motherboards, Power Supplies, PC Cases, as well as Monitors and Gaming Gear from world-renowned brands like NVIDIA, AMD, Intel, ASUS, MSI, Gigabyte, and many more.'
+                  : 'เรารวบรวมสินค้าไอทียอดนิยมครอบคลุมทุกหมวดหมู่ ไม่ว่าจะเป็น การ์ดจอ (Graphics Cards), ซีพียู (Processors), แรม (RAM DDR4/DDR5), อุปกรณ์จัดเก็บข้อมูล (SSD / HDD), เมนบอร์ด (Motherboards), พาวเวอร์ซัพพลาย (Power Supply), เคสคอมพิวเตอร์ รวมไปถึงจอมอนิเตอร์ และเกมมิ่งเกียร์ จากแบรนด์ดังระดับโลก เช่น NVIDIA, AMD, Intel, ASUS, MSI, Gigabyte และอีกมากมาย'}
               </p>
             </div>
 
-            {/* Column 2 */}
-            <div className="space-y-3 p-4 rounded-2xl bg-[#090314] border border-purple-500/20">
-              <div className="flex items-center space-x-2 font-bold text-white text-sm">
-                <Bell className="w-4 h-4 text-cyan-400" />
-                <span>{lang === 'en' ? 'Price Drop Alerts & Trends' : 'แจ้งเตือนราคาลด & ประวัติย้อนหลัง'}</span>
-              </div>
+            {/* Block 2 */}
+            <div className="space-y-3">
+              <h2 className="text-base sm:text-lg font-bold font-display text-white">
+                {lang === 'en' ? 'IT PRICE is More Than Just Price Comparison' : 'IT PRICE เป็นมากกว่าการเปรียบเทียบราคาสินค้า'}
+              </h2>
               <p className="text-slate-400">
                 {lang === 'en'
-                  ? 'Track time-series price graphs to spot whether a product is on a downward trend. Set your custom target price and receive instant email notifications the moment any store drops below your threshold.'
-                  : 'ดูกราฟประวัติราคาย้อนหลังเพื่อตัดสินใจจังหวะซื้อที่เหมาะสม ไม่ต้องกลัวซื้อแพง พร้อมฟังก์ชันตั้งราคาเป้าหมาย (Price Alert) แจ้งเตือนเข้าอีเมลทันทีเมื่อมีร้านค้าปรับราคาลดลงถึงเกณฑ์ที่คุณต้องการ'}
+                  ? 'Because in addition to transparently comparing prices from leading stores, the system also displays graphs analyzing historical average price trends, along with a notification system when product prices drop, ensuring you never miss a shopping opportunity and always get the best price at any time.'
+                  : 'เพราะนอกจากคุณจะสามารถเปรียบเทียบราคาจากร้านค้าชั้นนำได้อย่างโปร่งใสแล้ว ระบบยังแสดงกราฟวิเคราะห์แนวโน้มราคาเฉลี่ยย้อนหลัง พร้อมระบบแจ้งเตือนเมื่อสินค้าปรับราคาลง ช่วยให้คุณไม่พลาดทุกจังหวะในการช้อปปิ้งและได้ราคาที่ดีที่สุดเสมอในทุกช่วงเวลา'}
               </p>
             </div>
 
-            {/* Column 3 */}
-            <div className="space-y-3 p-4 rounded-2xl bg-[#090314] border border-purple-500/20">
-              <div className="flex items-center space-x-2 font-bold text-white text-sm">
-                <Scale className="w-4 h-4 text-purple-400" />
-                <span>{lang === 'en' ? 'Price-to-Performance Value' : 'ความคุ้มค่าสเปกต่อราคา'}</span>
-              </div>
+            {/* Block 3 */}
+            <div className="space-y-3">
+              <h2 className="text-base sm:text-lg font-bold font-display text-white">
+                {lang === 'en' ? 'IT PRICE: IT Equipment Buying Guide We Recommend' : 'IT PRICE คู่มือการเลือกซื้ออุปกรณ์ไอทีที่เราอยากแนะนำ'}
+              </h2>
               <p className="text-slate-400">
                 {lang === 'en'
-                  ? 'Our Spec Comparison Matrix calculates tangible value metrics like ฿/Core for CPUs, ฿/GB for Memory and NVMe Storage, and ฿/Hz for Gaming Monitors so you get the highest possible computing power per Baht.'
-                  : 'ตารางวิเคราะห์สเปกละเอียดของเราคำนวณ Value Score เชิงปริมาณ เช่น ราคาต่อคอร์ (฿/Core) สำหรับ CPU, ราคาต่อกิกะไบต์ (฿/GB) สำหรับ RAM/SSD และราคาต่อเฮิรตซ์ (฿/Hz) เพื่อความคุ้มค่าต่อบาทสูงสุด'}
+                  ? 'We strive to be a helper in purchasing decisions or a guide in building a PC. We analyze Price-to-Performance value to ensure that every baht of your money is spent cost-effectively and meets your actual usage needs perfectly.'
+                  : 'เราพยายามที่จะเป็นผู้ช่วยเหลือในการตัดสินใจเลือกซื้อสินค้า หรือเป็นแนวทางในการจัดสเปกคอมพิวเตอร์ วิเคราะห์ความคุ้มค่าเทียบสเปกต่อราคา (Price-to-Performance) เพื่อให้มั่นใจว่าเงินทุกบาทของคุณจะถูกใช้อย่างคุ้มค่าและตอบโจทย์การใช้งานจริงอย่างตรงจุดที่สุด'}
               </p>
             </div>
+
           </div>
         </div>
       </section>
