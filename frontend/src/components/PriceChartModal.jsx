@@ -383,12 +383,12 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         {/* MODAL BODY: 2-COLUMN SPLIT */}
         {/* ========================================================= */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
 
             {/* ===================================================== */}
             {/* LEFT COLUMN: PRODUCT PREVIEW & 4 STORES TABLE (7/12) */}
             {/* ===================================================== */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-7 flex flex-col gap-4">
 
               {/* CARD 1: PRODUCT PREVIEW & MINI SPECS */}
               <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
@@ -489,7 +489,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               </div>
 
               {/* CARD 2: REAL-TIME COMPARISON TABLE ACROSS 4 TOP STORES */}
-              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 sm:p-5 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 sm:p-5 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex-1 flex flex-col">
                 <div className="flex items-center justify-between text-xs pb-1">
                   <h3 className="font-bold text-white flex items-center space-x-2">
                     <ShoppingBag className="w-4 h-4 text-emerald-400" />
@@ -593,7 +593,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
             {/* ===================================================== */}
             {/* RIGHT COLUMN: PRICE OVERVIEW, CHART, ALERT (5/12) */}
             {/* ===================================================== */}
-            <div className="lg:col-span-5 space-y-4">
+            <div className="lg:col-span-5 flex flex-col gap-4">
 
               {/* CARD 1: TODAY'S PRICE OVERVIEW */}
               <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
@@ -662,7 +662,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               </div>
 
               {/* CARD 3: PRICE DROP ALERT EMBEDDED FORM */}
-              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center space-x-2 text-xs">
                     <div className="w-6 h-6 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300">
