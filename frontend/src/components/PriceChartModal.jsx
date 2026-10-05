@@ -554,7 +554,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <div
                       key={item.store_id || idx}
                       className={`flex-1 p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                        item.is_lowest
+                        item.is_lowest && item.stock_status !== 'out_of_stock' && item.price > 0
                           ? 'bg-[#110524] border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
                           : 'bg-[#0E061E] border-purple-500/20 hover:border-purple-500/40'
                       }`}
@@ -607,28 +607,40 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                       <div className="flex items-center space-x-3 flex-shrink-0">
                         <div className="text-right">
                           <div className={`text-sm font-black font-display ${item.is_lowest ? 'text-emerald-400' : 'text-white'}`}>
-                            ฿{Number(item.price).toLocaleString()}
+                            {item.stock_status === 'out_of_stock' || !item.price ? (
+                              <span className="text-red-400 text-xs">{lang === 'en' ? 'Out of Stock' : 'ของหมด'}</span>
+                            ) : (
+                              `฿${Number(item.price).toLocaleString()}`
+                            )}
                           </div>
-                          {item.old_price && (
+                          {item.old_price && item.price > 0 && (
                             <span className="text-[10px] font-mono text-slate-500 line-through block">
                               ฿{Number(item.old_price).toLocaleString()}
                             </span>
                           )}
                         </div>
 
-                        <a
-                          href={item.product_url || '#'}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all ${
-                            item.is_lowest
-                              ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]'
-                              : 'bg-[#1C0F3A] hover:bg-[#281652] border border-purple-500/30 text-white'
-                          }`}
-                        >
-                          <span>{lang === 'en' ? 'Go to Store' : 'ไปร้าน'}</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                        {item.stock_status === 'out_of_stock' || !item.price ? (
+                          <div
+                            className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all bg-slate-800 text-slate-500 cursor-not-allowed"
+                          >
+                            <span>{lang === 'en' ? 'Unavailable' : 'หมด'}</span>
+                          </div>
+                        ) : (
+                          <a
+                            href={item.product_url || '#'}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all ${
+                              item.is_lowest
+                                ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]'
+                                : 'bg-[#1C0F3A] hover:bg-[#281652] border border-purple-500/30 text-white'
+                            }`}
+                          >
+                            <span>{lang === 'en' ? 'Go to Store' : 'ไปร้าน'}</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}

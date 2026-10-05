@@ -168,23 +168,23 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
         l for l in prod.listings 
         if l.is_available and l.price > 0 and l.store and l.product_url
     ]
-    unique_stores = {l.store.slug for l in active_listings}
-    if not REQUIRED_STORES.issubset(unique_stores):
-        raise HTTPException(
-            status_code=404, 
-            detail="Product is not available across all 4 required stores (JIB, iHaveCPU, BaNANA, Advice)"
-        )
-
+    
+    # We no longer enforce REQUIRED_STORES strictly with 404
+    # Instead we will generate out of stock entries for missing ones
     sorted_listings = sorted(active_listings, key=lambda x: (x.price + x.shipping_cost))
-    lowest_total = sorted_listings[0].price + sorted_listings[0].shipping_cost
-    lowest_raw_price = sorted_listings[0].price
-    highest_price = max(l.price for l in active_listings)
-    avg_price = round(sum(l.price for l in active_listings) / len(active_listings), 2)
-    max_savings = round(highest_price - lowest_raw_price, 2)
+    
+    lowest_total = sorted_listings[0].price + sorted_listings[0].shipping_cost if sorted_listings else 0
+    lowest_raw_price = sorted_listings[0].price if sorted_listings else 0
+    highest_price = max((l.price for l in active_listings), default=0)
+    avg_price = round(sum(l.price for l in active_listings) / len(active_listings), 2) if active_listings else 0
+    max_savings = round(highest_price - lowest_raw_price, 2) if active_listings else 0
 
     platform_items = []
+    found_stores = set()
+    
     for l in sorted_listings:
         store = l.store
+        found_stores.add(store.slug)
         total_p = round(l.price + l.shipping_cost, 2)
         diff_from_lowest = round(total_p - lowest_total, 2)
         disc_pct = (
@@ -205,7 +205,7 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
                 currency=l.currency,
                 discount_percent=disc_pct,
                 price_diff_from_lowest=diff_from_lowest,
-                is_lowest=(l.id == sorted_listings[0].id),
+                is_lowest=(l.id == sorted_listings[0].id) if sorted_listings else False,
                 stock_status=l.stock_status,
                 shipping_cost=l.shipping_cost,
                 total_price=total_p,
@@ -222,6 +222,40 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
                 last_checked=l.last_checked
             )
         )
+        
+    # Inject out of stock for missing required stores
+    store_meta = {
+        'jib': {'id': 1, 'name': 'JIB Computer Official', 'color': '#10b981'},
+        'ihavecpu': {'id': 2, 'name': 'iHaveCPU Official', 'color': '#8b5cf6'},
+        'advice': {'id': 3, 'name': 'Advice IT Infinite', 'color': '#06b6d4'},
+        'banana': {'id': 4, 'name': 'BaNANA IT Online', 'color': '#f59e0b'}
+    }
+    
+    for req_slug in REQUIRED_STORES:
+        if req_slug not in found_stores:
+            meta = store_meta.get(req_slug, {'id': 99, 'name': req_slug, 'color': '#ccc'})
+            platform_items.append(
+                PlatformComparisonItem(
+                    store_id=meta['id'],
+                    store_name=meta['name'],
+                    store_slug=req_slug,
+                    store_logo=None,
+                    store_color=meta['color'],
+                    price=0,
+                    original_price=None,
+                    currency="THB",
+                    discount_percent=0.0,
+                    price_diff_from_lowest=0.0,
+                    is_lowest=False,
+                    stock_status="out_of_stock",
+                    shipping_cost=0.0,
+                    total_price=0.0,
+                    product_url="#",
+                    rating=0.0,
+                    review_count=0,
+                    last_checked=prod.updated_at
+                )
+            )
 
     savings_pct = round((max_savings / highest_price * 100), 1) if highest_price > 0 else 0.0
     if prod.msrp and lowest_raw_price < prod.msrp * 0.95:
