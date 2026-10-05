@@ -51,6 +51,7 @@ const MOCK_COMPARE_PRODUCTS = [
     ],
     image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
     score_label: 'ประหยัดไฟ & เกมมิ่งสูงสุด',
+    score_label_en: 'Energy Efficient & Ultimate Gaming',
     score_val: '9.8/10',
     score_percent: 98,
     benchmark_fps: 248,
@@ -78,6 +79,7 @@ const MOCK_COMPARE_PRODUCTS = [
     ],
     image_url: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
     score_label: 'เรนเดอร์งาน & Multi-Tasking สเปกสูง',
+    score_label_en: 'High-Spec Rendering & Multi-Tasking',
     score_val: '9.2/10',
     score_percent: 92,
     benchmark_fps: 227,
@@ -184,6 +186,8 @@ export default function ComparePage({ compareList, setCompareList }) {
     }).catch(console.error)
   }, [])
 
+  const [hasClearedMock, setHasClearedMock] = useState(false)
+
   useEffect(() => {
     let ids = []
     if (idsParam) {
@@ -194,14 +198,16 @@ export default function ComparePage({ compareList, setCompareList }) {
 
     if (ids.length > 0) {
       fetchComparison(ids)
-    } else {
-      // Use rich mock data by default for presentation
+    } else if (!hasClearedMock) {
+      // Use rich mock data by default for presentation unless cleared
       setCompareData({
         products: MOCK_COMPARE_PRODUCTS,
         spec_matrix: MOCK_SPEC_ROWS
       })
+    } else {
+      setCompareData(null)
     }
-  }, [idsParam, compareList])
+  }, [idsParam, compareList, hasClearedMock])
 
   const fetchComparison = async (ids) => {
     setLoading(true)
@@ -232,6 +238,7 @@ export default function ComparePage({ compareList, setCompareList }) {
     if (updated.length > 0) {
       setSearchParams({ ids: updated.join(',') })
     } else {
+      setHasClearedMock(true)
       setSearchParams({})
       setCompareData(null)
     }
@@ -379,6 +386,21 @@ export default function ComparePage({ compareList, setCompareList }) {
           )}
         </div>
       </div>
+
+      {activeProducts.length === 0 && !loading && (
+        <div className="flex flex-col items-center justify-center py-20 bg-[#120826]/50 rounded-3xl border border-purple-500/20 mt-8">
+          <Scale className="w-16 h-16 text-slate-500 mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">{lang === 'en' ? 'No products to compare' : 'ไม่มีสินค้าที่เปรียบเทียบ'}</h2>
+          <p className="text-slate-400 mb-6 text-sm max-w-md text-center">{lang === 'en' ? 'Search and add products above to start comparing specs and prices.' : 'ค้นหาและเพิ่มสินค้าด้านบนเพื่อเริ่มเปรียบเทียบสเปกและราคา'}</p>
+          <button onClick={() => setShowAddDropdown(true)} className="btn-cyber-primary px-6 py-2.5 rounded-xl font-bold text-sm flex items-center shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+            <Plus className="w-4 h-4 mr-2" />
+            {lang === 'en' ? 'Add Product' : 'เพิ่มสินค้า'}
+          </button>
+        </div>
+      )}
+
+      {activeProducts.length > 0 && (
+        <>
 
       {/* VALUE SCORE CHAMPION BANNER (Spec-to-Price Analysis from analysis.md) */}
       {compareData?.value_score_leader_id && (
@@ -529,7 +551,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                 <div className="flex items-center justify-between text-xs pt-1 border-t border-purple-500/20">
                   <span className="text-slate-300 font-medium flex items-center space-x-1">
                     <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>{p.score_label || (lang === 'en' ? 'Overall Value Score' : 'คะแนนรวมความคุ้มค่า')}</span>
+                    <span>{lang === 'en' ? (p.score_label_en || p.score_label || 'Overall Value Score') : (p.score_label || 'คะแนนรวมความคุ้มค่า')}</span>
                   </span>
                   <span className="font-mono font-bold text-cyan-400">{p.score_val || '9.5/10'}</span>
                 </div>
@@ -814,6 +836,8 @@ export default function ComparePage({ compareList, setCompareList }) {
           </form>
         )}
       </div>
+      </>
+      )}
 
     </div>
   )
