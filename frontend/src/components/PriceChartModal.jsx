@@ -57,7 +57,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const [alertSubmitting, setAlertSubmitting] = useState(false)
   const [alertSuccess, setAlertSuccess] = useState(false)
   const [alertError, setAlertError] = useState(null)
-  const [timeframe, setTimeframe] = useState('1week')
+  const [timeframe, setTimeframe] = useState('1w')
 
   useEffect(() => {
     if (!product) return
@@ -670,7 +670,11 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                   
                   <div className="relative flex items-center bg-[#06020E] border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] text-slate-300 cursor-pointer">
                     <Calendar className="w-3 h-3 text-slate-400 flex-shrink-0 mr-1" />
-                    <select className="bg-transparent text-slate-300 outline-none cursor-pointer appearance-none pr-4 min-w-[60px]">
+                    <select 
+                      className="bg-transparent text-slate-300 outline-none cursor-pointer appearance-none pr-4 min-w-[60px]"
+                      value={timeframe}
+                      onChange={(e) => setTimeframe(e.target.value)}
+                    >
                       <option className="bg-[#0D051D]" value="1w">{lang === 'en' ? '1 Week' : '1 สัปดาห์'}</option>
                       <option className="bg-[#0D051D]" value="1m">{lang === 'en' ? '1 Month' : '1 เดือน'}</option>
                       <option className="bg-[#0D051D]" value="3m">{lang === 'en' ? '3 Months' : '3 เดือน'}</option>
