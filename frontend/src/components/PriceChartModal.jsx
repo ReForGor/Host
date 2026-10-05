@@ -385,7 +385,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
             {/* ===================================================== */}
             {/* LEFT COLUMN: PRODUCT PREVIEW & 4 STORES TABLE (7/12) */}
             {/* ===================================================== */}
-            <div className="lg:col-span-7 flex flex-col gap-4">
+            <div className="lg:col-span-7 flex flex-col gap-4 h-full">
 
               {/* CARD 1: PRODUCT PREVIEW & MINI SPECS */}
               <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
@@ -592,7 +592,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
             {/* ===================================================== */}
             {/* RIGHT COLUMN: PRICE OVERVIEW, CHART, ALERT (5/12) */}
             {/* ===================================================== */}
-            <div className="lg:col-span-5 flex flex-col gap-4">
+            <div className="lg:col-span-5 flex flex-col gap-4 h-full">
 
               {/* CARD 1: TODAY'S PRICE OVERVIEW */}
               <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
