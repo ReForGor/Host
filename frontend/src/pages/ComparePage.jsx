@@ -242,6 +242,11 @@ export default function ComparePage({ compareList, setCompareList }) {
       setSearchParams({})
       setCompareData(null)
     }
+    
+    // Also remove from global state so it doesn't reload them
+    if (setCompareList) {
+      setCompareList(prev => prev.filter(p => p.id !== productId))
+    }
   }
 
   const handleAddProduct = (productId) => {
