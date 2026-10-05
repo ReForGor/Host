@@ -341,7 +341,10 @@ export default function ComparePage({ compareList, setCompareList }) {
             email: alertEmail,
             target_price: Math.floor((p.lowest_price || 0) * 0.95), // Notify if drops by 5%
             currency: 'THB'
-          }).catch(err => console.warn('Failed to create alert for', p.name, err))
+          }).catch(err => {
+            console.warn('Failed to create alert for', p.name, err)
+            throw err
+          })
         }))
       }
       setAlertSuccess(true)
