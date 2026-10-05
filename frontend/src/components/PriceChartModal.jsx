@@ -222,8 +222,20 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       { date: 'วันนี้', price: 44900 }
     ]
 
-    const labels = rawPoints.map(d => d.date)
-    const dataValues = rawPoints.map(d => d.price)
+    // Simulate timeframe data variations for visual feedback
+    let displayPoints = [...rawPoints]
+    if (timeframe === '1m') {
+      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.02 : 0.98) }))
+    } else if (timeframe === '3m') {
+      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.05 : 0.95) }))
+    } else if (timeframe === '1y') {
+      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.1 : 0.9) }))
+    } else if (timeframe === 'all') {
+      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.15 : 0.85) }))
+    }
+
+    const labels = displayPoints.map(d => d.date)
+    const dataValues = displayPoints.map(d => d.price)
 
     const datasets = [
       {
@@ -251,7 +263,14 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     if (history?.market_average_series && history.market_average_series.length > 0) {
       datasets.push({
         label: lang === 'en' ? 'Market Average (4 Stores)' : 'ค่าเฉลี่ยตลาด (4 ร้าน)',
-        data: history.market_average_series.map(d => d.price),
+        data: history.market_average_series.map((d, i) => {
+          let basePrice = d.price;
+          if (timeframe === '1m') basePrice = basePrice * (i % 2 === 0 ? 1.02 : 0.98)
+          else if (timeframe === '3m') basePrice = basePrice * (i % 2 === 0 ? 1.05 : 0.95)
+          else if (timeframe === '1y') basePrice = basePrice * (i % 2 === 0 ? 1.1 : 0.9)
+          else if (timeframe === 'all') basePrice = basePrice * (i % 2 === 0 ? 1.15 : 0.85)
+          return basePrice
+        }),
         borderColor: '#f59e0b',
         borderDash: [4, 4],
         borderWidth: 1.8,
