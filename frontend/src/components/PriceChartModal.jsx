@@ -222,6 +222,14 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       { date: 'วันนี้', price: 44900 }
     ]
 
+    // Pad if only 1 point so the chart draws a flat line
+    if (rawPoints.length === 1) {
+      rawPoints = [
+        { ...rawPoints[0], date: 'Prev' },
+        rawPoints[0]
+      ]
+    }
+
     // Downsample points to max 7 so the chart isn't too cluttered with dots
     if (rawPoints.length > 7) {
       const step = (rawPoints.length - 1) / 6;
