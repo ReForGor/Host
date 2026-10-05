@@ -69,12 +69,9 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const allTimeLow = history?.lowest_historical_price || Math.round(lowestPrice * 0.97)
 
   // 4 Gallery images for multiple angle preview
-  const galleryImages = [
-    product.image_url || 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&auto=format&fit=crop&q=80'
-  ]
+  const galleryImages = product.image_url 
+    ? [product.image_url] 
+    : ['https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80']
 
   const loadData = async () => {
     setLoading(true)
@@ -424,28 +421,30 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     </div>
 
                     {/* 4 Thumbnails & "4 มุมมอง" indicator */}
-                    <div className="flex items-center justify-between w-full mt-2.5">
-                      <div className="flex items-center space-x-1.5">
-                        {galleryImages.map((imgUrl, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setActiveImgIdx(idx)}
-                            className={`w-9 h-7 rounded-md bg-[#06020E] border p-0.5 overflow-hidden transition-all ${
-                              activeImgIdx === idx 
-                                ? 'border-cyan-400 ring-1 ring-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]' 
-                                : 'border-purple-500/25 opacity-60 hover:opacity-100'
-                            }`}
-                          >
-                            <img src={imgUrl} alt="" className="w-full h-full object-contain" />
-                          </button>
-                        ))}
-                      </div>
+                    {galleryImages.length > 1 && (
+                      <div className="flex items-center justify-between w-full mt-2.5">
+                        <div className="flex items-center space-x-1.5">
+                          {galleryImages.map((imgUrl, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setActiveImgIdx(idx)}
+                              className={`w-9 h-7 rounded-md bg-[#06020E] border p-0.5 overflow-hidden transition-all ${
+                                activeImgIdx === idx 
+                                  ? 'border-cyan-400 ring-1 ring-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)]' 
+                                  : 'border-purple-500/25 opacity-60 hover:opacity-100'
+                              }`}
+                            >
+                              <img src={imgUrl} alt="" className="w-full h-full object-contain" />
+                            </button>
+                          ))}
+                        </div>
 
-                      <div className="flex items-center space-x-1 text-[10px] font-mono text-cyan-400">
-                        <Eye className="w-3 h-3 text-cyan-400" />
-                        <span>{lang === 'en' ? '4 Views' : '4 มุมมอง'}</span>
+                        <div className="flex items-center space-x-1 text-[10px] font-mono text-cyan-400">
+                          <Eye className="w-3 h-3 text-cyan-400" />
+                          <span>{lang === 'en' ? `${galleryImages.length} Views` : `${galleryImages.length} มุมมอง`}</span>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Right: Product Title, Description, 4 Metric Spec Boxes */}
