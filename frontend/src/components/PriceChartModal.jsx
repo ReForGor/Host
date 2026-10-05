@@ -224,15 +224,33 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
 
     // Simulate timeframe data variations for visual feedback
     let displayPoints = [...rawPoints]
+    let simulatedDates = lang === 'en' 
+      ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'] 
+      : ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์', 'วันนี้']
+
     if (timeframe === '1m') {
+      simulatedDates = lang === 'en'
+        ? ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Today']
+        : ['วันที่ 1', 'วันที่ 5', 'วันที่ 10', 'วันที่ 15', 'วันที่ 20', 'วันที่ 25', 'วันนี้']
       displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.02 : 0.98) }))
     } else if (timeframe === '3m') {
+      simulatedDates = lang === 'en'
+        ? ['Jan', 'Mid Jan', 'Feb', 'Mid Feb', 'Mar', 'Mid Mar', 'Today']
+        : ['ม.ค.', 'กลาง ม.ค.', 'ก.พ.', 'กลาง ก.พ.', 'มี.ค.', 'กลาง มี.ค.', 'วันนี้']
       displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.05 : 0.95) }))
     } else if (timeframe === '1y') {
+      simulatedDates = lang === 'en'
+        ? ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov', 'Today']
+        : ['ม.ค.', 'มี.ค.', 'พ.ค.', 'ก.ค.', 'ก.ย.', 'พ.ย.', 'วันนี้']
       displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.1 : 0.9) }))
     } else if (timeframe === 'all') {
+      simulatedDates = lang === 'en'
+        ? ['2021', '2022', '2023', '2024', '2025', '2026', 'Today']
+        : ['2564', '2565', '2566', '2567', '2568', '2569', 'วันนี้']
       displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.15 : 0.85) }))
     }
+
+    displayPoints = displayPoints.map((p, i) => ({ ...p, date: simulatedDates[i % simulatedDates.length] }))
 
     const labels = displayPoints.map(d => d.date)
     const dataValues = displayPoints.map(d => d.price)
