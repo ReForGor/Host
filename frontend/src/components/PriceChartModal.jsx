@@ -523,11 +523,11 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 </div>
 
                 {/* 4 Store Rows */}
-                <div className="space-y-2">
+                <div className="flex-1 flex flex-col gap-2">
                   {detail?.platforms?.map((item, idx) => (
                     <div
                       key={item.store_id || idx}
-                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                      className={`flex-1 p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                         item.is_lowest
                           ? 'bg-[#110524] border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
                           : 'bg-[#0E061E] border-purple-500/20 hover:border-purple-500/40'
