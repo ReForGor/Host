@@ -358,7 +358,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const discountPercent = product.max_discount_percent || 7.4
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
       <div className="relative w-full max-w-5xl bg-[#0D051D]/95 rounded-3xl shadow-[0_0_80px_rgba(139,92,246,0.35)] overflow-hidden flex flex-col border border-purple-500/35 my-auto max-h-[96vh]">
         
         {/* ========================================================= */}
@@ -668,11 +668,22 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 <div className="grid grid-cols-2 gap-2 text-[10px] pt-1">
                   <div className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium truncate flex items-center space-x-1">
                     <TrendingDown className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                    <span className="truncate">{detail?.price_trend_text || (lang === 'en' ? 'Downward Trend (Buy)' : 'Trend ขาลง (แนะนำซื้อ)')}</span>
+                    <span className="truncate">
+                      {detail?.price_trend_text?.includes('ลง') || !detail?.price_trend_text
+                        ? (lang === 'en' ? 'Downward Trend (Buy)' : 'Trend ขาลง (แนะนำซื้อ)')
+                        : detail?.price_trend_text?.includes('ขึ้น')
+                        ? (lang === 'en' ? 'Upward Trend' : 'Trend ขาขึ้น')
+                        : (lang === 'en' ? 'Stable Price' : 'ราคาคงที่')
+                      }
+                    </span>
                   </div>
                   <div className="px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 font-medium truncate flex items-center space-x-1">
                     <Activity className="w-3 h-3 text-cyan-400 flex-shrink-0" />
-                    <span className="truncate">{history?.volatility_cv_percent ? `ผันผวน: ${history.volatility_cv_percent}% (CV)` : 'เสถียรภาพราคา: สูง'}</span>
+                    <span className="truncate">
+                      {history?.volatility_cv_percent 
+                        ? (lang === 'en' ? `Volatility: ${history.volatility_cv_percent}% (CV)` : `ผันผวน: ${history.volatility_cv_percent}% (CV)`) 
+                        : (lang === 'en' ? 'Price Stability: High' : 'เสถียรภาพราคา: สูง')}
+                    </span>
                   </div>
                 </div>
 
