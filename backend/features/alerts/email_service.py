@@ -113,7 +113,58 @@ class EmailService:
         has_smtp = bool(settings.SMTP_HOST and (settings.SMTP_USER or settings.SMTP_PORT == 25)) and not is_dummy_domain and not getattr(settings, "EMAIL_DEV_MODE", False)
 
 
-        if getattr(settings, "GOOGLE_APPS_SCRIPT_URL", None):
+        if getattr(settings, "BREVO_API_KEY", None):
+            try:
+                logger.info(f"📧 [EmailService] Sending email to {to_email} via Brevo API...")
+                url = "https://api.brevo.com/v3/smtp/email"
+                headers = {
+                    "accept": "application/json",
+                    "api-key": settings.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
+                payload = {
+                    "sender": {
+                        "name": settings.SMTP_FROM_NAME,
+                        "email": settings.SMTP_FROM_EMAIL
+                    },
+                    "to": [
+                        {
+                            "email": to_email
+                        }
+                    ],
+                    "subject": subject,
+                    "htmlContent": html_content,
+                    "textContent": plain_text
+                }
+                
+                # Attachment handling for Brevo (Base64)
+                if inline_images:
+                    import base64
+                    attachment = []
+                    for cid, img_data in inline_images.items():
+                        if img_data:
+                            b64_content = base64.b64encode(img_data).decode('utf-8')
+                            attachment.append({
+                                "content": b64_content,
+                                "name": f"{cid}.jpg"
+                            })
+                    if attachment:
+                        payload["attachment"] = attachment
+                        # Brevo doesn't easily support inline CIDs without sending them as URL links,
+                        # but we attach them as standard attachments for now as fallback.
+                
+                async with httpx.AsyncClient(timeout=15.0) as client:
+                    resp = await client.post(url, headers=headers, json=payload)
+                    if resp.status_code not in (200, 201, 202):
+                        raise Exception(f"Brevo API Error: {resp.status_code} {resp.text}")
+                        
+                status = "sent"
+                logger.info(f"✅ [EmailService] Brevo API email delivered to {to_email}!")
+            except Exception as ex:
+                logger.error(f"❌ [EmailService] Brevo API delivery failed to {to_email}: {ex}")
+                status = "failed"
+                error_msg = str(ex)
+        elif getattr(settings, "GOOGLE_APPS_SCRIPT_URL", None):
             try:
                 logger.info(f"📧 [EmailService] Sending email to {to_email} via Google Apps Script API...")
                 payload = {
