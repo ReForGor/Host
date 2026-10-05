@@ -212,7 +212,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
 
   // Build Chart.js datasets with Market Average Line
   const getChartData = () => {
-    const rawPoints = history?.series?.[0]?.data_points || [
+    let rawPoints = history?.series?.[0]?.data_points || [
       { date: '10 มี.ค.', price: 43500 },
       { date: '12 มี.ค.', price: 42100 },
       { date: '15 มี.ค.', price: 38900 },
@@ -221,6 +221,12 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       { date: '26 มี.ค.', price: 43800 },
       { date: 'วันนี้', price: 44900 }
     ]
+
+    // Downsample points to max 7 so the chart isn't too cluttered with dots
+    if (rawPoints.length > 7) {
+      const step = (rawPoints.length - 1) / 6;
+      rawPoints = Array.from({ length: 7 }, (_, i) => rawPoints[Math.round(i * step)]);
+    }
 
     // Simulate timeframe data variations for visual feedback
     let displayPoints = [...rawPoints]
@@ -279,9 +285,14 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     ]
 
     if (history?.market_average_series && history.market_average_series.length > 0) {
+      let mktAvg = history.market_average_series;
+      if (mktAvg.length > 7) {
+        const step = (mktAvg.length - 1) / 6;
+        mktAvg = Array.from({ length: 7 }, (_, i) => mktAvg[Math.round(i * step)]);
+      }
       datasets.push({
         label: lang === 'en' ? 'Market Average (4 Stores)' : 'ค่าเฉลี่ยตลาด (4 ร้าน)',
-        data: history.market_average_series.map((d, i) => {
+        data: mktAvg.map((d, i) => {
           let basePrice = d.price;
           if (timeframe === '1m') basePrice = basePrice * (i % 2 === 0 ? 1.02 : 0.98)
           else if (timeframe === '3m') basePrice = basePrice * (i % 2 === 0 ? 1.05 : 0.95)
