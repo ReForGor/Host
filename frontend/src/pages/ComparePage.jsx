@@ -25,7 +25,7 @@ import {
   Briefcase,
   Gamepad2
 } from 'lucide-react'
-import { compareApi, productApi } from '../api/client'
+import { compareApi, productApi, alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
 
 // High-fidelity fallback comparison data matching Figma reference
@@ -329,11 +329,27 @@ export default function ComparePage({ compareList, setCompareList }) {
     toast.success(lang === 'en' ? 'Comparison link copied to clipboard!' : 'คัดลอกลิงก์การเปรียบเทียบสเปกแล้ว!')
   }
 
-  const handleAlertSubmit = (e) => {
+  const handleAlertSubmit = async (e) => {
     e.preventDefault()
     if (!alertEmail || !alertEmail.includes('@')) return
-    setAlertSuccess(true)
-    setTimeout(() => setAlertSuccess(false), 5000)
+    
+    try {
+      if (activeProducts && activeProducts.length > 0) {
+        await Promise.all(activeProducts.map(p => {
+          return alertApi.createAlert({
+            product_id: p.id,
+            email: alertEmail,
+            target_price: Math.floor((p.lowest_price || 0) * 0.95), // Notify if drops by 5%
+            currency: 'THB'
+          }).catch(err => console.warn('Failed to create alert for', p.name, err))
+        }))
+      }
+      setAlertSuccess(true)
+      setAlertEmail('')
+      setTimeout(() => setAlertSuccess(false), 5000)
+    } catch (err) {
+      toast.error(lang === 'en' ? 'Failed to setup alerts' : 'เกิดข้อผิดพลาดในการตั้งค่าแจ้งเตือน')
+    }
   }
 
   let activeProducts = []
