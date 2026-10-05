@@ -113,7 +113,28 @@ class EmailService:
         has_smtp = bool(settings.SMTP_HOST and (settings.SMTP_USER or settings.SMTP_PORT == 25)) and not is_dummy_domain and not getattr(settings, "EMAIL_DEV_MODE", False)
 
 
-        if has_smtp:
+        if getattr(settings, "GOOGLE_APPS_SCRIPT_URL", None):
+            try:
+                logger.info(f"📧 [EmailService] Sending email to {to_email} via Google Apps Script API...")
+                payload = {
+                    "to": to_email,
+                    "subject": subject,
+                    "html": html_content,
+                    "text": plain_text
+                }
+                async with httpx.AsyncClient() as client:
+                    resp = await client.post(settings.GOOGLE_APPS_SCRIPT_URL, json=payload, timeout=15.0)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    if data.get("status") != "success":
+                        raise Exception(f"Apps Script Error: {data.get('message', 'Unknown error')}")
+                status = "sent"
+                logger.info(f"✅ [EmailService] API email delivered to {to_email}!")
+            except Exception as ex:
+                logger.error(f"❌ [EmailService] API delivery failed to {to_email}: {ex}")
+                status = "failed"
+                error_msg = str(ex)
+        elif has_smtp:
             try:
                 logger.info(f"📧 [EmailService] Sending live SMTP email to {to_email} via {settings.SMTP_HOST}:{settings.SMTP_PORT}...")
                 await asyncio.to_thread(_send_smtp_sync, to_email, subject, html_content, plain_text, inline_images)

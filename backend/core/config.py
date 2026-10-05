@@ -71,5 +71,6 @@ class Settings:
     SMTP_REPLY_TO: str = os.getenv("SMTP_REPLY_TO", "itprice@noreply.com")
     SMTP_TLS: bool = os.getenv("SMTP_TLS", "true").lower() in ("true", "1", "yes")
     EMAIL_DEV_MODE: bool = os.getenv("EMAIL_DEV_MODE", "false").lower() in ("true", "1", "yes")
+    GOOGLE_APPS_SCRIPT_URL: str = os.getenv("GOOGLE_APPS_SCRIPT_URL", "")
 
 settings = Settings()
