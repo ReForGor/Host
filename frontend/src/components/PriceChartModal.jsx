@@ -305,7 +305,10 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         ticks: {
           color: '#64748b',
           font: { size: 9, family: 'monospace' },
-          callback: (val) => val === 0 ? '0' : `฿${(val / 1000).toFixed(0)}k`
+          callback: (val) => {
+            if (val === 0) return '0'
+            return val >= 1000 ? `฿${(val / 1000).toFixed(1).replace('.0', '')}k` : `฿${val}`
+          }
         }
       }
     }
@@ -646,10 +649,16 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <span>{lang === 'en' ? 'Price History (Total savings)' : 'กราฟประวัติราคา (Total savings)'}</span>
                   </span>
                   
-                  <div className="flex items-center space-x-1 bg-[#06020E] border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] text-slate-300">
-                    <Calendar className="w-3 h-3 text-slate-400" />
-                    <span>{lang === 'en' ? '1 Week' : '1 สัปดาห์'}</span>
-                    <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+                  <div className="relative flex items-center bg-[#06020E] border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] text-slate-300 cursor-pointer">
+                    <Calendar className="w-3 h-3 text-slate-400 flex-shrink-0 mr-1" />
+                    <select className="bg-transparent text-slate-300 outline-none cursor-pointer appearance-none pr-4 min-w-[60px]">
+                      <option className="bg-[#0D051D]" value="1w">{lang === 'en' ? '1 Week' : '1 สัปดาห์'}</option>
+                      <option className="bg-[#0D051D]" value="1m">{lang === 'en' ? '1 Month' : '1 เดือน'}</option>
+                      <option className="bg-[#0D051D]" value="3m">{lang === 'en' ? '3 Months' : '3 เดือน'}</option>
+                      <option className="bg-[#0D051D]" value="1y">{lang === 'en' ? '1 Year' : '1 ปี'}</option>
+                      <option className="bg-[#0D051D]" value="all">{lang === 'en' ? 'All Time' : 'ทั้งหมด'}</option>
+                    </select>
+                    <ChevronDown className="w-3 h-3 text-slate-400 absolute right-1 pointer-events-none" />
                   </div>
                 </div>
 
