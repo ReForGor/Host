@@ -122,7 +122,7 @@ class EmailService:
                     "html": html_content,
                     "text": plain_text
                 }
-                async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient(follow_redirects=True) as client:
                     resp = await client.post(settings.GOOGLE_APPS_SCRIPT_URL, json=payload, timeout=15.0)
                     resp.raise_for_status()
                     data = resp.json()
