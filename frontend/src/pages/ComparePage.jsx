@@ -336,8 +336,12 @@ export default function ComparePage({ compareList, setCompareList }) {
     setTimeout(() => setAlertSuccess(false), 5000)
   }
 
-  const activeProducts = compareData?.products || MOCK_COMPARE_PRODUCTS
-
+  let activeProducts = []
+  if (compareData?.products) {
+    activeProducts = compareData.products
+  } else if (!hasClearedMock) {
+    activeProducts = MOCK_COMPARE_PRODUCTS
+  }
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 animate-fade-in">
 
