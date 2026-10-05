@@ -382,13 +382,10 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               i
             </div>
 
-            {/* IT PRICE Brand + PRO Badge */}
+            {/* IT PRICE Brand */}
             <div className="flex items-center space-x-1.5 flex-shrink-0">
               <span className="font-extrabold tracking-wider text-white font-mono text-xs">
                 IT PRICE
-              </span>
-              <span className="px-1.5 py-0.2 rounded border border-cyan-400/50 text-cyan-300 font-bold text-[9px] font-mono">
-                PRO
               </span>
             </div>
 
