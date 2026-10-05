@@ -640,7 +640,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
               </div>
 
               {/* CARD 2: PRICE HISTORY CHART WITH SAVINGS */}
-              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex-1 flex flex-col">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-white flex items-center space-x-1.5">
                     <Activity className="w-3.5 h-3.5 text-purple-400" />
@@ -655,14 +655,13 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                 </div>
 
                 {/* Chart Box with Floating Tooltip Preview matching screenshot */}
-                <div className="relative h-36 w-full pt-1">
+                <div className="relative flex-1 min-h-[144px] w-full pt-1">
                   <Line data={getChartData()} options={chartOptions} />
-
                 </div>
               </div>
 
               {/* CARD 3: PRICE DROP ALERT EMBEDDED FORM */}
-              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)] flex-1 flex flex-col justify-between">
+              <div className="bg-[#0C041C] border border-purple-500/25 rounded-2xl p-4 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
                 <div>
                   <div className="flex items-center space-x-2 text-xs">
                     <div className="w-6 h-6 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300">
