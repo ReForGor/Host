@@ -124,16 +124,16 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
   // Categories Grid mapping real product counts
   const allCategoriesDef = [
-    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: '/products?category=Graphics Cards (GPU)', icon: Layers, dbKey: 'Graphics Cards (GPU)', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: '/products?category=Processors (CPU)', icon: Cpu, dbKey: 'Processors (CPU)', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
-    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: '/products?category=Memory (RAM)', icon: Zap, dbKey: 'Memory (RAM)', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
-    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: '/products?category=Storage (SSD & HDD)', icon: HardDrive, dbKey: 'Storage (SSD & HDD)', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
-    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: '/products?category=Monitors & Displays', icon: Tv, dbKey: 'Monitors & Displays', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
-    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: '/products?category=Motherboards', icon: Server, dbKey: 'Motherboards', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: '/products?category=Power Supplies (PSU)', icon: Zap, dbKey: 'Power Supplies (PSU)', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
-    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: '/products?category=PC Cases & Cooling', icon: Wind, dbKey: 'PC Cases & Cooling', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
-    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: '/products?category=Gaming Peripherals', icon: MousePointer, dbKey: 'Gaming Peripherals', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
-    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: '/products?category=Laptops & Notebooks', icon: Laptop, dbKey: 'Laptops & Notebooks', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: `/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`, icon: Layers, dbKey: 'Graphics Cards (GPU)', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: `/products?category=${encodeURIComponent('Processors (CPU)')}`, icon: Cpu, dbKey: 'Processors (CPU)', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
+    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: `/products?category=${encodeURIComponent('Memory (RAM)')}`, icon: Zap, dbKey: 'Memory (RAM)', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
+    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: `/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`, icon: HardDrive, dbKey: 'Storage (SSD & HDD)', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
+    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: `/products?category=${encodeURIComponent('Monitors & Displays')}`, icon: Tv, dbKey: 'Monitors & Displays', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
+    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: `/products?category=${encodeURIComponent('Motherboards')}`, icon: Server, dbKey: 'Motherboards', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: `/products?category=${encodeURIComponent('Power Supplies (PSU)')}`, icon: Zap, dbKey: 'Power Supplies (PSU)', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
+    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: `/products?category=${encodeURIComponent('PC Cases & Cooling')}`, icon: Wind, dbKey: 'PC Cases & Cooling', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
+    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: `/products?category=${encodeURIComponent('Gaming Peripherals')}`, icon: MousePointer, dbKey: 'Gaming Peripherals', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
+    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: `/products?category=${encodeURIComponent('Laptops & Notebooks')}`, icon: Laptop, dbKey: 'Laptops & Notebooks', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
   ]
 
   const figmaCategories = allCategoriesDef
@@ -351,7 +351,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <Link
-            to="/products?category=Graphics Cards (GPU)"
+            to={`/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`}
             className="group relative rounded-2xl bg-gradient-to-br from-[#1C0F3A]/90 to-[#0F0720]/90 border border-purple-500/30 hover:border-cyan-400/60 p-6 flex flex-col justify-between shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_10px_40px_rgba(6,182,212,0.25)] transition-all hover:-translate-y-1"
           >
             <div>
@@ -375,7 +375,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
           </Link>
 
           <Link
-            to="/products?category=Processors (CPU)"
+            to={`/products?category=${encodeURIComponent('Processors (CPU)')}`}
             className="group relative rounded-2xl bg-gradient-to-br from-[#1C0F3A]/90 to-[#0F0720]/90 border border-purple-500/30 hover:border-purple-400/60 p-6 flex flex-col justify-between shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_10px_40px_rgba(139,92,246,0.25)] transition-all hover:-translate-y-1"
           >
             <div>
@@ -399,7 +399,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
           </Link>
 
           <Link
-            to="/products?category=Storage (SSD & HDD)"
+            to={`/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`}
             className="group relative rounded-2xl bg-gradient-to-br from-[#1C0F3A]/90 to-[#0F0720]/90 border border-purple-500/30 hover:border-amber-400/60 p-6 flex flex-col justify-between shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_10px_40px_rgba(245,158,11,0.25)] transition-all hover:-translate-y-1"
           >
             <div>

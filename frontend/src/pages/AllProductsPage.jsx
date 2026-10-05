@@ -237,18 +237,20 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           return 'Processors (CPU)'
         case 'Memory (RAM)':
           return 'Memory (RAM)'
-        case 'Storage (SSD, HDD)':
+        case 'Storage (SSD & HDD)':
           return 'Storage (SSD & HDD)'
-        case 'Monitors':
+        case 'Monitors & Displays':
           return 'Monitors'
         case 'Motherboards':
           return 'Motherboards'
         case 'Power Supplies (PSU)':
           return 'Power Supplies (PSU)'
-        case 'Case & Cooling':
+        case 'PC Cases & Cooling':
           return 'Case & Cooling'
-        case 'Accessories':
+        case 'Gaming Peripherals':
           return 'Accessories & Gaming Gear'
+        case 'Laptops & Notebooks':
+          return 'Laptops & Notebooks'
         case 'All':
           return 'All Products'
         default:
@@ -262,18 +264,20 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
         return 'ซีพียู (CPU)'
       case 'Memory (RAM)':
         return 'แรม (RAM)'
-      case 'Storage (SSD, HDD)':
+      case 'Storage (SSD & HDD)':
         return 'ที่เก็บข้อมูล (SSD & HDD)'
-      case 'Monitors':
+      case 'Monitors & Displays':
         return 'จอมอนิเตอร์ (Monitor)'
       case 'Motherboards':
         return 'เมนบอร์ด (Mainboard)'
       case 'Power Supplies (PSU)':
         return 'พาวเวอร์ซัพพลาย (PSU)'
-      case 'Case & Cooling':
+      case 'PC Cases & Cooling':
         return 'เคส & ชุดระบายความร้อน'
-      case 'Accessories':
+      case 'Gaming Peripherals':
         return 'อุปกรณ์เสริม & เกมมิ่งเกียร์'
+      case 'Laptops & Notebooks':
+        return 'โน้ตบุ๊กทำงาน & เล่นเกม'
       case 'All':
         return 'สินค้าทั้งหมด (All Products)'
       default:
