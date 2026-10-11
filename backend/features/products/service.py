@@ -341,9 +341,70 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
             "price": rec.price
         })
 
-    lowest_hist = min(all_prices) if all_prices else (prod.msrp or 0)
-    highest_hist = max(all_prices) if all_prices else (prod.msrp or 0)
-    current_lowest = lowest_hist
+    # Also fetch current active PriceListings
+    listing_q = (
+        select(PriceListing)
+        .options(selectinload(PriceListing.store))
+        .where(
+            PriceListing.product_id == product_id,
+            PriceListing.is_available == True,
+            PriceListing.price > 0
+        )
+    )
+    listing_res = await db.execute(listing_q)
+    active_listings = listing_res.scalars().all()
+
+    # Determine real-time current lowest price
+    if active_listings:
+        current_lowest = min(l.price for l in active_listings)
+    elif all_prices:
+        current_lowest = all_prices[-1]
+    else:
+        current_lowest = prod.msrp or 0
+
+    lowest_hist = min(all_prices) if all_prices else current_lowest
+    highest_hist = max(all_prices) if all_prices else current_lowest
+
+    # If current_lowest is less than lowest_hist, update lowest_hist
+    if current_lowest < lowest_hist and current_lowest > 0:
+        lowest_hist = current_lowest
+
+    # Find date and store of all-time low
+    all_time_low_date = None
+    all_time_low_store = None
+    if records:
+        lowest_rec = min(records, key=lambda r: r.price)
+        all_time_low_date = lowest_rec.timestamp.strftime("%Y-%m-%d")
+        if lowest_rec.store:
+            all_time_low_store = lowest_rec.store.name
+
+    # Append today's point (Bangkok time) to series if not already present
+    from datetime import datetime, timezone, timedelta
+    bkk_now = datetime.now(timezone(timedelta(hours=7)))
+    today_str = bkk_now.strftime("%Y-%m-%d")
+
+    today_store_prices = []
+    for l in active_listings:
+        st = l.store
+        if not st:
+            continue
+        today_store_prices.append(l.price)
+        if st.id not in store_map:
+            store_map[st.id] = {
+                "store_name": st.name,
+                "store_id": st.id,
+                "store_color": st.color or "#06b6d4",
+                "data_points": []
+            }
+        # Check if today's date already exists in data_points
+        pts = store_map[st.id]["data_points"]
+        if not pts or pts[-1]["date"] != today_str:
+            pts.append({
+                "date": today_str,
+                "price": l.price
+            })
+        else:
+            pts[-1]["price"] = l.price
 
     # Calculate Market Average Line (daily average across all stores)
     market_average_series = [
@@ -353,11 +414,21 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
         }
         for d, plist in sorted(date_prices.items())
     ]
+    if today_store_prices:
+        avg_today = round(sum(today_store_prices) / len(today_store_prices), 2)
+        if not market_average_series or market_average_series[-1]["date"] != today_str:
+            market_average_series.append({
+                "date": today_str,
+                "price": avg_today
+            })
+        else:
+            market_average_series[-1]["price"] = avg_today
 
     # Calculate Price Volatility Score (Coefficient of Variation: CV %)
-    if len(all_prices) > 1:
-        mean_p = sum(all_prices) / len(all_prices)
-        variance = sum((x - mean_p) ** 2 for x in all_prices) / (len(all_prices) - 1)
+    combined_prices = all_prices + [l.price for l in active_listings]
+    if len(combined_prices) > 1:
+        mean_p = sum(combined_prices) / len(combined_prices)
+        variance = sum((x - mean_p) ** 2 for x in combined_prices) / (len(combined_prices) - 1)
         stdev_p = variance ** 0.5
         cv_pct = round((stdev_p / mean_p) * 100, 2) if mean_p > 0 else 0.0
     else:
@@ -384,7 +455,9 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
         series=series_list,
         market_average_series=market_average_series,
         suggested_target_price=suggested_target,
-        volatility_cv_percent=cv_pct
+        volatility_cv_percent=cv_pct,
+        all_time_low_date=all_time_low_date,
+        all_time_low_store=all_time_low_store
     )
 
 async def search_suggestions_service(q: str, limit: int, db: AsyncSession):

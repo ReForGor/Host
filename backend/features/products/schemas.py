@@ -128,3 +128,5 @@ class ProductPriceHistoryOut(BaseModel):
     market_average_series: Optional[List[Dict[str, Any]]] = []
     suggested_target_price: Optional[float] = None
     volatility_cv_percent: Optional[float] = 0.0
+    all_time_low_date: Optional[str] = None
+    all_time_low_store: Optional[str] = None

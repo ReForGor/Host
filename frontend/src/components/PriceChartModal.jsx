@@ -53,21 +53,30 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const [activeImgIdx, setActiveImgIdx] = useState(0)
 
   // Right column embedded alert state
-  const [alertTargetPrice, setAlertTargetPrice] = useState('38000')
+  const lowestPrice = detail?.lowest_price || product.lowest_price || 0
+  const msrpPrice = detail?.msrp || product.msrp || lowestPrice
+  const allTimeLow = history?.lowest_historical_price || (lowestPrice > 0 ? lowestPrice : 0)
+
+  const [alertTargetPrice, setAlertTargetPrice] = useState(
+    lowestPrice > 0 ? Math.round(lowestPrice * 0.95).toString() : '3000'
+  )
   const [alertEmail, setAlertEmail] = useState('')
   const [alertSubmitting, setAlertSubmitting] = useState(false)
   const [alertSuccess, setAlertSuccess] = useState(false)
   const [alertError, setAlertError] = useState(null)
-  const [timeframe, setTimeframe] = useState('1w')
+  const [timeframe, setTimeframe] = useState('1m')
 
   useEffect(() => {
     if (!product) return
     loadData()
   }, [product])
 
-  const lowestPrice = detail?.lowest_price || product.lowest_price || 38900
-  const msrpPrice = detail?.msrp || product.msrp || 42500
-  const allTimeLow = history?.lowest_historical_price || Math.round(lowestPrice * 0.97)
+  // Update alert target price default when lowestPrice is resolved
+  useEffect(() => {
+    if (lowestPrice > 0) {
+      setAlertTargetPrice(Math.round(lowestPrice * 0.95).toString())
+    }
+  }, [lowestPrice])
 
   // 4 Gallery images for multiple angle preview
   const galleryImages = product.image_url 
@@ -82,7 +91,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         productApi.getPriceHistory(product.id).catch(() => ({ data: null }))
       ])
 
-      const base = product.lowest_price || 38900
+      const base = product.lowest_price || 0
 
       if (detailRes.data) {
         setDetail(detailRes.data)
@@ -90,91 +99,39 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
         setDetail({
           ...product,
           lowest_price: base,
-          highest_price: base + 1000,
-          avg_price: base + 550,
-          msrp: product.msrp || 42500,
-          platforms: [
-            {
-              store_id: 1,
-              store_name: 'JIB Computer Official',
-              store_slug: 'jib',
-              store_color: '#10b981',
-              price: base,
-              old_price: base + 3090,
-              is_lowest: true,
-              perks: lang === 'en' ? 'In Stock • 3-Yr Thai Warranty • 0% Installment' : 'มีสต็อกพร้อมส่ง • ประกันศูนย์ไทย 3 ปี • ผ่อน 0%',
-              badge1: lang === 'en' ? 'Lowest Price' : 'ถูกที่สุด',
-              badge2: lang === 'en' ? 'Fast 3h Delivery' : 'ส่งด่วน 3 ชม.',
-              product_url: 'https://www.jib.co.th'
-            },
-            {
-              store_id: 2,
-              store_name: 'iHaveCPU Official',
-              store_slug: 'ihavecpu',
-              store_color: '#8b5cf6',
-              price: base + 300,
-              old_price: base + 2600,
-              is_lowest: false,
-              perks: lang === 'en' ? 'Ready to Ship • 3-Yr Warranty • Pre-tested' : 'พร้อมส่ง • ประกันศูนย์แท้ 3 ปี • เทสก่อนส่ง',
-              badge1: '+฿300',
-              badge2: lang === 'en' ? 'Free ROG Shirt' : 'แถมเสื้อ ROG',
-              product_url: 'https://www.ihavecpu.com'
-            },
-            {
-              store_id: 3,
-              store_name: 'Advice IT Infinite',
-              store_slug: 'advice',
-              store_color: '#06b6d4',
-              price: base + 600,
-              old_price: base + 3000,
-              is_lowest: false,
-              perks: lang === 'en' ? 'Express Delivery • 0% Installment • 7-Day Return' : 'พร้อมส่งด่วน • ผ่อน 0% สูงสุด 10 ด. • คืนเงินใน 7 วัน',
-              badge1: '+฿600',
-              badge2: lang === 'en' ? 'Free Shipping' : 'ส่งฟรี',
-              product_url: 'https://www.advice.co.th'
-            },
-            {
-              store_id: 4,
-              store_name: 'BaNANA IT Online',
-              store_slug: 'banana',
-              store_color: '#f59e0b',
-              price: base + 1000,
-              old_price: base + 3600,
-              is_lowest: false,
-              perks: lang === 'en' ? 'Pickup at 42 Branches • Synnex Warranty' : 'รับหน้าร้าน 42 สาขา • ประกันแท้ศูนย์ไทย SYNNEX',
-              badge1: '+฿1,000',
-              badge2: lang === 'en' ? 'Pickup in 1h' : 'รับใน 1 ชม.',
-              product_url: 'https://www.bnn.in.th'
-            }
-          ]
+          highest_price: base,
+          avg_price: base,
+          msrp: product.msrp || base,
+          platforms: []
         })
       }
 
       if (histRes.data && histRes.data.series?.length > 0) {
         setHistory(histRes.data)
       } else {
+        // Fallback using actual product price
+        const todayStr = new Date().toISOString().slice(0, 10)
         setHistory({
-          lowest_historical_price: 37990,
+          lowest_historical_price: base,
           current_lowest_price: base,
           series: [
             {
-              store_name: 'JIB Online',
+              store_name: product.best_store_name || 'Advice IT Infinite',
               store_color: '#06b6d4',
               data_points: [
-                { date: lang === 'en' ? 'Mon' : 'จันทร์', price: 44200 },
-                { date: lang === 'en' ? 'Tue' : 'อังคาร', price: 42100 },
-                { date: lang === 'en' ? 'Wed' : 'พุธ', price: 38900, is_lowest_point: true },
-                { date: lang === 'en' ? 'Thu' : 'พฤหัส', price: 36900 },
-                { date: lang === 'en' ? 'Fri' : 'ศุกร์', price: 41800 },
-                { date: lang === 'en' ? 'Sat' : 'เสาร์', price: 43500 },
-                { date: lang === 'en' ? 'Sun' : 'อาทิตย์', price: 44900 }
+                { date: todayStr, price: base }
               ]
             }
+          ],
+          market_average_series: [
+            { date: todayStr, price: base }
           ]
         })
       }
 
-      setAlertTargetPrice(Math.round(base * 0.97).toString())
+      if (base > 0) {
+        setAlertTargetPrice(Math.round(base * 0.95).toString())
+      }
     } catch (e) {
       console.error(e)
     } finally {
@@ -211,110 +168,143 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     }
   }
 
-  // Build Chart.js datasets with Market Average Line
+  // Format real date string YYYY-MM-DD to readable label
+  const formatDateLabel = (dateStr, isLast = false) => {
+    if (!dateStr) return isLast ? (lang === 'en' ? 'Today' : 'วันนี้') : ''
+    try {
+      const parts = dateStr.split('-')
+      if (parts.length === 3) {
+        const monthNum = parseInt(parts[1], 10)
+        const dayNum = parseInt(parts[2], 10)
+        const thMonths = ['', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.']
+        const enMonths = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const mStr = lang === 'en' ? enMonths[monthNum] : thMonths[monthNum]
+        if (isLast) {
+          return `${dayNum} ${mStr} (${lang === 'en' ? 'Today' : 'วันนี้'})`
+        }
+        return `${dayNum} ${mStr}`
+      }
+    } catch {
+      // fallback
+    }
+    return isLast ? (lang === 'en' ? 'Today' : 'วันนี้') : dateStr
+  }
+
+  // Build Chart.js datasets with real history and real timeframes
   const getChartData = () => {
-    let rawPoints = history?.series?.[0]?.data_points || [
-      { date: '10 มี.ค.', price: 43500 },
-      { date: '12 มี.ค.', price: 42100 },
-      { date: '15 มี.ค.', price: 38900 },
-      { date: '18 มี.ค.', price: 36800 },
-      { date: '22 มี.ค.', price: 41500 },
-      { date: '26 มี.ค.', price: 43800 },
-      { date: 'วันนี้', price: 44900 }
-    ]
+    // 1. Gather all unique dates across all stores and market average
+    const allStoreSeries = history?.series || []
+    let dateMap = {}
 
-    // Pad if only 1 point so the chart draws a flat line
-    if (rawPoints.length === 1) {
-      rawPoints = [
-        { ...rawPoints[0], date: 'Prev' },
-        rawPoints[0]
-      ]
+    // Find min date across all store data
+    const now = new Date()
+    let cutoffDays = 30 // default 1m
+    if (timeframe === '1w') cutoffDays = 7
+    else if (timeframe === '1m') cutoffDays = 30
+    else if (timeframe === '3m') cutoffDays = 90
+    else if (timeframe === '1y') cutoffDays = 365
+    else if (timeframe === 'all') cutoffDays = 9999
+
+    const cutoffDate = new Date(now.getTime() - cutoffDays * 24 * 60 * 60 * 1000)
+    const cutoffStr = cutoffDate.toISOString().slice(0, 10)
+
+    // Collect lowest price per date across stores
+    allStoreSeries.forEach(s => {
+      (s.data_points || []).forEach(pt => {
+        if (timeframe === 'all' || pt.date >= cutoffStr) {
+          if (!dateMap[pt.date] || pt.price < dateMap[pt.date]) {
+            dateMap[pt.date] = pt.price
+          }
+        }
+      })
+    })
+
+    // If market average is available, collect those dates too
+    const mktSeries = history?.market_average_series || []
+    let mktMap = {}
+    mktSeries.forEach(pt => {
+      if (timeframe === 'all' || pt.date >= cutoffStr) {
+        mktMap[pt.date] = pt.price
+      }
+    })
+
+    // Get sorted unique dates
+    let sortedDates = Object.keys(dateMap).sort()
+
+    // If sortedDates is empty, build a fallback using today
+    if (sortedDates.length === 0) {
+      const todayStr = new Date().toISOString().slice(0, 10)
+      const prevStr = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10)
+      const priceVal = lowestPrice || product.lowest_price || 0
+      sortedDates = [prevStr, todayStr]
+      dateMap[prevStr] = priceVal
+      dateMap[todayStr] = priceVal
+      mktMap[prevStr] = priceVal
+      mktMap[todayStr] = priceVal
+    } else if (sortedDates.length === 1) {
+      // Pad to create a line
+      const firstD = sortedDates[0]
+      const prevD = new Date(new Date(firstD).getTime() - 86400000).toISOString().slice(0, 10)
+      sortedDates = [prevD, firstD]
+      dateMap[prevD] = dateMap[firstD]
+      if (mktMap[firstD]) mktMap[prevD] = mktMap[firstD]
     }
 
-    // Downsample points to max 7 so the chart isn't too cluttered with dots
-    if (rawPoints.length > 7) {
-      const step = (rawPoints.length - 1) / 6;
-      rawPoints = Array.from({ length: 7 }, (_, i) => rawPoints[Math.round(i * step)]);
+    // Downsample dates if more than 10 points to keep chart clean and clear
+    let displayDates = sortedDates
+    if (sortedDates.length > 10) {
+      const step = (sortedDates.length - 1) / 8
+      const sampled = []
+      for (let i = 0; i < 8; i++) {
+        sampled.push(sortedDates[Math.round(i * step)])
+      }
+      // Always include the very last date (today/latest)
+      if (!sampled.includes(sortedDates[sortedDates.length - 1])) {
+        sampled.push(sortedDates[sortedDates.length - 1])
+      }
+      displayDates = [...new Set(sampled)].sort()
     }
 
-    // Simulate timeframe data variations for visual feedback
-    let displayPoints = [...rawPoints]
-    let simulatedDates = lang === 'en' 
-      ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'] 
-      : ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัส', 'ศุกร์', 'เสาร์', 'วันนี้']
-
-    if (timeframe === '1m') {
-      simulatedDates = lang === 'en'
-        ? ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Today']
-        : ['วันที่ 1', 'วันที่ 5', 'วันที่ 10', 'วันที่ 15', 'วันที่ 20', 'วันที่ 25', 'วันนี้']
-      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.02 : 0.98) }))
-    } else if (timeframe === '3m') {
-      simulatedDates = lang === 'en'
-        ? ['Jan', 'Mid Jan', 'Feb', 'Mid Feb', 'Mar', 'Mid Mar', 'Today']
-        : ['ม.ค.', 'กลาง ม.ค.', 'ก.พ.', 'กลาง ก.พ.', 'มี.ค.', 'กลาง มี.ค.', 'วันนี้']
-      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.05 : 0.95) }))
-    } else if (timeframe === '1y') {
-      simulatedDates = lang === 'en'
-        ? ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov', 'Today']
-        : ['ม.ค.', 'มี.ค.', 'พ.ค.', 'ก.ค.', 'ก.ย.', 'พ.ย.', 'วันนี้']
-      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.1 : 0.9) }))
-    } else if (timeframe === 'all') {
-      simulatedDates = lang === 'en'
-        ? ['2021', '2022', '2023', '2024', '2025', '2026', 'Today']
-        : ['2564', '2565', '2566', '2567', '2568', '2569', 'วันนี้']
-      displayPoints = displayPoints.map((p, i) => ({ ...p, price: p.price * (i % 2 === 0 ? 1.15 : 0.85) }))
-    }
-
-    displayPoints = displayPoints.map((p, i) => ({ ...p, date: simulatedDates[i % simulatedDates.length] }))
-
-    const labels = displayPoints.map(d => d.date)
-    const dataValues = displayPoints.map(d => d.price)
+    // Labels with real dates
+    const labels = displayDates.map((d, idx) => formatDateLabel(d, idx === displayDates.length - 1))
+    const lowestData = displayDates.map(d => dateMap[d] ?? lowestPrice)
 
     const datasets = [
       {
         label: lang === 'en' ? 'Lowest Store Price' : 'ราคาต่ำสุดของร้าน',
-        data: dataValues,
+        data: lowestData,
         borderColor: '#06b6d4',
         backgroundColor: (context) => {
-          const ctx = context.chart.ctx
+          const ctx = context.chart?.ctx
+          if (!ctx) return 'rgba(6, 182, 212, 0.2)'
           const gradient = ctx.createLinearGradient(0, 0, 0, 160)
           gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)')
           gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)')
           return gradient
         },
         borderWidth: 2.5,
-        pointRadius: 2,
+        pointRadius: displayDates.length > 15 ? 1 : 3,
         pointBackgroundColor: '#06b6d4',
         pointBorderColor: '#ffffff',
         pointBorderWidth: 1.5,
         pointHoverRadius: 6,
         fill: true,
-        tension: 0.38
+        tension: 0.3
       }
     ]
 
-    if (history?.market_average_series && history.market_average_series.length > 0) {
-      let mktAvg = history.market_average_series;
-      if (mktAvg.length > 7) {
-        const step = (mktAvg.length - 1) / 6;
-        mktAvg = Array.from({ length: 7 }, (_, i) => mktAvg[Math.round(i * step)]);
-      }
+    // If market average is present, map corresponding points
+    if (Object.keys(mktMap).length > 0) {
+      const mktData = displayDates.map(d => mktMap[d] ?? dateMap[d] ?? lowestPrice)
       datasets.push({
         label: lang === 'en' ? 'Market Average (4 Stores)' : 'ค่าเฉลี่ยตลาด (4 ร้าน)',
-        data: mktAvg.map((d, i) => {
-          let basePrice = d.price;
-          if (timeframe === '1m') basePrice = basePrice * (i % 2 === 0 ? 1.02 : 0.98)
-          else if (timeframe === '3m') basePrice = basePrice * (i % 2 === 0 ? 1.05 : 0.95)
-          else if (timeframe === '1y') basePrice = basePrice * (i % 2 === 0 ? 1.1 : 0.9)
-          else if (timeframe === 'all') basePrice = basePrice * (i % 2 === 0 ? 1.15 : 0.85)
-          return basePrice
-        }),
+        data: mktData,
         borderColor: '#f59e0b',
         borderDash: [4, 4],
         borderWidth: 1.8,
         pointRadius: 0,
         fill: false,
-        tension: 0.38
+        tension: 0.3
       })
     }
 
@@ -354,8 +344,15 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
     },
     scales: {
       x: {
-        display: false,
-        grid: { display: false }
+        display: true,
+        grid: { display: false },
+        ticks: {
+          color: '#64748b',
+          font: { size: 9 },
+          maxRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 6
+        }
       },
       y: {
         grid: { color: 'rgba(255, 255, 255, 0.04)' },
@@ -681,7 +678,9 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <span className="text-xl font-black font-display text-emerald-400 block my-0.5">
                       ฿{Number(lowestPrice).toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-slate-400 block truncate">{lang === 'en' ? 'Store: JIB Online' : 'ร้าน JIB Online'}</span>
+                    <span className="text-[10px] text-slate-400 block truncate">
+                      {detail?.best_store || product.best_store_name || (lang === 'en' ? 'Lowest Store' : 'ร้านที่ถูกที่สุด')}
+                    </span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-[#06020E] border border-purple-500/20">
@@ -692,7 +691,11 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <span className="text-xl font-black font-display text-purple-400 block my-0.5">
                       ฿{Number(allTimeLow).toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">{lang === 'en' ? '15 Mar Payday' : '15 มี.ค. Payday'}</span>
+                    <span className="text-[10px] text-slate-400 block truncate">
+                      {history?.all_time_low_date
+                        ? `${formatDateLabel(history.all_time_low_date)} • ${history.all_time_low_store || ''}`
+                        : (lang === 'en' ? 'Historical Low' : 'สถิติต่ำสุด')}
+                    </span>
                   </div>
                 </div>
 
@@ -774,18 +777,21 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                   </div>
                 ) : (
                   <form onSubmit={handleEmbeddedAlertSubmit} className="space-y-2.5 text-xs">
-                    {/* 3 Quick Target Buttons */}
+                    {/* 3 Quick Target Buttons based on real product price */}
                     <div className="grid grid-cols-3 gap-1.5">
-                      {['38,000', '37,500', '36,900'].map((presetStr, pIdx) => {
-                        const numericVal = parseInt(presetStr.replace(/,/g, ''))
+                      {[
+                        Math.round(lowestPrice * 0.98),
+                        Math.round(lowestPrice * 0.95),
+                        Math.round(lowestPrice * 0.92)
+                      ].map((presetVal, pIdx) => {
                         return (
                           <button
                             key={pIdx}
                             type="button"
-                            onClick={() => setAlertTargetPrice(numericVal.toString())}
+                            onClick={() => setAlertTargetPrice(presetVal.toString())}
                             className="py-1 px-1.5 rounded-lg bg-[#140826] hover:bg-purple-600/30 border border-purple-500/30 hover:border-purple-400 font-mono text-[11px] text-purple-200 hover:text-white transition-colors text-center"
                           >
-                            &lt; ฿{presetStr}
+                            &lt; ฿{presetVal.toLocaleString()}
                           </button>
                         )
                       })}
