@@ -125,21 +125,21 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
   // Categories Grid mapping real product counts
   const allCategoriesDef = [
-    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: `/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`, icon: Layers, dbKey: 'Graphics Cards (GPU)', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: `/products?category=${encodeURIComponent('Processors (CPU)')}`, icon: Cpu, dbKey: 'Processors (CPU)', color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
-    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: `/products?category=${encodeURIComponent('Memory (RAM)')}`, icon: Zap, dbKey: 'Memory (RAM)', color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
-    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: `/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`, icon: HardDrive, dbKey: 'Storage (SSD & HDD)', color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
-    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: `/products?category=${encodeURIComponent('Monitors & Displays')}`, icon: Tv, dbKey: 'Monitors & Displays', color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
-    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: `/products?category=${encodeURIComponent('Motherboards')}`, icon: Server, dbKey: 'Motherboards', color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
-    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: `/products?category=${encodeURIComponent('Power Supplies (PSU)')}`, icon: Zap, dbKey: 'Power Supplies (PSU)', color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
-    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: `/products?category=${encodeURIComponent('PC Cases & Cooling')}`, icon: Wind, dbKey: 'PC Cases & Cooling', color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
-    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: `/products?category=${encodeURIComponent('Gaming Peripherals')}`, icon: MousePointer, dbKey: 'Gaming Peripherals', color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
-    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: `/products?category=${encodeURIComponent('Laptops & Notebooks')}`, icon: Laptop, dbKey: 'Laptops & Notebooks', color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: `/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`, icon: Layers, dbKey: 'Graphics Cards (GPU)', aliases: ['Graphics Cards (GPU)'], color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: `/products?category=${encodeURIComponent('Processors (CPU)')}`, icon: Cpu, dbKey: 'Processors (CPU)', aliases: ['Processors (CPU)'], color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
+    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: `/products?category=${encodeURIComponent('Memory (RAM)')}`, icon: Zap, dbKey: 'Memory (RAM)', aliases: ['Memory (RAM)'], color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
+    { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: `/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`, icon: HardDrive, dbKey: 'Storage (SSD & HDD)', aliases: ['Storage (SSD & HDD)', 'Solid State Drives (SSD)', 'Storage (SSD, HDD)'], color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
+    { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: `/products?category=${encodeURIComponent('Monitors & Displays')}`, icon: Tv, dbKey: 'Monitors & Displays', aliases: ['Monitors & Displays', 'Monitors'], color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
+    { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: `/products?category=${encodeURIComponent('Motherboards')}`, icon: Server, dbKey: 'Motherboards', aliases: ['Motherboards'], color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
+    { name: lang === 'en' ? 'Power Supplies' : 'พาวเวอร์ซัพพลาย', path: `/products?category=${encodeURIComponent('Power Supplies (PSU)')}`, icon: Zap, dbKey: 'Power Supplies (PSU)', aliases: ['Power Supplies (PSU)'], color: 'from-amber-500/20 to-orange-600/20 text-amber-400' },
+    { name: lang === 'en' ? 'Case & Cooling' : 'เคส & ระบายความร้อน', path: `/products?category=${encodeURIComponent('PC Cases & Cooling')}`, icon: Wind, dbKey: 'PC Cases & Cooling', aliases: ['PC Cases & Cooling', 'Case & Cooling'], color: 'from-teal-500/20 to-emerald-600/20 text-teal-400' },
+    { name: lang === 'en' ? 'Gaming Gear' : 'เกมมิ่งเกียร์', path: `/products?category=${encodeURIComponent('Gaming Peripherals')}`, icon: MousePointer, dbKey: 'Gaming Peripherals', aliases: ['Gaming Peripherals', 'Accessories'], color: 'from-rose-500/20 to-purple-600/20 text-rose-400' },
+    { name: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊กทำงาน & เล่นเกม', path: `/products?category=${encodeURIComponent('Laptops & Notebooks')}`, icon: Laptop, dbKey: 'Laptops & Notebooks', aliases: ['Laptops & Notebooks', 'Laptops', 'Notebooks'], color: 'from-blue-500/20 to-cyan-600/20 text-cyan-400' },
   ]
 
   const figmaCategories = allCategoriesDef
     .map(c => {
-      const realCount = products.filter(p => p.category === c.dbKey).length;
+      const realCount = products.filter(p => (c.aliases || [c.dbKey]).includes(p.category) || p.category === c.dbKey).length;
       return {
         ...c,
         realCount,
@@ -157,8 +157,8 @@ export default function HomePage({ user, compareList, setCompareList }) {
     { key: 'Storage (SSD & HDD)', label: lang === 'en' ? 'Storage (SSD & HDD)' : 'ที่เก็บข้อมูล (SSD & HDD)', count: products.filter(p => p.category === 'Storage (SSD & HDD)' || p.category === 'Solid State Drives (SSD)').length },
     { key: 'Monitors & Displays', label: lang === 'en' ? 'Monitors & Displays' : 'จอมอนิเตอร์ & หน้าจอ', count: products.filter(p => p.category === 'Monitors & Displays' || p.category === 'Monitors').length },
     { key: 'Motherboards', label: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Mainboard)', count: products.filter(p => p.category === 'Motherboards').length },
-    { key: 'Gaming Peripherals', label: lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์', count: products.filter(p => p.category === 'Gaming Peripherals').length },
-    { key: 'Laptops & Notebooks', label: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊ก', count: products.filter(p => p.category === 'Laptops & Notebooks').length },
+    { key: 'Gaming Peripherals', label: lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์', count: products.filter(p => p.category === 'Gaming Peripherals' || p.category === 'Accessories').length },
+    { key: 'Laptops & Notebooks', label: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊ก', count: products.filter(p => p.category === 'Laptops & Notebooks' || p.category === 'Laptops').length },
   ]
 
   useEffect(() => {
@@ -204,13 +204,9 @@ export default function HomePage({ user, compareList, setCompareList }) {
   // Filter products for display in Deals grid
   const displayedProducts = products.filter(p => {
     if (selectedFilterCategory !== 'All') {
-      if (selectedFilterCategory === 'Monitors & Displays') {
-        if (p.category !== 'Monitors & Displays' && p.category !== 'Monitors') return false
-      } else if (selectedFilterCategory === 'Storage (SSD & HDD)') {
-        if (p.category !== 'Storage (SSD & HDD)' && p.category !== 'Solid State Drives (SSD)') return false
-      } else if (p.category !== selectedFilterCategory) {
-        return false
-      }
+      const catDef = allCategoriesDef.find(c => c.dbKey === selectedFilterCategory)
+      const allowed = catDef?.aliases || [selectedFilterCategory]
+      if (!allowed.includes(p.category)) return false
     }
     if (storeFilter && !((p.best_store_name || '').toLowerCase().includes(storeFilter.toLowerCase()))) return false
     if (brandFilter && !((p.brand || '').toLowerCase().includes(brandFilter.toLowerCase()))) return false

@@ -79,6 +79,22 @@
       4. **Seeding Laptops (`Laptops & Notebooks`):** เพิ่มหมวดหมู่และเพิ่มสินค้าแล็ปท็อปจริง 2 รุ่น (ASUS TUF Gaming A15, Lenovo IdeaPad Slim 3) เปรียบเทียบครบทั้ง 4 ร้าน (Advice, JIB, BaNANA, iHaveCPU) รวมสินค้าในระบบเป็น 34 รายการ ครบทุก 10 หมวดหมู่
       5. **Home Filter & Subseries Chips (`HomePage.jsx`, `AllProductsPage.jsx`):** ปรับจำนวนสินค้าและแท็บกรองให้ตรงกับข้อมูลจริงใน PostgreSQL 100%
 
+16. **แก้ไขรูปภาพสินค้าโน้ตบุ๊ก & จำนวนสินค้าในแต่ละหมวดหมู่หน้าแรกให้ตรงกับฐานข้อมูลจริง 100%:**
+    - **สาเหตุของปัญหา:**
+      1. รูปภาพสินค้าโน้ตบุ๊ก (ID 437 ASUS TUF Gaming A15 และ ID 438 Lenovo IdeaPad Slim 3) ในฐานข้อมูลเดิมใช้ URL รูปจาก JIB ซึ่งไฟล์ภาพปลายทางบนเซิร์ฟเวอร์ JIB ถูกลบหรือเปลี่ยน path ส่งผลให้เกิด HTTP 404 ทำให้รูปภาพไม่แสดง
+      2. จำนวนสินค้าบนการ์ดหมวดหมู่หน้าแรก (`HomePage.jsx`) เดิมใช้การจับคู่ String ตรงเป๊ะ (`p.category === c.dbKey`) ทำให้สินค้าที่มีชื่อหมวดหมู่ย่อย (เช่น Samsung 990 PRO ที่เป็น `Solid State Drives (SSD)` หรือ ASUS VG259Q5A ที่เป็น `Monitors`) ไม่ถูกนับรวม ยอดรวมสินค้าจึงแสดงขาดไป 2 รายการ
+    - **สิ่งที่แก้ไขและผลลัพธ์:**
+      1. **อัปเดตรูปภาพโน้ตบุ๊ก (Database):** เปลี่ยน Image URL ของทั้ง 2 รุ่นเป็นรูปภาพความละเอียดสูงจาก Advice CDN ทางการ (Verified HTTP 200 โหลดได้จริง 100%):
+         - ASUS TUF Gaming A15: `https://img.advice.co.th/images_nas/pic_product4/A0154032/A0154032OK_BIG_1.jpg`
+         - Lenovo IdeaPad Slim 3: `https://img.advice.co.th/images_nas/pic_product4/A0159495/A0159495OK_BIG_1.jpg`
+      2. **ปรับปรุง Category Normalization (Database & Frontend):** 
+         - ปรับ Category ในฐานข้อมูลให้เป็นมาตรฐานเดียวกับทั้ง 10 หมวดหมู่หลัก
+         - ใน `HomePage.jsx` เพิ่มระบบ `aliases` สำหรับทุกหมวดหมู่ ทำให้การ์ดทั้ง 10 หมวดหมู่นับจำนวนสินค้าครอบคลุมทุกรายการ:
+           - ที่เก็บข้อมูล (SSD): แสดง **5 รายการ** (ตรงกับของจริง)
+           - จอมอนิเตอร์: แสดง **3 รายการ** (ตรงกับของจริง)
+           - โน้ตบุ๊กทำงาน & เล่นเกม: แสดง **2 รายการ** (ตรงกับของจริง)
+           - รวมทุกหมวดหมู่: ครบ **34 รายการ** ตรงตามฐานข้อมูลจริง 100%
+
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
 - **Git Repository ที่ใช้:**
   - Remote `origin`: `https://github.com/ReForGor/Software-Proj.git`
