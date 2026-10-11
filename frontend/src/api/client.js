@@ -88,6 +88,7 @@ export const analyticsApi = {
   getStoreDominance: () => api.get('/analysis/store-dominance'),
   getMarketSummary: () => api.get('/analysis/market-summary'),
   trackOutboundClick: (data) => api.post('/analytics/outbound-click', data),
+  getOutboundClicks: (limit = 100) => api.get('/analytics/outbound-clicks', { params: { limit } }),
 }
 
 export default api

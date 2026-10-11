@@ -70,6 +70,37 @@ async def track_outbound_click(
         print(f"Outbound click logging warning: {e}")
         return {"status": "error", "message": str(e)}
 
+@router.get("/outbound-clicks")
+async def get_outbound_clicks(
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Returns recent outbound store click logs from PostgreSQL for Admin Dashboard.
+    """
+    res = await db.execute(
+        select(OutboundClickLog)
+        .order_by(desc(OutboundClickLog.created_at))
+        .limit(limit)
+    )
+    logs = res.scalars().all()
+    return [
+        {
+            "id": l.id,
+            "product_id": l.product_id,
+            "product_name": l.product_name or "Unknown Product",
+            "store_name": l.store_name or "Store",
+            "target_url": l.target_url,
+            "price": l.price,
+            "user_id": l.user_id,
+            "session_id": l.session_id,
+            "ip_address": l.ip_address,
+            "source_page": l.source_page or "web",
+            "created_at": l.created_at.strftime("%Y-%m-%d %H:%M:%S") if l.created_at else None
+        }
+        for l in logs
+    ]
+
 class VisitPingRequest(BaseModel):
     session_id: str
     path: Optional[str] = "/"

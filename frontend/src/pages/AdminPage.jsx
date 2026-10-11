@@ -76,6 +76,10 @@ export default function AdminPage({ user }) {
     { id: 3, platform: 'BaNANA IT', error_type: 'Slow Response (>3500ms)', detail: 'Cloudflare bot mitigation handshake latency', status: 'Monitoring', time: '2026-09-28 06:12' },
   ])
 
+  // Outbound store click logs state
+  const [clickLogs, setClickLogs] = useState([])
+  const [clickFilterStore, setClickFilterStore] = useState('ALL')
+
   useEffect(() => {
     loadData()
   }, [])
@@ -83,20 +87,22 @@ export default function AdminPage({ user }) {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [statsRes, prodsRes, scrapersRes, usersRes, analyticsRes, emailLogsRes, schedulerRes] = await Promise.all([
+      const [statsRes, prodsRes, scrapersRes, usersRes, analyticsRes, emailLogsRes, schedulerRes, clickLogsRes] = await Promise.all([
         adminApi.getStats(),
         adminApi.getProducts(),
         scraperApi.getStatuses().catch(() => ({ data: [] })),
         adminApi.getUsers().catch(() => ({ data: [] })),
         analyticsApi.getStats().catch(() => ({ data: null })),
         alertApi.getEmailLogs().catch(() => ({ data: [] })),
-        scraperApi.getSchedulerStatus().catch(() => ({ data: null }))
+        scraperApi.getSchedulerStatus().catch(() => ({ data: null })),
+        analyticsApi.getOutboundClicks(100).catch(() => ({ data: [] }))
       ])
       setStats(statsRes.data)
       setProducts(prodsRes.data)
       setScrapers(scrapersRes.data || [])
       setUsersList(usersRes.data || [])
       setAnalytics(analyticsRes?.data || null)
+      setClickLogs(clickLogsRes?.data || [])
       if (emailLogsRes?.data?.length > 0) {
         setNotificationsHistory(emailLogsRes.data.map((log) => ({
           id: log.id,
@@ -341,69 +347,100 @@ export default function AdminPage({ user }) {
           <AlertTriangle className="w-4 h-4" />
           <span>6. รายงานข้อผิดพลาด</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('clicks')}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
+            activeTab === 'clicks'
+              ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+              : 'text-slate-400 hover:text-white hover:bg-purple-900/30'
+          }`}
+        >
+          <ExternalLink className="w-4 h-4 text-cyan-400" />
+          <span>7. ประวัติการคลิกออกร้านค้า (Outbound Click Logs)</span>
+          {clickLogs.length > 0 && (
+            <span className="px-2 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold">
+              {clickLogs.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* 1. OVERVIEW TAB (PDF Page 2: "หน้าแดชบอร์ดสรุปภาพรวมของระบบ") */}
       {activeTab === 'overview' && (
         <div className="space-y-8 animate-fade-in">
           {/* KPI Summary Cards with REAL Data from PostgreSQL */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Real Registered Users Card */}
-            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-5 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t.admin.usersCount}</span>
                 <Users className="w-5 h-5 text-purple-400" />
               </div>
-              <div className="text-3xl font-extrabold text-white">
-                {analytics?.total_users || usersList.length || 5} <span className="text-xs font-normal text-slate-400">บัญชีจริง</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-white">
+                {analytics?.total_users || usersList.length || 5} <span className="text-xs font-normal text-slate-400">บัญชี</span>
               </div>
               <p className="text-[11px] text-emerald-400 mt-2 flex items-center">
-                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> ข้อมูลจริงจาก Neon DB
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> ข้อมูลจริง Neon DB
               </p>
             </div>
 
             {/* Real Total Visitors Card */}
-            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-5 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ยอดผู้เข้าชมสะสม</span>
                 <Activity className="w-5 h-5 text-purple-400" />
               </div>
-              <div className="text-3xl font-extrabold text-white font-mono">
+              <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">
                 {(analytics?.total_visitors ?? 0).toLocaleString()} <span className="text-xs font-normal text-slate-400">ครั้ง</span>
               </div>
               <p className="text-[11px] text-purple-400 mt-2">
-                ผู้เข้าชมไม่ซ้ำ: {(analytics?.unique_visitors ?? 0).toLocaleString()} คน
+                ไม่ซ้ำ: {(analytics?.unique_visitors ?? 0).toLocaleString()} คน
+              </p>
+            </div>
+
+            {/* Outbound Store Clicks Card */}
+            <div className="bg-[#120826]/90 border border-cyan-500/30 p-5 rounded-2xl shadow-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">คลิกไปร้านค้าหลัก</span>
+                <ExternalLink className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-mono">
+                {(analytics?.total_outbound_clicks ?? clickLogs.length ?? 0).toLocaleString()} <span className="text-xs font-normal text-slate-400">ครั้ง</span>
+              </div>
+              <p className="text-[11px] text-cyan-400 mt-2">
+                กดปุ่มซื้อ/ไปร้านค้าจริง
               </p>
             </div>
 
             {/* Real Online Users Now */}
-            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-5 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ผู้ใช้งานออนไลน์ขณะนี้</span>
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ออนไลน์ขณะนี้</span>
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                 </span>
               </div>
-              <div className="text-3xl font-extrabold text-emerald-400 font-mono">
-                {analytics?.online_now || 1} <span className="text-xs font-normal text-slate-400">คน (Real-time)</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono">
+                {analytics?.online_now || 1} <span className="text-xs font-normal text-slate-400">คน</span>
               </div>
               <p className="text-[11px] text-slate-400 mt-2">
-                Active Session ในช่วง 15 นาที
+                Real-time (Active 2m)
               </p>
             </div>
 
             {/* Total Products in Catalog */}
-            <div className="bg-[#120826]/90 border border-purple-500/25 p-6 rounded-2xl shadow-xl">
+            <div className="bg-[#120826]/90 border border-purple-500/25 p-5 rounded-2xl shadow-xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t.admin.productsCount}</span>
                 <Package className="w-5 h-5 text-purple-400" />
               </div>
-              <div className="text-3xl font-extrabold text-white">
-                {stats?.total_products || products.length || 26} <span className="text-xs font-normal text-slate-400">รุ่นฮิต</span>
+              <div className="text-2xl sm:text-3xl font-extrabold text-white">
+                {stats?.total_products || products.length || 32} <span className="text-xs font-normal text-slate-400">รุ่น</span>
               </div>
               <p className="text-[11px] text-purple-400 mt-2">
-                ครอบคลุม 9 หมวดหมู่หลัก
+                ครอบคลุม 11 หมวดหมู่หลัก
               </p>
             </div>
           </div>
@@ -836,6 +873,127 @@ export default function AdminPage({ user }) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* 7. OUTBOUND STORE CLICK LOGS TAB (ประวัติการคลิกออกร้านค้า) */}
+      {activeTab === 'clicks' && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-purple-500/20 gap-4">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+                <ExternalLink className="w-5 h-5 text-cyan-400" />
+                <span>ประวัติการคลิกออกร้านค้าหลัก (Outbound Store Click Logs)</span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
+                  {clickLogs.length} รายการล่าสุด
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                บันทึกการส่งต่อผู้ใช้ไปยังเว็บไซต์ร้านค้าจริง (Advice, JIB, BaNANA, iHaveCPU) แบบ Real-time ใน PostgreSQL
+              </p>
+            </div>
+
+            {/* Filter by store */}
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-slate-400">กรองตามร้าน:</span>
+              <select
+                value={clickFilterStore}
+                onChange={(e) => setClickFilterStore(e.target.value)}
+                className="bg-[#0A0314] text-xs text-white border border-purple-500/30 rounded-xl px-3 py-1.5 focus:outline-none focus:border-cyan-400"
+              >
+                <option value="ALL">ทุกร้านค้า (All Stores)</option>
+                <option value="Advice">Advice IT Infinite</option>
+                <option value="JIB">JIB Online</option>
+                <option value="iHaveCPU">iHaveCPU</option>
+                <option value="BaNANA">BaNANA IT</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Quick Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            {['Advice', 'JIB', 'iHaveCPU', 'BaNANA'].map((storeName) => {
+              const count = clickLogs.filter(c => (c.store_name || '').toLowerCase().includes(storeName.toLowerCase())).length
+              return (
+                <div key={storeName} className="p-4 rounded-2xl bg-[#120826]/90 border border-purple-500/25">
+                  <span className="text-xs text-slate-400 block">{storeName}</span>
+                  <span className="text-2xl font-black font-mono text-cyan-300 mt-1 block">
+                    {count} <span className="text-xs font-normal text-slate-400">คลิก</span>
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Clicks Table */}
+          <div className="border border-purple-500/25 rounded-2xl overflow-hidden bg-[#120826]/90 shadow-xl">
+            {clickLogs.length === 0 ? (
+              <div className="p-12 text-center space-y-3">
+                <ExternalLink className="w-10 h-10 text-slate-600 mx-auto" />
+                <p className="text-sm font-bold text-slate-300">ยังไม่มีประวัติการคลิกออกร้านค้าในฐานข้อมูล</p>
+                <p className="text-xs text-slate-500">
+                  ระบบจะบันทึกอัตโนมัติทันทีเมื่อผู้ใช้งานกดปุ่ม "ไปร้าน", "ซื้อทันที", หรือกดลิงก์ร้านค้าในหน้าต่างๆ
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#0A0314] text-slate-400 text-xs uppercase border-b border-purple-500/25 font-mono">
+                    <tr>
+                      <th className="py-3 px-4">วัน-เวลา (UTC)</th>
+                      <th className="py-3 px-4">ร้านค้าปลายทาง</th>
+                      <th className="py-3 px-4">ชื่อสินค้า</th>
+                      <th className="py-3 px-4 text-right">ราคาที่แสดง</th>
+                      <th className="py-3 px-4 text-center">หน้าต้นทาง</th>
+                      <th className="py-3 px-4">IP Address</th>
+                      <th className="py-3 px-4 text-center">ลิงก์ปลายทาง</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-purple-500/15">
+                    {clickLogs
+                      .filter(l => clickFilterStore === 'ALL' || (l.store_name || '').toLowerCase().includes(clickFilterStore.toLowerCase()))
+                      .map((log) => (
+                        <tr key={log.id} className="hover:bg-purple-900/20 transition-colors">
+                          <td className="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">
+                            {log.created_at || 'เพิ่งบันทึก'}
+                          </td>
+                          <td className="py-3 px-4 font-bold text-white">
+                            <span className="px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300">
+                              {log.store_name}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 font-medium text-slate-200 max-w-[280px] truncate">
+                            {log.product_name}
+                          </td>
+                          <td className="py-3 px-4 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">
+                            {log.price ? `฿${Number(log.price).toLocaleString()}` : '—'}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className="px-2 py-0.5 rounded bg-[#0A0314] text-slate-400 font-mono text-[10px] uppercase">
+                              {log.source_page}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
+                            {log.ip_address || '127.0.0.1'}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <a
+                              href={log.target_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center space-x-1 text-cyan-400 hover:text-cyan-300 font-bold"
+                            >
+                              <span>เปิดดู</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
