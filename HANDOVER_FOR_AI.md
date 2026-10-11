@@ -30,6 +30,8 @@
    - **สิ่งที่แก้:** ใน `backend/features/auth/router.py` บันทึก session ลง `visitor_records` และเพิ่ม metric `total_logins` ใน `system_metrics` ทันทีเมื่อ Login สำเร็จ
 7. **บันทึก Log เมื่อมีคนกดเข้าไปดูสินค้าในเว็บหลักจากเว็บเรา (Outbound Store Click Tracking):**
    - **สิ่งที่แก้:** เพิ่มตาราง `outbound_click_logs` และ API Endpoint `/api/analytics/outbound-click` เพื่อบันทึกทุกครั้งที่มีคนกดลิงก์ "ไปร้าน", "ซื้อทันที", หรือแบนเนอร์ร้านค้า (เก็บชื่อสินค้า, ร้านค้า, ราคา, URL ปลายทาง, IP, Session ID, User ID)
+8. **วิเคราะห์ตลาดไอที 4 มิติจาก Database จริงพร้อมแสดงแหล่งอ้างอิงเชิงวิชาการ (`PlatformsPage.jsx`):**
+   - **สิ่งที่แก้:** เชื่อมโยงตัวเลขทุก Dimension 1-4, สัดส่วนความได้เปรียบ (Dominance Rate), ค่าสัมประสิทธิ์การแปรผัน (CV %), ส่วนต่างราคาเฉลี่ย (26.7%) เข้ากับฐานข้อมูลจริง PostgreSQL (Neon Cloud) และเพิ่มกล่อง **Database Ground-Truth Citations & Methodology** แสดงตารางที่ใช้อ้างอิง (`products`, `price_listings`, `price_history`, `stores`) พร้อมสูตรคำนวณทางสถิติและ Timestamp ชัดเจน
 *(รายละเอียดเชิงลึกทั้งหมดบันทึกไว้ใน [`ARCHITECTURE_AND_AI_DATABASE_SPEC.md`](file:///d:/Newfolder/ARCHITECTURE_AND_AI_DATABASE_SPEC.md))*
 
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)

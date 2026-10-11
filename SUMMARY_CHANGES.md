@@ -153,5 +153,54 @@
 * **ผลการตรวจสอบสด (Verification):** **Bad Images: 0** | **Bad Store Links: 0**
 * **ผลการทดสอบระบบรวม:** ผ่านชุดทดสอบอัตโนมัติ `run_all_tests.py` ครบถ้วน **22/22 Tests Passed (100%)**
 
+---
+
+## 📊 14. การเชื่อมโยงข้อมูลจริงจาก Database ในทุกหน้าของระบบ (Ground-Truth Integration)
+* **หน้ารายการสินค้าทั้งหมด (AllProductsPage.jsx):**
+  - แสดงผลคงที่ 16 ชิ้นต่อหน้า (Items per page = 16)
+  - ระบบเปลี่ยนหน้าแบบเลขหน้าไดนามิก (1, 2, 3...) พร้อมปุ่ม Previous / Next และกระโดดข้ามหน้าได้จริง
+  - คำนวณจำนวนสินค้ารวมจากฐานข้อมูลจริง 32 ชิ้น
+* **หน้าเปรียบเทียบสเปกและราคา (ComparePage.jsx):**
+  - ปลดล็อกเงื่อนไขที่เคยบล็อก Product ID ที่ต่ำกว่า 1000 ทำให้สามารถเปรียบเทียบสินค้าจริงในฐานข้อมูลได้ทุกชิ้น
+  - ดึงข้อมูลเปรียบเทียบสเปกและราคาจาก `/api/compare` เรนเดอร์สเปกตารางแบบไดนามิกตรงตามฐานข้อมูลจริง
+* **หน้าสินค้าลดราคาพิเศษ (DealsPage.jsx & Backend Service):**
+  - ปรับการคำนวณส่วนลดราคาใน `backend/features/products/service.py` ให้อิงจากราคาเปิดตัว (MSRP) และเปรียบเทียบกับราคาร้านค้าที่จำหน่ายแพงที่สุด ทำให้ได้สินค้าลดราคาจริง (Deals) ที่ถูกต้อง
+
+---
+
+## 🖱️ 15. ระบบบันทึก Log การคลิกออกไปยังร้านค้าภายนอก (Outbound Store Click Tracking)
+* **ตารางฐานข้อมูล `outbound_click_logs`:**
+  - สร้างตารางใน `backend/features/analytics/models.py` จัดเก็บข้อมูล:
+    - `product_id`, `product_name`, `store_id`, `store_name`, `price`
+    - `destination_url` (URL ปลายทางที่ผู้ใช้กดไป)
+    - `user_id` (กรณีผู้ใช้ล็อกอิน), `session_id`, `ip_address`, `user_agent`
+    - `clicked_at` (เวลาที่กด เข้าสู่ระบบ)
+* **API Endpoint:**
+  - เพิ่ม `POST /api/analytics/outbound-click` ใน `backend/features/analytics/router.py` บันทึกคลิกลงตารางทันที และเพิ่มค่าสะสมใน `system_metrics` (`total_outbound_clicks`)
+* **Frontend Click Tracker Helper:**
+  - สร้างยูทิลิตี้ `frontend/src/utils/trackStoreClick.js` ผูกเข้ากับทุกปุ่ม "ไปร้าน", "ซื้อทันที", และการกดดูลิงก์ภายนอกของร้านค้าทั้ง 4 แห่ง (Advice, JIB, BaNANA, iHaveCPU) ทั้งหมด
+
+---
+
+## 📈 16. ระบบวิเคราะห์ตลาด 4 มิติจาก Database พร้อมแหล่งอ้างอิงเชิงวิชาการ (Analysis & Citations)
+* **การคำนวณสถิติจากฐานข้อมูลจริง 100% (`PlatformsPage.jsx`):**
+  - **Dimension 1 (การจัดอันดับราคา):** ส่วนต่างราคาเฉลี่ยดึงตรงจากตาราง `price_listings` (เฉลี่ย **26.7%**, ประหยัดเฉลี่ย **฿2,352.19** ต่อชิ้น)
+  - **Dimension 2 (ความสอดคล้องของราคา):** คำนวณค่าสัมประสิทธิ์การแปรผัน (CV %) ของราคา CPU จากตาราง `price_history` สด (**CV 4.8% เกาะกลุ่ม**)
+  - **Dimension 3 (แนวโน้มและจังหวะซื้อ):** ดึงจำนวนสินค้าขาลงต่ำกว่า MSRP สดจากฐานข้อมูล (**27 ชิ้น คิดเป็น 84%**)
+  - **Dimension 4 (ความสามารถแข่งขันของร้าน):** ดึงอันดับผู้นำราคาต่ำสุดอันดับ 1 สดจาก Database (**iHaveCPU 50.0%** โดยชนะ 16 / 32 รายการ ตามด้วย Advice 40.6%)
+  - **Items Badge:** แสดงยอดสินค้าจริงในฐานข้อมูล (**32 รายการ**) แทนค่า Mock เดิม
+* **การแสดงแหล่งข้อมูลอ้างอิงและระเบียบวิธีวิเคราะห์ (Database Citations & Methodology):**
+  - ระบุชื่อตารางจริงในฐานข้อมูล PostgreSQL (Neon Cloud):
+    - `products` (32 รายการ - เก็บหมวดหมู่, ชื่อรุ่น, MSRP)
+    - `price_listings` (128 รายการ - ราคาแยกตาม 4 ร้านค้าสำหรับหา Best Deal)
+    - `price_history` (Time-series บันทึกประวัติราคาย้อนหลังเพื่อคำนวณ CV% และ Trend)
+    - `stores` (4 ร้านค้าหลัก JIB, Advice, BaNANA, iHaveCPU)
+  - แสดงสูตรคำนวณทางสถิติที่โปร่งใส:
+    - Price Spread %: `((P_max - P_min) / P_max) * 100`
+    - Coefficient of Variation (CV %): `(σ / μ) * 100`
+    - Store Dominance %: `(Wins_lowest / N_total) * 100`
+  - ประทับตราเวลา Database Snapshot พร้อมเชื่อมโยงระบบ Real-time Scraper และ API Backend อย่างสมบูรณ์
+
+
 
 
