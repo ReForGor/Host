@@ -252,19 +252,48 @@ export default function ComparePage({ compareList, setCompareList }) {
   const fetchComparison = async (ids) => {
     setLoading(true)
     try {
-      // If the ids are mock string IDs (e.g. 101, 102), handle them locally
-      const isMockIds = ids.every(id => id.toString().length < 4 || isNaN(Number(id)))
-      
-      if (!isMockIds) {
-        const res = await compareApi.compareProducts(ids)
-        if (res.data && res.data.products?.length > 0) {
-          setCompareData(res.data)
+      // Call real backend compare API
+      const validNumericIds = ids.filter(id => !isNaN(Number(id)))
+      if (validNumericIds.length > 0) {
+        const res = await compareApi.compareProducts(validNumericIds)
+        if (res.data && res.data.products && res.data.products.length > 0) {
+          // Transform products from backend to include store_options and badges
+          const mappedProducts = res.data.products.map((p, idx) => {
+            const storeOptions = (p.listings && p.listings.length > 0)
+              ? p.listings.map(l => ({
+                  name: l.store_name,
+                  price: l.price,
+                  tag: l.store_name === p.best_store ? 'ต่ำสุด ณ ตอนนี้' : '',
+                  tag_en: l.store_name === p.best_store ? 'Lowest Now' : '',
+                  url: l.product_url || '#'
+                }))
+              : [
+                  { name: p.best_store || 'Advice IT', price: p.lowest_price, tag: 'ต่ำสุด ณ ตอนนี้', tag_en: 'Lowest Now', url: p.best_product_url || '#' }
+                ]
+
+            return {
+              ...p,
+              store_options: storeOptions,
+              subtitle: `${p.brand} • ${p.category} ${p.model_no ? `• ${p.model_no}` : ''}`,
+              badge: idx === 0 ? 'BEST VALUE' : 'TOP PERFORMER',
+              badgeColor: idx === 0 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40',
+              discount: p.discount_percent ? `-${p.discount_percent}%` : null,
+              price_diff: p.price_difference ? `-฿${Number(p.price_difference).toLocaleString()}` : null,
+              score_label: 'คะแนนความคุ้มค่า (Value Score)',
+              score_val: res.data.value_scores?.[p.id] || '9.5/10'
+            }
+          })
+
+          setCompareData({
+            ...res.data,
+            products: mappedProducts
+          })
           return
         }
       }
-      
+
       // Fallback: If it fails or is mock ids, filter the mock data
-      const filteredMocks = MOCK_COMPARE_PRODUCTS.filter(p => ids.includes(p.id.toString()))
+      const filteredMocks = MOCK_COMPARE_PRODUCTS.filter(p => ids.includes(p.id.toString()) || ids.includes(p.id))
       if (filteredMocks.length > 0) {
         setCompareData({
           products: filteredMocks,
@@ -276,7 +305,7 @@ export default function ComparePage({ compareList, setCompareList }) {
       }
     } catch (e) {
       console.warn('Backend compare error, falling back to mock:', e)
-      const filteredMocks = MOCK_COMPARE_PRODUCTS.filter(p => ids.includes(p.id.toString()))
+      const filteredMocks = MOCK_COMPARE_PRODUCTS.filter(p => ids.includes(p.id.toString()) || ids.includes(p.id))
       if (filteredMocks.length > 0) {
         setCompareData({
           products: filteredMocks,
@@ -752,50 +781,71 @@ export default function ComparePage({ compareList, setCompareList }) {
             <thead>
               <tr className="border-b border-white/[0.1] text-xs">
                 <th className="py-3 px-4 text-slate-400 w-1/3 font-semibold uppercase">{lang === 'en' ? 'SPECIFICATION' : 'รายการสเปกฮาร์ดแวร์'}</th>
-                <th className="py-3 px-4 text-emerald-400 font-bold w-1/3">AMD Ryzen 7 7800X3D</th>
-                <th className="py-3 px-4 text-purple-400 font-bold w-1/3">Intel Core i7-14700K</th>
+                {activeProducts.map((p, idx) => (
+                  <th key={p.id || idx} className={`py-3 px-4 font-bold ${idx === 0 ? 'text-emerald-400' : 'text-purple-400'}`}>
+                    {p.name}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04] text-xs">
-              {MOCK_SPEC_ROWS.map((row, idx) => (
-                <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                  {/* Spec Name */}
-                  <td className="py-4 px-4 align-top">
-                    <span className="font-bold text-white block">{lang === 'en' ? (row.label_en || row.label) : row.label}</span>
-                    <span className="text-[11px] text-slate-500 block mt-0.5">{row.sub}</span>
-                  </td>
-
-                  {/* Product 1 Value */}
-                  <td className="py-4 px-4 align-top">
-                    <div className="space-y-1.5">
-                      <span className="text-slate-200 whitespace-pre-line font-medium block">
-                        {lang === 'en' ? (row.val1_en || row.val1) : row.val1}
-                      </span>
-                      {(lang === 'en' ? row.val1_highlight_en : row.val1_highlight) && (
-                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.25)]">
-                          <Check className="w-3 h-3 text-emerald-300" />
-                          <span>{lang === 'en' ? row.val1_highlight_en : row.val1_highlight}</span>
+              {compareData?.spec_matrix && compareData.spec_matrix.length > 0 ? (
+                compareData.spec_matrix.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-4 align-top">
+                      <span className="font-bold text-white block">{row.spec_label}</span>
+                      <span className="text-[11px] text-slate-500 block mt-0.5">{row.spec_key}</span>
+                    </td>
+                    {activeProducts.map((p, pIdx) => (
+                      <td key={p.id || pIdx} className="py-4 px-4 align-top">
+                        <span className="text-slate-200 whitespace-pre-line font-medium block">
+                          {String(row.values?.[p.id] ?? '—')}
                         </span>
-                      )}
-                    </div>
-                  </td>
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                MOCK_SPEC_ROWS.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                    {/* Spec Name */}
+                    <td className="py-4 px-4 align-top">
+                      <span className="font-bold text-white block">{lang === 'en' ? (row.label_en || row.label) : row.label}</span>
+                      <span className="text-[11px] text-slate-500 block mt-0.5">{row.sub}</span>
+                    </td>
 
-                  {/* Product 2 Value */}
-                  <td className="py-4 px-4 align-top">
-                    <div className="space-y-1.5">
-                      <span className="text-slate-200 whitespace-pre-line font-medium block">
-                        {lang === 'en' ? (row.val2_en || row.val2) : row.val2}
-                      </span>
-                      {(lang === 'en' ? row.val2_highlight_en : row.val2_highlight) && (
-                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold border border-purple-500/40 shadow-[0_0_8px_rgba(139,92,246,0.25)]">
-                          <Check className="w-3 h-3 text-purple-300" />
-                          <span>{lang === 'en' ? row.val2_highlight_en : row.val2_highlight}</span>
+                    {/* Product 1 Value */}
+                    <td className="py-4 px-4 align-top">
+                      <div className="space-y-1.5">
+                        <span className="text-slate-200 whitespace-pre-line font-medium block">
+                          {lang === 'en' ? (row.val1_en || row.val1) : row.val1}
                         </span>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {(lang === 'en' ? row.val1_highlight_en : row.val1_highlight) && (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.25)]">
+                            <Check className="w-3 h-3 text-emerald-300" />
+                            <span>{lang === 'en' ? row.val1_highlight_en : row.val1_highlight}</span>
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Product 2 Value */}
+                    <td className="py-4 px-4 align-top">
+                      <div className="space-y-1.5">
+                        <span className="text-slate-200 whitespace-pre-line font-medium block">
+                          {lang === 'en' ? (row.val2_en || row.val2) : row.val2}
+                        </span>
+                        {(lang === 'en' ? row.val2_highlight_en : row.val2_highlight) && (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold border border-purple-500/40 shadow-[0_0_8px_rgba(139,92,246,0.25)]">
+                            <Check className="w-3 h-3 text-purple-300" />
+                            <span>{lang === 'en' ? row.val2_highlight_en : row.val2_highlight}</span>
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

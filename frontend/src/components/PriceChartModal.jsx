@@ -451,8 +451,8 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <span className="px-2.5 py-0.5 rounded-md bg-[#003852] border border-cyan-500/40 text-cyan-300 font-bold text-[10px]">
                       {brandName}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-md bg-[#25104A] border border-purple-500/40 text-purple-300 font-bold text-[10px]">
-                      ADA LOVELACE
+                    <span className="px-2.5 py-0.5 rounded-md bg-[#25104A] border border-purple-500/40 text-purple-300 font-bold text-[10px] uppercase">
+                      {product.category || 'PRODUCT'}
                     </span>
                   </div>
                   <span className="text-slate-400 font-mono text-[10px]">
@@ -510,33 +510,28 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                         {product.name}
                       </h2>
                       <p className="text-[11px] text-slate-400 line-clamp-2 mb-3 leading-relaxed">
-                        {lang === 'en' 
-                          ? '4th Gen Tensor Cores, 3rd Gen RT Cores with Axial-tech fans for supreme thermal performance and silence.' 
-                          : 'Tensor Cores ยุคที่ 4, RT Cores เจเนอเรชันที่ 3 พร้อมพัดลม Axial-tech ระบายความร้อนดีเยี่ยม'}
+                        {product.description || (lang === 'en' 
+                          ? 'No description available for this product.' 
+                          : 'ไม่มีคำอธิบายสำหรับสินค้านี้')}
                       </p>
                     </div>
 
-                    {/* 4 Mini Spec Chips */}
+                    {/* Dynamic Spec Chips (Up to 4) */}
                     <div className="grid grid-cols-4 gap-1.5 pt-1">
-                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
-                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">CLOCK</span>
-                        <span className="text-xs font-mono font-bold text-white">2670<span className="text-[9px] text-slate-400 ml-0.5">M</span></span>
-                      </div>
-
-                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
-                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">VRAM</span>
-                        <span className="text-xs font-mono font-bold text-white">16<span className="text-[9px] text-slate-400 ml-0.5">GB</span></span>
-                      </div>
-
-                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
-                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">CUDA</span>
-                        <span className="text-xs font-mono font-bold text-cyan-400">10,240</span>
-                      </div>
-
-                      <div className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
-                        <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider">PSU</span>
-                        <span className="text-xs font-mono font-bold text-amber-500">750<span className="text-[9px] text-slate-400 ml-0.5">W</span></span>
-                      </div>
+                      {product.specs && Object.keys(product.specs).length > 0 ? (
+                        Object.entries(product.specs).slice(0, 4).map(([key, val], idx) => (
+                          <div key={idx} className="p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center flex flex-col items-center justify-center">
+                            <span className="text-[9px] text-purple-300/80 font-bold uppercase block tracking-wider truncate w-full">{key}</span>
+                            <span className="text-xs font-mono font-bold text-white truncate w-full inline-block" title={String(val)}>{val}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-span-4 p-2 rounded-xl bg-[#06020E] border border-purple-500/20 text-center">
+                          <span className="text-xs font-mono font-bold text-slate-500">
+                            {lang === 'en' ? 'No detailed specs available' : 'ไม่มีข้อมูลสเปคโดยละเอียด'}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

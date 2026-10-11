@@ -19,9 +19,12 @@ export default function DealsPage({ user }) {
   const loadDeals = async () => {
     setLoading(true)
     try {
-      const res = await productApi.getProducts({ sort_by: 'discount', limit: 40 })
-      if (res.data && res.data.length > 0) {
-        setDeals(res.data)
+      const res = await productApi.getProducts({ sort_by: 'discount', limit: 50 })
+      const items = Array.isArray(res.data) ? res.data : (res.data?.items || [])
+      if (items.length > 0) {
+        // Filter products with valid lowest price and sort by highest discount/savings
+        const activeDeals = items.filter(p => p.lowest_price && p.lowest_price > 0)
+        setDeals(activeDeals)
       } else {
         setDeals([])
       }

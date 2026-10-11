@@ -76,6 +76,10 @@ async def list_products_service(
             ((l.original_price - l.price) / l.original_price * 100)
             for l in all_active_listings if l.original_price and l.original_price > l.price
         ]
+        if prod.msrp and lowest_p and prod.msrp > lowest_p:
+            discounts.append(((prod.msrp - lowest_p) / prod.msrp * 100))
+        if highest_p and lowest_p and highest_p > lowest_p:
+            discounts.append(((highest_p - lowest_p) / highest_p * 100))
         max_discount = max(discounts) if discounts else 0.0
 
         if min_price is not None and lowest_p is not None and lowest_p < min_price:

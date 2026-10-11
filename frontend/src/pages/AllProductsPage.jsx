@@ -219,6 +219,11 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '85000')
   const [selectedSubSeries, setSelectedSubSeries] = useState('')
 
+  // Pagination States (16 items per page)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 16
+  const [jumpPageInput, setJumpPageInput] = useState('1')
+
   // Quick alert email state
   const [quickAlertEmail, setQuickAlertEmail] = useState('')
   const [quickAlertSubscribed, setQuickAlertSubscribed] = useState(false)
@@ -378,6 +383,19 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
     if (!selectedSubSeries) return true
     return (p.name || '').toLowerCase().includes(selectedSubSeries.toLowerCase())
   })
+
+  // Pagination Calculations (16 items per page)
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / itemsPerPage))
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages)
+  const startIndex = (validCurrentPage - 1) * itemsPerPage
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredProducts.length)
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+    setJumpPageInput('1')
+  }, [selectedCategory, selectedBrand, selectedStore, sortBy, maxPrice, selectedSubSeries, searchQuery])
 
   // Compute key stats
   const lowestTodayPrice = filteredProducts.length > 0
@@ -600,7 +618,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {filteredProducts.map((product) => (
+          {paginatedProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -709,37 +727,75 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
         </div>
       </div>
 
-      {/* PAGINATION (FROM FIGMA) */}
+      {/* PAGINATION (16 ITEMS PER PAGE & DYNAMIC 1 2 3 BUTTONS) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-purple-500/20 text-xs text-slate-400">
         <div>
           {lang === 'en' ? (
-            <>Showing <strong className="text-white font-mono">1 - {filteredProducts.length}</strong> of <strong className="text-white font-mono">{filteredProducts.length}</strong> items</>
+            <>Showing <strong className="text-white font-mono">{filteredProducts.length === 0 ? 0 : startIndex + 1} - {endIndex}</strong> of <strong className="text-white font-mono">{filteredProducts.length}</strong> items (Page {validCurrentPage} of {totalPages})</>
           ) : (
-            <>แสดงรายการที่ <strong className="text-white font-mono">1 - {filteredProducts.length}</strong> จากทั้งหมด <strong className="text-white font-mono">{filteredProducts.length}</strong> รายการ</>
+            <>แสดงรายการที่ <strong className="text-white font-mono">{filteredProducts.length === 0 ? 0 : startIndex + 1} - {endIndex}</strong> จากทั้งหมด <strong className="text-white font-mono">{filteredProducts.length}</strong> รายการ (หน้า {validCurrentPage} จาก {totalPages})</>
           )}
         </div>
 
         <div className="flex items-center space-x-1.5">
-          <button className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white transition-colors">
+          <button 
+            onClick={() => setCurrentPage(1)}
+            disabled={validCurrentPage === 1}
+            title={lang === 'en' ? 'First Page' : 'หน้าแรกสุด'}
+            className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
             |&lt;
           </button>
-          <button className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white transition-colors">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={validCurrentPage === 1}
+            title={lang === 'en' ? 'Previous Page' : 'หน้าก่อนหน้า'}
+            className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
             &lt;
           </button>
-          <button className="px-3 py-1.5 rounded-lg bg-[#7C3AED] text-white font-bold font-mono shadow-[0_0_10px_rgba(124,58,237,0.5)]">
-            1
-          </button>
-          <button className="px-3 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-300 hover:text-white transition-colors font-mono">
-            2
-          </button>
-          <button className="px-3 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-300 hover:text-white transition-colors font-mono">
-            3
-          </button>
-          <span className="px-1 text-slate-600">...</span>
-          <button className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white transition-colors">
+
+          {/* DYNAMIC PAGE NUMBERS (1, 2, 3...) */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(pageNum => {
+              // Show pages close to current page, plus first and last
+              return pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - validCurrentPage) <= 1
+            })
+            .map((pageNum, idx, arr) => {
+              const prev = arr[idx - 1]
+              const showEllipsis = prev && pageNum - prev > 1
+
+              return (
+                <React.Fragment key={pageNum}>
+                  {showEllipsis && <span className="px-1 text-slate-600">...</span>}
+                  <button
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3 py-1.5 rounded-lg font-bold font-mono transition-all ${
+                      validCurrentPage === pageNum
+                        ? 'bg-[#7C3AED] text-white shadow-[0_0_12px_rgba(124,58,237,0.6)]'
+                        : 'bg-[#140826] border border-purple-500/20 text-slate-300 hover:text-white hover:border-purple-400'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                </React.Fragment>
+              )
+            })}
+
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={validCurrentPage === totalPages}
+            title={lang === 'en' ? 'Next Page' : 'หน้าถัดไป'}
+            className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
             &gt;
           </button>
-          <button className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white transition-colors">
+          <button 
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={validCurrentPage === totalPages}
+            title={lang === 'en' ? 'Last Page' : 'หน้าสุดท้าย'}
+            className="px-2.5 py-1.5 rounded-lg bg-[#140826] border border-purple-500/20 text-slate-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
             &gt;|
           </button>
         </div>
@@ -748,11 +804,29 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           <span>{lang === 'en' ? 'Go to page:' : 'ไปยังหน้า:'}</span>
           <input
             type="number"
-            defaultValue={1}
+            value={jumpPageInput}
+            onChange={(e) => setJumpPageInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const target = parseInt(jumpPageInput)
+                if (!isNaN(target) && target >= 1 && target <= totalPages) {
+                  setCurrentPage(target)
+                }
+              }
+            }}
             min={1}
-            className="w-12 bg-[#140826] border border-purple-500/25 rounded-lg px-2 py-1 text-center text-white font-mono focus:outline-none"
+            max={totalPages}
+            className="w-12 bg-[#140826] border border-purple-500/25 rounded-lg px-2 py-1 text-center text-white font-mono focus:outline-none focus:border-purple-400"
           />
-          <button className="px-3 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-white font-semibold transition-colors">
+          <button 
+            onClick={() => {
+              const target = parseInt(jumpPageInput)
+              if (!isNaN(target) && target >= 1 && target <= totalPages) {
+                setCurrentPage(target)
+              }
+            }}
+            className="px-3 py-1 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-white font-semibold transition-colors"
+          >
             {lang === 'en' ? 'Go' : 'ไป'}
           </button>
         </div>

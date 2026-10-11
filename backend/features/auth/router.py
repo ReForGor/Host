@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from backend.core.database import get_db
 from backend.features.auth.models import User
 from backend.features.alerts.models import PriceAlert, Notification
+from backend.features.analytics.models import VisitorRecord, SystemMetric
 from backend.features.auth.schemas import UserRegister, UserLogin, TokenOut, UserProfileOut, UserOut
 from backend.core.security import (
     hash_password,
@@ -68,6 +70,7 @@ async def register(
 async def login(
     data: UserLogin,
     response: Response,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     login_id = data.email_or_username.strip().lower()
@@ -85,6 +88,41 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email/username or password."
         )
+
+    # Record login activity log in database
+    try:
+        now = datetime.utcnow()
+        client_ip = request.client.host if request.client else "127.0.0.1"
+        user_agent = (request.headers.get("user-agent") or "Unknown")[:250]
+        login_session_id = f"login_u{user.id}_{int(now.timestamp())}"
+
+        # Insert audit visitor record for this login
+        log_record = VisitorRecord(
+            session_id=login_session_id,
+            ip_address=client_ip,
+            user_agent=user_agent,
+            path=f"/login [User: {user.username} ({user.email})]",
+            user_id=user.id,
+            created_at=now,
+            last_seen_at=now
+        )
+        db.add(log_record)
+
+        # Increment total logins system metric
+        metric_res = await db.execute(
+            select(SystemMetric).where(SystemMetric.metric_key == "total_logins")
+        )
+        login_metric = metric_res.scalars().first()
+        if not login_metric:
+            login_metric = SystemMetric(metric_key="total_logins", metric_value=0, updated_at=now)
+            db.add(login_metric)
+        login_metric.metric_value += 1
+        login_metric.updated_at = now
+
+        await db.commit()
+    except Exception as log_err:
+        # Logging failure should not disrupt successful authentication
+        print(f"Login audit record notice: {log_err}")
 
     access_token = create_access_token(data={"sub": str(user.id), "email": user.email})
 
