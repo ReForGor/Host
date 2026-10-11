@@ -53,12 +53,12 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
     { name: t.nav?.gpu || (lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (VGA/GPU)'), path: '/products?category=Graphics Cards (GPU)', icon: Layers, highlight: true },
     { name: t.nav?.cpu || (lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)'), path: '/products?category=Processors (CPU)', icon: Cpu, highlight: true },
     { name: t.nav?.ram || (lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)'), path: '/products?category=Memory (RAM)', icon: Zap, highlight: true },
-    { name: t.nav?.storage || (lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD, HDD)'), path: '/products?category=Storage (SSD, HDD)', icon: HardDrive, highlight: false },
-    { name: t.nav?.monitor || (lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์ (Monitor)'), path: '/products?category=Monitors', icon: Tv, highlight: false },
+    { name: t.nav?.storage || (lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD, HDD)'), path: '/products?category=Storage (SSD & HDD)', icon: HardDrive, highlight: false },
+    { name: t.nav?.monitor || (lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์ (Monitor)'), path: '/products?category=Monitors & Displays', icon: Tv, highlight: false },
     { name: t.nav?.mainboard || (lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Motherboard)'), path: '/products?category=Motherboards', icon: Server, highlight: false },
     { name: t.nav?.psu || (lang === 'en' ? 'Power Supplies (PSU)' : 'พาวเวอร์ซัพพลาย (PSU)'), path: '/products?category=Power Supplies (PSU)', icon: Zap, highlight: false },
-    { name: t.nav?.caseCooling || (lang === 'en' ? 'Case & Cooling' : 'เคส & ชุดระบายความร้อน'), path: '/products?category=Case & Cooling', icon: Wind, highlight: false },
-    { name: t.nav?.accessories || (lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์'), path: '/products?category=Accessories', icon: MousePointer, highlight: false },
+    { name: t.nav?.caseCooling || (lang === 'en' ? 'Case & Cooling' : 'เคส & ชุดระบายความร้อน'), path: '/products?category=PC Cases & Cooling', icon: Wind, highlight: false },
+    { name: t.nav?.accessories || (lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์'), path: '/products?category=Gaming Peripherals', icon: MousePointer, highlight: false },
     { name: t.nav?.compare || (lang === 'en' ? 'Compare Specs' : 'เปรียบเทียบสเปก'), path: '/compare', icon: Scale, highlight: true, special: true },
   ]
 

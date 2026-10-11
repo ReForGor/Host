@@ -47,6 +47,11 @@ async def list_products(
 async def get_product_detail(product_id: int, db: AsyncSession = Depends(get_db)):
     return await get_product_detail_service(product_id=product_id, db=db)
 
+@router.post("/products/{product_id}/sync", response_model=ProductDetailOut)
+async def sync_product_prices(product_id: int, db: AsyncSession = Depends(get_db)):
+    from backend.features.products.service import sync_product_prices_service
+    return await sync_product_prices_service(product_id=product_id, db=db)
+
 @router.get("/products/{product_id}/history", response_model=ProductPriceHistoryOut)
 async def get_product_price_history(product_id: int, db: AsyncSession = Depends(get_db)):
     return await get_price_history_service(product_id=product_id, db=db)

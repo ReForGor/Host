@@ -60,6 +60,12 @@
       4. **สร้างเอกสารสรุป 2 ไฟล์ใหม่:**
          - [`PRESENTATION_AI_3TIER_GUIDE.md`](file:///d:/Newfolder/PRESENTATION_AI_3TIER_GUIDE.md): คู่มือทำสไลด์และบทพูดนำเสนอ (Slide-by-Slide Script)
          - [`PROJECT_CURRENT_STATUS_CODEBASE_SUMMARY.md`](file:///d:/Newfolder/PROJECT_CURRENT_STATUS_CODEBASE_SUMMARY.md): สรุปสถานะ 100% ของโปรเจกต์และเจาะลึกหน้าที่ของไฟล์โค้ดทุกไฟล์
+14. **ระบบ Auto-Sync ราคาสดจริงจากหน้าเว็บร้านค้า & แก้ไขหมวดหมู่ Mega Menu:**
+    - **ปัญหา:** ราคาสินค้าบางรายการ (เช่น Logitech G102 Lightsync) ใน DB เก่าอยู่ที่ 500.- แต่หน้าเว็บ Advice ปรับเป็น 535.- และหมวดหมู่ในเมนู Mega Menu เช่น เคส & ชุดระบายความร้อน, อุปกรณ์เสริม ส่ง query ไม่ตรงกับชื่อหมวดหมู่ในฐานข้อมูล
+    - **สิ่งที่แก้:**
+      1. **Backend (`service.py`, `router.py`):** สร้าง `sync_product_prices_service` และ Endpoint `POST /api/products/{id}/sync` วิ่งไปดึง schema.org JSON-LD จาก URL ปลายทางของร้านค้าสดๆ (Advice, JIB, BaNANA, iHaveCPU) อัปเดตราคาล่าสุดและสถานะสต็อก (`in_stock` / `out_of_stock`) ลงตาราง `price_listings` และบันทึกประวัติลง `price_history` ทันที
+      2. **Category Aliases (`service.py`):** เพิ่ม Category Normalization ให้รองรับชื่อหมวดหมู่ทั้งแบบสั้นและแบบเต็ม (เช่น `Case & Cooling` -> `PC Cases & Cooling`, `Accessories` -> `Gaming Peripherals`, `Monitors` -> `Monitors & Displays`) ทำให้คลิกหมวดหมู่ไหนก็ดึงสินค้าจริงจาก Database ได้ถูกต้อง 100%
+      3. **Frontend (`PriceChartModal.jsx`, `client.js`):** เพิ่มปุ่ม `Live Sync (อัปเดตราคาล่าสุด)` พร้อมไอคอนหมุนโหลดในหน้า Modal เพื่อให้ผู้ใช้สามารถกด Sync ดึงราคาสดจริงจากทุกร้านค้าได้ทันที
 
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
 - **Git Repository ที่ใช้:**

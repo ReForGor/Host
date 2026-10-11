@@ -16,7 +16,8 @@ import {
   Mail,
   Activity,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  RefreshCw
 } from 'lucide-react'
 import { productApi, alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -50,6 +51,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const [detail, setDetail] = useState(null)
   const [history, setHistory] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [activeImgIdx, setActiveImgIdx] = useState(0)
 
   // Right column embedded alert state
@@ -136,6 +138,25 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       console.error(e)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSyncLivePrice = async () => {
+    if (isSyncing || !product?.id) return
+    setIsSyncing(true)
+    try {
+      const res = await productApi.syncProductPrice(product.id)
+      if (res?.data) {
+        setDetail(res.data)
+      }
+      const histRes = await productApi.getPriceHistory(product.id).catch(() => ({ data: null }))
+      if (histRes?.data && histRes.data.series?.length > 0) {
+        setHistory(histRes.data)
+      }
+    } catch (err) {
+      console.warn('Sync notice:', err)
+    } finally {
+      setIsSyncing(false)
     }
   }
 
@@ -543,10 +564,15 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                     <ShoppingBag className="w-4 h-4 text-emerald-400" />
                     <span>{lang === 'en' ? 'Compare Top 4 Retailers (Real-time)' : 'เปรียบเทียบราคา 4 ร้านค้าชั้นนำ (Real-time)'}</span>
                   </h3>
-                  <span className="text-emerald-400 font-mono text-[11px] flex items-center space-x-1.5 font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>{lang === 'en' ? 'Live Synced' : 'อัปเดตแล้ว'}</span>
-                  </span>
+                  <button
+                    onClick={handleSyncLivePrice}
+                    disabled={isSyncing}
+                    title={lang === 'en' ? 'Click to re-fetch live price directly from stores' : 'คลิกเพื่อกวาดราคาสดจากเว็บร้านค้าทันที'}
+                    className="text-emerald-400 hover:text-emerald-300 font-mono text-[11px] flex items-center space-x-1.5 font-bold px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3 h-3 text-emerald-400 ${isSyncing ? 'animate-spin' : ''}`} />
+                    <span>{isSyncing ? (lang === 'en' ? 'Syncing...' : 'กำลังดึงราคา...') : (lang === 'en' ? 'Live Sync' : 'อัปเดตราคาล่าสุด')}</span>
+                  </button>
                 </div>
 
                 {/* 4 Store Rows */}

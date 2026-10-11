@@ -33,6 +33,7 @@ api.interceptors.response.use(
 export const productApi = {
   getProducts: (params = {}) => api.get('/products', { params }),
   getProductDetail: (id) => api.get(`/products/${id}`),
+  syncProductPrice: (id) => api.post(`/products/${id}/sync`),
   getPriceHistory: (id) => api.get(`/products/${id}/history`),
   getCategories: () => api.get('/categories'),
   getBrands: () => api.get('/brands'),
