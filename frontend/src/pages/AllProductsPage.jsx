@@ -30,178 +30,6 @@ import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { Helmet } from 'react-helmet-async'
 
-// Rich sample mock fallback if backend is empty
-const MOCK_LISTING_PRODUCTS = [
-  {
-    id: 201,
-    name: 'ASUS TUF Gaming GeForce RTX 4070 SUPER 12GB GDDR6X OC Edition',
-    category: 'Graphics Cards (GPU)',
-    brand: 'ASUS',
-    model_no: 'TUF-RTX4070S-O12G',
-    lowest_price: 25650,
-    msrp: 29900,
-    max_discount_percent: 14.2,
-    best_store_name: 'Advice IT Infinite',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.advice.co.th'
-  },
-  {
-    id: 202,
-    name: 'MSI GeForce RTX 4060 Ti GAMING X 16G GDDR6 Dual Fan Gaming Card',
-    category: 'Graphics Cards (GPU)',
-    brand: 'MSI',
-    model_no: 'G4060TGX-16G',
-    lowest_price: 17100,
-    msrp: 18900,
-    max_discount_percent: 9.5,
-    best_store_name: 'iHaveCPU',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.ihavecpu.com'
-  },
-  {
-    id: 203,
-    name: 'GIGABYTE Radeon RX 7800 XT GAMING OC 16GB GDDR6 Triple Fan',
-    category: 'Graphics Cards (GPU)',
-    brand: 'GIGABYTE',
-    model_no: 'GV-R78XTGAMING-16GD',
-    lowest_price: 18650,
-    msrp: 22900,
-    max_discount_percent: 18.6,
-    best_store_name: 'JIB Online',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.jib.co.th'
-  },
-  {
-    id: 204,
-    name: 'ZOTAC GAMING GeForce RTX 4080 SUPER Trinity Black Edition 16GB',
-    category: 'Graphics Cards (GPU)',
-    brand: 'ZOTAC',
-    model_no: 'ZT-D40820D-10P',
-    lowest_price: 36950,
-    msrp: 39900,
-    max_discount_percent: 7.4,
-    best_store_name: 'BaNANA IT',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.bnn.in.th'
-  },
-  {
-    id: 205,
-    name: 'GALAX GeForce RTX 4070 EX Gamer White 1-Click OC 12GB GDDR6X',
-    category: 'Graphics Cards (GPU)',
-    brand: 'GALAX',
-    model_no: '47NOM7MD7KWH',
-    lowest_price: 20850,
-    msrp: 23500,
-    max_discount_percent: 11.3,
-    best_store_name: 'Advice IT Infinite',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.advice.co.th'
-  },
-  {
-    id: 206,
-    name: 'INNO3D GeForce RTX 4060 Twin X2 8GB GDDR6 128-bit Compact Dual Fan',
-    category: 'Graphics Cards (GPU)',
-    brand: 'INNO3D',
-    model_no: 'N40602-08D6-173051N',
-    lowest_price: 9720,
-    msrp: 11500,
-    max_discount_percent: 15.4,
-    best_store_name: 'iHaveCPU',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.ihavecpu.com'
-  },
-  {
-    id: 207,
-    name: 'ASUS ROG Strix GeForce RTX 4090 24GB GDDR6X OC Edition Flagship',
-    category: 'Graphics Cards (GPU)',
-    brand: 'ASUS ROG',
-    model_no: 'ROG-STRIX-RTX4090-O24G',
-    lowest_price: 74500,
-    msrp: 79900,
-    max_discount_percent: 6.8,
-    best_store_name: 'JIB Online',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.jib.co.th'
-  },
-  {
-    id: 208,
-    name: 'Sapphire PULSE AMD Radeon RX 7600 8GB GDDR6 Dual-X Cooling',
-    category: 'Graphics Cards (GPU)',
-    brand: 'SAPPHIRE',
-    model_no: '11324-01-20G',
-    lowest_price: 8630,
-    msrp: 10500,
-    max_discount_percent: 17.8,
-    best_store_name: 'BaNANA IT',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.bnn.in.th'
-  },
-  {
-    id: 387,
-    name: 'AMD Ryzen 7 7800X3D 8-Core 16-Thread Gaming Processor',
-    category: 'Processors (CPU)',
-    brand: 'AMD',
-    model_no: '100-100000910WOF',
-    lowest_price: 12390,
-    msrp: 15900,
-    max_discount_percent: 8.3,
-    best_store_name: 'iHaveCPU',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.ihavecpu.com'
-  },
-  {
-    id: 388,
-    name: 'Intel Core i5-12400F 6-Core 12-Thread Processor',
-    category: 'Processors (CPU)',
-    brand: 'Intel',
-    model_no: 'BX8071512400F',
-    lowest_price: 4390,
-    msrp: 5500,
-    max_discount_percent: 8.3,
-    best_store_name: 'iHaveCPU',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.ihavecpu.com'
-  },
-  {
-    id: 395,
-    name: 'Kingston FURY Beast DDR4 16GB (8GBx2) 3200MHz Black',
-    category: 'Memory (RAM)',
-    brand: 'Kingston',
-    model_no: 'KF432C16BBK2/16',
-    lowest_price: 4990,
-    msrp: 6000,
-    max_discount_percent: 8.3,
-    best_store_name: 'iHaveCPU',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1562976540-1502c2145186?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.ihavecpu.com'
-  },
-  {
-    id: 396,
-    name: 'Kingston FURY Beast DDR5 32GB (16GBx2) 5600MHz Black',
-    category: 'Memory (RAM)',
-    brand: 'Kingston',
-    model_no: 'KF556C40BBK2-32',
-    lowest_price: 10290,
-    msrp: 18500,
-    max_discount_percent: 8.3,
-    best_store_name: 'BaNANA IT',
-    store_count: 4,
-    image_url: 'https://images.unsplash.com/photo-1562976540-1502c2145186?w=500&auto=format&fit=crop&q=80',
-    best_product_url: 'https://www.bnn.in.th'
-  }
-]
-
 export default function AllProductsPage({ user, compareList, setCompareList }) {
   const { t, lang } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -291,20 +119,34 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
   }
 
   // Popular chip tags based on category
-  const subSeriesChips = selectedCategory === 'Processors (CPU)'
-    ? ['Ryzen 7 7800X3D', 'Ryzen 5 5600', 'Core i5-12400F', 'Ryzen 5 5500', 'Core i7', 'Ryzen 9']
-    : selectedCategory === 'Memory (RAM)'
-    ? ['DDR4', 'DDR5', '16GB', '32GB', '3200MHz', '5600MHz']
-    : selectedCategory === 'All'
-    ? ['RTX 4070', 'RTX 4060', 'Ryzen 7', 'Core i5', 'DDR5', 'DDR4']
-    : [
-        'RTX 4070 SUPER',
-        'RTX 4060 Ti',
-        'RX 7800 XT',
-        'RTX 4080 SUPER',
-        'RX 7700 XT',
-        'RTX 4090'
-      ]
+  const getSubSeriesChips = (cat) => {
+    switch (cat) {
+      case 'Processors (CPU)':
+        return ['Ryzen 7 7800X3D', 'Ryzen 5 5600', 'Core i5-12400F', 'Ryzen 5 5500']
+      case 'Graphics Cards (GPU)':
+        return ['RTX 4070', 'RTX 4060', 'RTX 3050', 'Gigabyte', 'ASUS']
+      case 'Memory (RAM)':
+        return ['DDR4', 'DDR5', '16GB', '32GB', 'Kingston', 'Corsair']
+      case 'Motherboards':
+        return ['B650', 'B760', 'AM5', 'Gigabyte', 'ASRock', 'MSI', 'ASUS']
+      case 'Storage (SSD & HDD)':
+        return ['NV3', '1TB', '2TB', '500GB', 'SN850X', '990 PRO', 'Kingston']
+      case 'Monitors & Displays':
+        return ['144Hz', 'IPS', 'LG', 'Dahua', 'ASUS']
+      case 'Power Supplies (PSU)':
+        return ['650W', '850W', 'Corsair', 'MSI', 'Bronze', 'Gold']
+      case 'PC Cases & Cooling':
+        return ['NZXT', 'Kraken', '360 RGB', 'Liquid']
+      case 'Gaming Peripherals':
+        return ['G102', 'G502', 'DeathAdder', 'Superlight', 'Logitech', 'Razer']
+      case 'Laptops & Notebooks':
+        return ['TUF Gaming', 'IdeaPad', 'RTX 3050', 'Core i5', 'Ryzen 5']
+      case 'All':
+      default:
+        return ['Ryzen', 'Core i5', 'RTX', 'DDR5', 'NVMe', 'Logitech', 'TUF']
+    }
+  }
+  const subSeriesChips = getSubSeriesChips(selectedCategory)
 
   useEffect(() => {
     const cat = searchParams.get('category')
@@ -339,20 +181,11 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
       if (maxPrice) params.max_price = parseFloat(maxPrice)
 
       const res = await productApi.getProducts(params)
-      if (res.data && res.data.length > 0) {
-        setProducts(res.data)
-      } else {
-        const fallback = selectedCategory === 'All'
-          ? MOCK_LISTING_PRODUCTS
-          : MOCK_LISTING_PRODUCTS.filter(p => p.category === selectedCategory)
-        setProducts(fallback.length > 0 ? fallback : MOCK_LISTING_PRODUCTS)
-      }
+      const items = Array.isArray(res.data) ? res.data : (res.data?.items || [])
+      setProducts(items)
     } catch (e) {
-      console.warn('Backend products notice, using listing fallback:', e)
-      const fallback = selectedCategory === 'All'
-        ? MOCK_LISTING_PRODUCTS
-        : MOCK_LISTING_PRODUCTS.filter(p => p.category === selectedCategory)
-      setProducts(fallback.length > 0 ? fallback : MOCK_LISTING_PRODUCTS)
+      console.warn('Backend products notice:', e)
+      setProducts([])
     } finally {
       setLoading(false)
     }

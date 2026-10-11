@@ -29,182 +29,6 @@ import { compareApi, productApi, alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
 import { trackStoreClick } from '../utils/trackStoreClick'
 
-// High-fidelity fallback comparison data matching Figma reference
-const MOCK_COMPARE_PRODUCTS = [
-  {
-    id: 1,
-    name: 'AMD Ryzen 7 7800X3D',
-    brand: 'AMD',
-    category: 'Processors (CPU)',
-    subtitle: 'Socket AM5 • 8 Cores / 16 Threads • 3D V-Cache',
-    badge: 'GAMING CHAMPION',
-    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-    discount: '-11.8%',
-    lowest_price: 14900,
-    msrp: 16900,
-    price_diff: '-฿2,000',
-    best_store: 'iHaveCPU',
-    store_options: [
-      { name: 'iHaveCPU', price: 14900, tag: 'ต่ำสุด ณ ตอนนี้', tag_en: 'Lowest Now', url: 'https://www.ihavecpu.com' },
-      { name: 'Advice IT Infinite', price: 15200, tag: '', url: 'https://www.advice.co.th' },
-      { name: 'JIB Online', price: 15490, tag: '', url: 'https://www.jib.co.th' },
-      { name: 'BaNANA IT', price: 15900, tag: '', url: 'https://www.bnn.in.th' }
-    ],
-    image_url: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
-    score_label: 'ประหยัดไฟ & เกมมิ่งสูงสุด',
-    score_label_en: 'Energy Efficient & Ultimate Gaming',
-    score_val: '9.8/10',
-    score_percent: 98,
-    benchmark_fps: 248,
-    benchmark_fps_delta: '+9.4%',
-    benchmark_cinebench: 18650,
-  },
-  {
-    id: 2,
-    name: 'Intel Core i7-14700K',
-    brand: 'INTEL',
-    category: 'Processors (CPU)',
-    subtitle: 'LGA1700 • 20 Cores / 28 Threads • UHD Graphics 770',
-    badge: 'PRODUCTIVITY KING',
-    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-    discount: '-9.5%',
-    lowest_price: 15200,
-    msrp: 16800,
-    price_diff: '-฿1,600',
-    best_store: 'Advice IT Infinite',
-    store_options: [
-      { name: 'Advice IT Infinite', price: 15200, tag: 'ต่ำสุด ณ ตอนนี้', tag_en: 'Lowest Now', url: 'https://www.advice.co.th' },
-      { name: 'iHaveCPU', price: 15400, tag: '', url: 'https://www.ihavecpu.com' },
-      { name: 'JIB Online', price: 15690, tag: '', url: 'https://www.jib.co.th' },
-      { name: 'BaNANA IT', price: 16100, tag: '', url: 'https://www.bnn.in.th' }
-    ],
-    image_url: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
-    score_label: 'เรนเดอร์งาน & Multi-Tasking สเปกสูง',
-    score_label_en: 'High-Spec Rendering & Multi-Tasking',
-    score_val: '9.2/10',
-    score_percent: 92,
-    benchmark_fps: 227,
-    benchmark_cinebench: 34500,
-    benchmark_cinebench_delta: '+85%',
-  }
-]
-
-// Figma Spec Matrix rows
-const MOCK_SPEC_ROWS = [
-  {
-    key: 'arch',
-    label: 'สถาปัตยกรรม (Architecture)',
-    label_en: 'Architecture',
-    sub: 'Manufacturing Process',
-    val1: 'Zen 4 (TSMC 5nm)',
-    val1_en: 'Zen 4 (TSMC 5nm)',
-    val1_highlight: '5nm ประหยัดไฟ',
-    val1_highlight_en: '5nm Efficient',
-    val2: 'Raptor Lake Refresh (Intel 7 / 10nm)',
-    val2_en: 'Raptor Lake Refresh (Intel 7 / 10nm)',
-    val2_highlight: null,
-    val2_highlight_en: null
-  },
-  {
-    key: 'cores',
-    label: 'คอร์ & เธรด (Cores / Threads)',
-    label_en: 'Cores / Threads',
-    sub: 'Compute Density',
-    val1: '8 Cores / 16 Threads',
-    val1_en: '8 Cores / 16 Threads',
-    val1_highlight: null,
-    val1_highlight_en: null,
-    val2: '20 Cores (8P + 12E) / 28 Threads',
-    val2_en: '20 Cores (8P + 12E) / 28 Threads',
-    val2_highlight: '+12 คอร์',
-    val2_highlight_en: '+12 Cores'
-  },
-  {
-    key: 'clock',
-    label: 'ความถี่คล็อก (Clock Speeds)',
-    label_en: 'Clock Speeds',
-    sub: 'Base / Max Boost',
-    val1: 'Base: 4.2 GHz\nBoost: สูงสุด 5.0 GHz',
-    val1_en: 'Base: 4.2 GHz\nBoost: Up to 5.0 GHz',
-    val1_highlight: null,
-    val1_highlight_en: null,
-    val2: 'Base: 3.4 GHz\nBoost: สูงสุด 5.6 GHz',
-    val2_en: 'Base: 3.4 GHz\nBoost: Up to 5.6 GHz',
-    val2_highlight: '+600 MHz',
-    val2_highlight_en: '+600 MHz'
-  },
-  {
-    key: 'cache',
-    label: 'หน่วยความจำแคช (L3 Cache)',
-    label_en: 'L3 Cache',
-    sub: 'Stacking Technology',
-    val1: '96 MB (3D V-Cache ขนาดมหึมา)',
-    val1_en: '96 MB (Massive 3D V-Cache)',
-    val1_highlight: '3x แคช',
-    val1_highlight_en: '3x Cache',
-    val2: '33 MB Intel Smart Cache (+ 28MB L2)',
-    val2_en: '33 MB Intel Smart Cache (+ 28MB L2)',
-    val2_highlight: null,
-    val2_highlight_en: null
-  },
-  {
-    key: 'tdp',
-    label: 'การใช้พลังงาน (TDP & Power)',
-    label_en: 'TDP & Power',
-    sub: 'Electrical Efficiency',
-    val1: '120W TDP (กินไฟจริงตอนเล่นเกม ~50-70W)',
-    val1_en: '120W TDP (Gaming ~50-70W)',
-    val1_highlight: 'ประหยัดไฟกว่า 3 เท่า',
-    val1_highlight_en: '3x More Efficient',
-    val2: '125W Base / 253W Max Boost (ต้องการชุดน้ำ 360mm)',
-    val2_en: '125W Base / 253W Max Boost (360mm AIO needed)',
-    val2_highlight: 'กินไฟสูง',
-    val2_highlight_en: 'High Power'
-  },
-  {
-    key: 'gaming',
-    label: 'ประสิทธิภาพเล่นเกม (1080p Gaming)',
-    label_en: '1080p Gaming',
-    sub: 'Avg Framerate Benchmark',
-    val1: 'เร็วกว่า 8% - 12% โดยเฉลี่ย',
-    val1_en: '8% - 12% Faster on Average',
-    val1_highlight: 'แชมป์เกมมิ่ง',
-    val1_highlight_en: 'Gaming King',
-    val2: 'เกณฑ์มาตรฐานระดับสูง (FPS เสถียร)',
-    val2_en: 'High-end Benchmark (Stable FPS)',
-    val2_highlight: null,
-    val2_highlight_en: null
-  },
-  {
-    key: 'igpu',
-    label: 'ชิปกราฟิกและการต่อจอ',
-    label_en: 'Integrated Graphics',
-    sub: 'Integrated GPU & Socket',
-    val1: 'AMD Radeon Graphics (2 CU)\nSocket AM5 (อัปเกรดได้ถึง 2027+)',
-    val1_en: 'AMD Radeon Graphics (2 CU)\nSocket AM5 (Upgradable to 2027+)',
-    val1_highlight: null,
-    val1_highlight_en: null,
-    val2: 'Intel UHD 770 (QuickSync)\nSocket LGA1700 (รองรับ DDR4/DDR5)',
-    val2_en: 'Intel UHD 770 (QuickSync)\nSocket LGA1700 (Supports DDR4/DDR5)',
-    val2_highlight: 'QuickSync ตัดต่อลื่น',
-    val2_highlight_en: 'QuickSync for Editing'
-  },
-  {
-    key: 'fps_per_baht',
-    label: 'ราคาต่อเฟรมเรต (FPS / Baht)',
-    label_en: 'FPS / Price Ratio',
-    sub: 'Cost-to-Performance Ratio',
-    val1: '฿60.08 / FPS\nประหยัดค่าเมนบอร์ดและชุดน้ำ',
-    val1_en: '฿60.08 / FPS\nSaves MB and Cooler costs',
-    val1_highlight: 'คุ้มค่าต่อ FPS สูงสุด',
-    val1_highlight_en: 'Best FPS Value',
-    val2: '฿66.96 / FPS\nแต่คุ้มค่ามหาศาลต่องานเรนเดอร์',
-    val2_en: '฿66.96 / FPS\nBut huge value for rendering',
-    val2_highlight: null,
-    val2_highlight_en: null
-  }
-]
-
 // Dynamic benchmark calculator based on real product specs & categories
 function getBenchmarks(p1, p2, compareData, lang) {
   if (!p1 || !p2) return null
@@ -599,11 +423,8 @@ export default function ComparePage({ compareList, setCompareList }) {
     if (ids.length > 0) {
       fetchComparison(ids)
     } else if (!hasClearedMock) {
-      // Use rich mock data by default for presentation unless cleared
-      setCompareData({
-        products: MOCK_COMPARE_PRODUCTS,
-        spec_matrix: MOCK_SPEC_ROWS
-      })
+      // Default to real popular hardware comparison from database (387: Ryzen 7 7800X3D, 388: Core i5-12400F)
+      fetchComparison(['387', '388'])
     } else {
       setCompareData(null)
     }
@@ -670,30 +491,10 @@ export default function ComparePage({ compareList, setCompareList }) {
           return
         }
       }
-
-      // Fallback: If it fails or is mock ids, filter the mock data
-      const filteredMocks = MOCK_COMPARE_PRODUCTS.filter(p => ids.includes(p.id.toString()) || ids.includes(p.id))
-      if (filteredMocks.length > 0) {
-        setCompareData({
-          products: filteredMocks,
-          spec_matrix: MOCK_SPEC_ROWS
-        })
-      } else {
-        setHasClearedMock(true)
-        setCompareData(null)
-      }
+      setCompareData(null)
     } catch (e) {
-      console.warn('Backend compare error, falling back to mock:', e)
-      const filteredMocks = MOCK_COMPARE_PRODUCTS.filter(p => ids.includes(p.id.toString()) || ids.includes(p.id))
-      if (filteredMocks.length > 0) {
-        setCompareData({
-          products: filteredMocks,
-          spec_matrix: MOCK_SPEC_ROWS
-        })
-      } else {
-        setHasClearedMock(true)
-        setCompareData(null)
-      }
+      console.warn('Backend compare notice:', e)
+      setCompareData(null)
     } finally {
       setLoading(false)
     }
@@ -766,8 +567,6 @@ export default function ComparePage({ compareList, setCompareList }) {
   let activeProducts = []
   if (compareData?.products) {
     activeProducts = compareData.products
-  } else if (!hasClearedMock) {
-    activeProducts = MOCK_COMPARE_PRODUCTS
   }
 
   const p1 = activeProducts[0]
@@ -1211,45 +1010,11 @@ export default function ComparePage({ compareList, setCompareList }) {
                   </tr>
                 ))
               ) : (
-                MOCK_SPEC_ROWS.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                    {/* Spec Name */}
-                    <td className="py-4 px-4 align-top">
-                      <span className="font-bold text-white block">{lang === 'en' ? (row.label_en || row.label) : row.label}</span>
-                      <span className="text-[11px] text-slate-500 block mt-0.5">{row.sub}</span>
-                    </td>
-
-                    {/* Product 1 Value */}
-                    <td className="py-4 px-4 align-top">
-                      <div className="space-y-1.5">
-                        <span className="text-slate-200 whitespace-pre-line font-medium block">
-                          {lang === 'en' ? (row.val1_en || row.val1) : row.val1}
-                        </span>
-                        {(lang === 'en' ? row.val1_highlight_en : row.val1_highlight) && (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/40 shadow-[0_0_8px_rgba(16,185,129,0.25)]">
-                            <Check className="w-3 h-3 text-emerald-300" />
-                            <span>{lang === 'en' ? row.val1_highlight_en : row.val1_highlight}</span>
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Product 2 Value */}
-                    <td className="py-4 px-4 align-top">
-                      <div className="space-y-1.5">
-                        <span className="text-slate-200 whitespace-pre-line font-medium block">
-                          {lang === 'en' ? (row.val2_en || row.val2) : row.val2}
-                        </span>
-                        {(lang === 'en' ? row.val2_highlight_en : row.val2_highlight) && (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold border border-purple-500/40 shadow-[0_0_8px_rgba(139,92,246,0.25)]">
-                            <Check className="w-3 h-3 text-purple-300" />
-                            <span>{lang === 'en' ? row.val2_highlight_en : row.val2_highlight}</span>
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                <tr>
+                  <td colSpan={Math.max(activeProducts.length + 1, 2)} className="py-8 text-center text-slate-400">
+                    {lang === 'en' ? 'No specifications available for comparison' : 'ไม่มีข้อมูลสเปกเพิ่มเติมสำหรับเปรียบเทียบ'}
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

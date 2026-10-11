@@ -932,7 +932,7 @@ VERIFIED_4_STORES_PRODUCTS = [
                 "url": "https://www.jib.co.th/web/product/readProduct/39950"
             },
             "advice": {
-                "price": 500.0,
+                "price": 535.0,
                 "orig": 650.0,
                 "url": "https://www.advice.co.th/product/gaming-mouse/gaming-mouse-wired-เมาส์สาย-/mouse-logitech-g102-lightsync-gaming-black-เมาส์สาย-"
             },

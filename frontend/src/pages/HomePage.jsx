@@ -150,13 +150,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
   // Category filter tabs for the Deals/Products section
   const dealCategoryTabs = [
-    { key: 'All', label: lang === 'en' ? 'All Products' : 'สินค้าทั้งหมด', count: products.length || 31 },
-    { key: 'Graphics Cards (GPU)', label: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', count: products.filter(p => p.category === 'Graphics Cards (GPU)').length || 4 },
-    { key: 'Processors (CPU)', label: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', count: products.filter(p => p.category === 'Processors (CPU)').length || 6 },
-    { key: 'Memory (RAM)', label: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', count: products.filter(p => p.category === 'Memory (RAM)').length || 4 },
-    { key: 'Storage (SSD & HDD)', label: lang === 'en' ? 'Storage (SSD & HDD)' : 'ที่เก็บข้อมูล (SSD & HDD)', count: products.filter(p => p.category === 'Storage (SSD & HDD)').length || 5 },
-    { key: 'Monitors & Displays', label: lang === 'en' ? 'Monitors & Displays' : 'จอมอนิเตอร์ & หน้าจอ', count: products.filter(p => p.category === 'Monitors & Displays').length || 4 },
-    { key: 'Motherboards', label: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Mainboard)', count: products.filter(p => p.category === 'Motherboards').length || 4 },
+    { key: 'All', label: lang === 'en' ? 'All Products' : 'สินค้าทั้งหมด', count: products.length },
+    { key: 'Graphics Cards (GPU)', label: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', count: products.filter(p => p.category === 'Graphics Cards (GPU)').length },
+    { key: 'Processors (CPU)', label: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', count: products.filter(p => p.category === 'Processors (CPU)').length },
+    { key: 'Memory (RAM)', label: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', count: products.filter(p => p.category === 'Memory (RAM)').length },
+    { key: 'Storage (SSD & HDD)', label: lang === 'en' ? 'Storage (SSD & HDD)' : 'ที่เก็บข้อมูล (SSD & HDD)', count: products.filter(p => p.category === 'Storage (SSD & HDD)' || p.category === 'Solid State Drives (SSD)').length },
+    { key: 'Monitors & Displays', label: lang === 'en' ? 'Monitors & Displays' : 'จอมอนิเตอร์ & หน้าจอ', count: products.filter(p => p.category === 'Monitors & Displays' || p.category === 'Monitors').length },
+    { key: 'Motherboards', label: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Mainboard)', count: products.filter(p => p.category === 'Motherboards').length },
+    { key: 'Gaming Peripherals', label: lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์', count: products.filter(p => p.category === 'Gaming Peripherals').length },
+    { key: 'Laptops & Notebooks', label: lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊ก', count: products.filter(p => p.category === 'Laptops & Notebooks').length },
   ]
 
   useEffect(() => {
@@ -201,7 +203,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
   // Filter products for display in Deals grid
   const displayedProducts = products.filter(p => {
-    if (selectedFilterCategory !== 'All' && p.category !== selectedFilterCategory) return false
+    if (selectedFilterCategory !== 'All') {
+      if (selectedFilterCategory === 'Monitors & Displays') {
+        if (p.category !== 'Monitors & Displays' && p.category !== 'Monitors') return false
+      } else if (selectedFilterCategory === 'Storage (SSD & HDD)') {
+        if (p.category !== 'Storage (SSD & HDD)' && p.category !== 'Solid State Drives (SSD)') return false
+      } else if (p.category !== selectedFilterCategory) {
+        return false
+      }
+    }
     if (storeFilter && !((p.best_store_name || '').toLowerCase().includes(storeFilter.toLowerCase()))) return false
     if (brandFilter && !((p.brand || '').toLowerCase().includes(brandFilter.toLowerCase()))) return false
     return true

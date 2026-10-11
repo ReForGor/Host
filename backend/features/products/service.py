@@ -48,7 +48,8 @@ async def list_products_service(
             "Monitors & Displays": ["Monitors & Displays", "Monitors"],
             "Storage (SSD, HDD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)", "Storage (SSD, HDD)"],
             "Storage (SSD & HDD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)", "Storage (SSD, HDD)"],
-            "Solid State Drives (SSD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)"]
+            "Solid State Drives (SSD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)"],
+            "Laptops & Notebooks": ["Laptops & Notebooks", "Laptops", "Notebooks"]
         }
         allowed_cats = cat_aliases.get(category, [category])
         query = query.where(Product.category.in_(allowed_cats))
@@ -68,8 +69,8 @@ async def list_products_service(
         ]
         unique_store_slugs = {l.store.slug for l in all_active_listings}
         
-        # We require availability across all 4 key stores
-        if not REQUIRED_STORES.issubset(unique_store_slugs):
+        # Include products that have active listings
+        if not all_active_listings:
             continue
 
         if store_slug and store_slug not in unique_store_slugs:
@@ -491,8 +492,7 @@ async def search_suggestions_service(q: str, limit: int, db: AsyncSession):
     suggestions = []
     for p in prods:
         active = [l for l in p.listings if l.is_available and l.price > 0 and l.store and l.product_url]
-        unique_stores = {l.store.slug for l in active}
-        if not REQUIRED_STORES.issubset(unique_stores):
+        if not active:
             continue
         min_p = min((l.price for l in active), default=p.msrp)
         suggestions.append({
@@ -536,7 +536,7 @@ async def sync_product_prices_service(product_id: int, db: AsyncSession):
         try:
             fetched = await asyncio.wait_for(
                 client.fetch_product(listing.product_url),
-                timeout=6.0
+                timeout=15.0
             )
             if fetched and fetched.get("price"):
                 new_price = float(fetched["price"])
@@ -553,7 +553,7 @@ async def sync_product_prices_service(product_id: int, db: AsyncSession):
                     product_id=prod.id,
                     store_id=listing.store_id,
                     price=new_price,
-                    created_at=datetime.utcnow()
+                    timestamp=datetime.utcnow()
                 )
                 db.add(history)
                 updated_stores.append({

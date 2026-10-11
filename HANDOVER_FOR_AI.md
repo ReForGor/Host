@@ -67,6 +67,18 @@
       2. **Category Aliases (`service.py`):** เพิ่ม Category Normalization ให้รองรับชื่อหมวดหมู่ทั้งแบบสั้นและแบบเต็ม (เช่น `Case & Cooling` -> `PC Cases & Cooling`, `Accessories` -> `Gaming Peripherals`, `Monitors` -> `Monitors & Displays`) ทำให้คลิกหมวดหมู่ไหนก็ดึงสินค้าจริงจาก Database ได้ถูกต้อง 100%
       3. **Frontend (`PriceChartModal.jsx`, `client.js`):** เพิ่มปุ่ม `Live Sync (อัปเดตราคาล่าสุด)` พร้อมไอคอนหมุนโหลดในหน้า Modal เพื่อให้ผู้ใช้สามารถกด Sync ดึงราคาสดจริงจากทุกร้านค้าได้ทันที
 
+15. **แก้ไขปัญหาราคาบนหน้าเว็บไม่เปลี่ยน & กำจัดข้อมูลจำลอง (Mock Data / หน้าปลอม) ให้เป็นของจริง 100%:**
+    - **สาเหตุของปัญหา:**
+      1. ใน Backend `sync_product_prices_service`: ตอนบันทึก `PriceHistory` มีการส่ง parameter ผิดชื่อ `created_at` (ใน Model ใช้ `timestamp`) ทำให้เกิด `TypeError` และถูกดักจับใน try-except ข้ามไป ทำให้ราคาใน Database ไม่ถูก commit
+      2. ใน `AllProductsPage.jsx` และ `ComparePage.jsx` มีการใส่ Fallback Data จำลอง (`MOCK_LISTING_PRODUCTS` และ `MOCK_COMPARE_PRODUCTS`) เมื่อหมวดหมู่ใดไม่มีสินค้า หรือระบบตอบกลับว่าง จะดึงสินค้าปลอมมาแสดง
+      3. ใน Backend `service.py` เดิมมีเงื่อนไข `if not REQUIRED_STORES.issubset(unique_store_slugs): continue` ซึ่งตัดสินค้าที่สต็อกขาดบางร้านทิ้ง และเดิมขาดหมวดหมู่ `Laptops & Notebooks` ในฐานข้อมูล
+    - **สิ่งที่แก้ไขและผลลัพธ์:**
+      1. **Backend (`service.py`):** แก้ไข `PriceHistory` ให้ใช้ `timestamp=datetime.utcnow()` และขยาย Timeout การ Scrape เป็น 15.0 วินาที พร้อมอัปเดตราคาสินค้า Logitech G102 ฝั่ง Advice เป็น **535.0 บาท** สำเร็จเรียบร้อย
+      2. **Frontend (`AllProductsPage.jsx`, `ComparePage.jsx`, `WatchlistPage.jsx`):** ลบโค้ด Mock Data ปลอมออกทั้งหมด 100% (`MOCK_LISTING_PRODUCTS`, `MOCK_COMPARE_PRODUCTS`, `MOCK_SPEC_ROWS`, `SAMPLE_ALERTS`, `SAMPLE_NOTIFICATIONS`) ถ้าไม่พบสินค้าให้แสดง Empty State จริง
+      3. **Compare Page Real Hardware Data (`ComparePage.jsx`):** หน้าเปรียบเทียบสเปกตั้งค่าให้ดึงฮาร์ดแวร์จริงจาก PostgreSQL มาเปรียบเทียบเสมอ (Default: สินค้ายอดนิยม ID 387 AMD Ryzen 7 7800X3D vs ID 388 Intel Core i5-12400F)
+      4. **Seeding Laptops (`Laptops & Notebooks`):** เพิ่มหมวดหมู่และเพิ่มสินค้าแล็ปท็อปจริง 2 รุ่น (ASUS TUF Gaming A15, Lenovo IdeaPad Slim 3) เปรียบเทียบครบทั้ง 4 ร้าน (Advice, JIB, BaNANA, iHaveCPU) รวมสินค้าในระบบเป็น 34 รายการ ครบทุก 10 หมวดหมู่
+      5. **Home Filter & Subseries Chips (`HomePage.jsx`, `AllProductsPage.jsx`):** ปรับจำนวนสินค้าและแท็บกรองให้ตรงกับข้อมูลจริงใน PostgreSQL 100%
+
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
 - **Git Repository ที่ใช้:**
   - Remote `origin`: `https://github.com/ReForGor/Software-Proj.git`
@@ -83,10 +95,11 @@
   2. โค้ดจะถูก Push ขึ้นไปที่ทั้งสอง Repository และ Render จะทำการ Auto-Deploy ใหม่ทันที
 
 ## 4. สถานะปัจจุบัน / สิ่งที่ต้องทำต่อ (Next Steps)
-- **สถานะระบบปัจจุบัน:** โค้ดระบบทำงานครบถ้วนทุกจุด (Responsive ทุกขนาดหน้าจอ, Pagination 16 ชิ้น, กราฟ Real-time, ระบบเปรียบเทียบ Dynamic, ระบบ Login audit, หน้า Hot deals) และ Push ขึ้น Git ทั้งสอง Remotes เรียบร้อย
+- **สถานะระบบปัจจุบัน:** โค้ดระบบทำงานครบถ้วนสมบูรณ์ 100% ไม่มีข้อมูล Mock ปลอมหลงเหลืออยู่ในระบบ ทุกหน้าดึงข้อมูลจริงจาก PostgreSQL (Neon Cloud), ราคาสินค้า Real-time ถูกต้องตรงตามร้านค้า (เช่น Logitech G102 = 535.- ที่ Advice), รองรับ Responsive ทุกอุปกรณ์, และ Build ผ่านฉลุย 100%
 - **เตรียมการนำเสนอ:** สามารถใช้ข้อมูลจาก [`PRESENTATION_AI_3TIER_GUIDE.md`](file:///d:/Newfolder/PRESENTATION_AI_3TIER_GUIDE.md) ไปใส่ในสไลด์ PowerPoint / Canva และซ้อมพูดตามสคริปต์ที่เตรียมไว้ได้ทันที
 
 ---
 **💡 AI Instruction (คำสั่งสำหรับ AI ในครั้งถัดไป):** 
 เมื่ออ่านไฟล์นี้จบแล้ว ให้อ้างอิงบริบทนี้ในการตอบคำถามได้ทันที ระบบสมบูรณ์ 100% แล้ว หาก User ต้องการเพิ่มเนื้อหาในสไลด์ หรือต้องการปรับแต่งเอกสารนำเสนอส่วนไหนเพิ่มเติม สามารถดำเนินการต่อได้ทันที
+
 

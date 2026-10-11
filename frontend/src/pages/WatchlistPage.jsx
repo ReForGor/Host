@@ -6,59 +6,6 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { toast } from 'react-hot-toast'
 import { Helmet } from 'react-helmet-async'
 
-const SAMPLE_ALERTS = [
-  {
-    id: 101,
-    email: 'user@techprice.th',
-    product_name: 'AMD Ryzen 5 5500 3.6GHz 6-Core 12-Thread AM4',
-    product_image: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=500&auto=format&fit=crop&q=80',
-    current_lowest_price: 3120,
-    target_price: 3200,
-    is_active: true
-  },
-  {
-    id: 102,
-    email: 'user@techprice.th',
-    product_name: 'ASUS TUF Gaming GeForce RTX 4070 SUPER 12GB GDDR6X OC',
-    product_image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80',
-    current_lowest_price: 25650,
-    target_price: 24500,
-    is_active: true
-  },
-  {
-    id: 103,
-    email: 'user@techprice.th',
-    product_name: 'Kingston FURY Beast DDR5 32GB (2x16GB) 6000MHz CL30',
-    product_image: 'https://images.unsplash.com/photo-1562976540-1502c2145186?w=500&auto=format&fit=crop&q=80',
-    current_lowest_price: 3890,
-    target_price: 3600,
-    is_active: false
-  }
-]
-
-const SAMPLE_NOTIFICATIONS = [
-  {
-    id: 201,
-    title: 'ราคาลดถึงเป้าหมายแล้ว! AMD Ryzen 5 5500',
-    message: 'ระบบตรวจพบราคาที่ Advice IT Infinite ปรับลดลงเหลือ ฿3,120 (ต่ำกว่าเป้าหมาย ฿3,200 ที่คุณตั้งไว้)',
-    store_name: 'Advice IT Infinite',
-    new_price: 3120,
-    created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    product_url: 'https://www.advice.co.th',
-    is_read: false
-  },
-  {
-    id: 202,
-    title: 'Flash Sale! GIGABYTE Radeon RX 7800 XT ปรับราคาลง',
-    message: 'JIB Online ปรับลดราคาพิเศษ 18.6% เหลือเพียง ฿18,650 จากราคาปกติ ฿22,900',
-    store_name: 'JIB Online',
-    new_price: 18650,
-    created_at: new Date(Date.now() - 1000 * 60 * 75).toISOString(),
-    product_url: 'https://www.jib.co.th',
-    is_read: true
-  }
-]
-
 export default function WatchlistPage({ user, onOpenLogin }) {
   const { t, lang } = useLanguage()
   const [alerts, setAlerts] = useState([])
