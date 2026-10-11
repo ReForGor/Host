@@ -52,24 +52,35 @@
       3. **Grid Breakpoints (`HomePage.jsx`, `AllProductsPage.jsx`, `DealsPage.jsx`):** เพิ่ม Breakpoints ครบวงจร: มือถือ (1 คอลัมน์), แท็บเล็ต/iPad (2 คอลัมน์), แล็ปท็อป/เดสก์ท็อป (3-4 คอลัมน์) และจอใหญ่พิเศษ Ultrawide/4K (`2xl:grid-cols-5`)
       4. **Price Chart & Retailer Modal (`PriceChartModal.jsx`):** ปรับแถวร้านค้า 4 ร้านใน Modal ให้ย่อเป็น Flex-col บนหน้าจอมือถือ ไม่เบียดปุ่มและราคา และจัดเรียง Flex-row เมื่อมีพื้นที่หน้าจอกว้างขึ้น
 *(รายละเอียดเชิงลึกทั้งหมดบันทึกไว้ใน [`ARCHITECTURE_AND_AI_DATABASE_SPEC.md`](file:///d:/Newfolder/ARCHITECTURE_AND_AI_DATABASE_SPEC.md))*
+13. **จัดทำเอกสารและเนื้อหาสำหรับการนำเสนออาจารย์ (AI & 3-Tier & Database Presentation Guides):**
+    - **สิ่งที่ทำตามข้อเสนอแนะอาจารย์:**
+      1. **การใช้ AI ในแต่ละส่วน:** ระบุโมเดลที่ใช้ (Gemini 1.5 Pro, Statistical ML, Gemini 1.5 Flash), ส่วนที่ดึงมาทำ (Scraper Raw Titles, Price History Stats, Comparison Specs), และแนบ **Prompt ฉบับเต็ม** ที่ใช้ในแต่ละส่วน
+      2. **สถาปัตยกรรม 3-Tier Architecture:** อธิบายหน้าที่ของ Presentation Tier (React/Tailwind/Chart.js), Application Tier (FastAPI/Pydantic/Brevo/AI), Data Tier (PostgreSQL/Neon Cloud) และรูปแบบการเชื่อมต่อ (HTTP REST API/JWT และ SQLAlchemy 2.0 Async/asyncpg)
+      3. **Database Data Flow:** แมปความสัมพันธ์ทุกตารางว่าตารางไหนส่งต่อไปใช้ในส่วนไหนอย่างละเอียด (เช่น `users` -> Login/Auth, `visitor_records` -> เก็บล็อกเมื่อกด Log in, `price_listings` -> เปรียบเทียบราคาต่ำสุดปัจจุบัน, `price_history` -> ดึงมาวิเคราะห์สถิติ All-Time Low และพล็อตเส้นกราฟย้อนหลัง, `price_alerts` -> ส่งอีเมลแจ้งเตือนราคาลดผ่าน Brevo API, `outbound_click_logs` -> สถิติกดไปร้านค้า)
+      4. **สร้างเอกสารสรุป 2 ไฟล์ใหม่:**
+         - [`PRESENTATION_AI_3TIER_GUIDE.md`](file:///d:/Newfolder/PRESENTATION_AI_3TIER_GUIDE.md): คู่มือทำสไลด์และบทพูดนำเสนอ (Slide-by-Slide Script)
+         - [`PROJECT_CURRENT_STATUS_CODEBASE_SUMMARY.md`](file:///d:/Newfolder/PROJECT_CURRENT_STATUS_CODEBASE_SUMMARY.md): สรุปสถานะ 100% ของโปรเจกต์และเจาะลึกหน้าที่ของไฟล์โค้ดทุกไฟล์
 
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
-- **Git Repository ที่ใช้:** `https://github.com/ReForGor/Host.git`
-- **Server:** Render (Backend)
+- **Git Repository ที่ใช้:**
+  - Remote `origin`: `https://github.com/ReForGor/Software-Proj.git`
+  - Remote `host`: `https://github.com/ReForGor/Host.git`
+- **Server:** Render (Backend), Vercel / Render (Frontend)
 - **วิธีการ Push / Deploy:**
   1. เมื่อแก้ไขโค้ดเสร็จ ให้รันคำสั่ง:
      ```bash
      git add .
      git commit -m "ข้อความอธิบายการแก้ไข"
-     git push
+     git push origin main
+     git push host main
      ```
-  2. โค้ดจะถูก Push ขึ้นไปที่ Repository `ReForGor/Host`
-  3. ถ้าเชื่อมต่อ Git ไว้กับ Render ระบบจะทำการ Auto-Deploy ใหม่ทันที (อย่าลืมให้ User เช็คใน Render ว่าแถบสถานะขึ้นสีเขียว)
+  2. โค้ดจะถูก Push ขึ้นไปที่ทั้งสอง Repository และ Render จะทำการ Auto-Deploy ใหม่ทันที
 
 ## 4. สถานะปัจจุบัน / สิ่งที่ต้องทำต่อ (Next Steps)
-- **เช็คอีเมล:** รอ User ยืนยันว่าหลังจากแก้ API Key บน Render แล้ว อีเมลแจ้งเตือนราคาเด้งเข้ากล่องข้อความแล้วหรือยัง
-- **รันฝั่ง Frontend:** `cd frontend` และ `npm run dev` เพื่อดูความเปลี่ยนแปลงของการแก้ UI ล่าสุด
+- **สถานะระบบปัจจุบัน:** โค้ดระบบทำงานครบถ้วนทุกจุด (Responsive ทุกขนาดหน้าจอ, Pagination 16 ชิ้น, กราฟ Real-time, ระบบเปรียบเทียบ Dynamic, ระบบ Login audit, หน้า Hot deals) และ Push ขึ้น Git ทั้งสอง Remotes เรียบร้อย
+- **เตรียมการนำเสนอ:** สามารถใช้ข้อมูลจาก [`PRESENTATION_AI_3TIER_GUIDE.md`](file:///d:/Newfolder/PRESENTATION_AI_3TIER_GUIDE.md) ไปใส่ในสไลด์ PowerPoint / Canva และซ้อมพูดตามสคริปต์ที่เตรียมไว้ได้ทันที
 
 ---
 **💡 AI Instruction (คำสั่งสำหรับ AI ในครั้งถัดไป):** 
-เมื่ออ่านไฟล์นี้จบแล้ว ให้อ้างอิงบริบทนี้ในการตอบคำถาม และพร้อมลุยงานต่อได้ทันที โดยสามารถถาม User ได้เลยว่า "อีเมลแจ้งเตือนเข้าปกติหรือยังครับ?" หรือ "มีส่วนไหนในหน้าเว็บที่อยากปรับแต่งเพิ่มเติมไหมครับ?"
+เมื่ออ่านไฟล์นี้จบแล้ว ให้อ้างอิงบริบทนี้ในการตอบคำถามได้ทันที ระบบสมบูรณ์ 100% แล้ว หาก User ต้องการเพิ่มเนื้อหาในสไลด์ หรือต้องการปรับแต่งเอกสารนำเสนอส่วนไหนเพิ่มเติม สามารถดำเนินการต่อได้ทันที
+
