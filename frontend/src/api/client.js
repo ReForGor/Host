@@ -87,7 +87,9 @@ export const analyticsApi = {
   getStats: () => api.get('/analytics/stats'),
   getStoreDominance: () => api.get('/analysis/store-dominance'),
   getMarketSummary: () => api.get('/analysis/market-summary'),
+  trackOutboundClick: (data) => api.post('/analytics/outbound-click', data),
 }
 
 export default api
+
 

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { productApi, alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
+import { trackStoreClick } from '../utils/trackStoreClick'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -634,6 +635,14 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                             href={item.product_url || '#'}
                             target="_blank"
                             rel="noreferrer"
+                            onClick={() => trackStoreClick({
+                              productId: product.id,
+                              productName: product.name,
+                              storeName: item.store_name,
+                              targetUrl: item.product_url,
+                              price: item.price,
+                              sourcePage: 'price_chart_modal'
+                            })}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all ${
                               item.is_lowest
                                 ? 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-[0_0_12px_rgba(6,182,212,0.4)]'

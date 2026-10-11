@@ -1,6 +1,7 @@
 import React from 'react'
 import { TrendingDown, ExternalLink, ArrowRight, Scale, Check, ShoppingCart, Award } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
+import { trackStoreClick } from '../utils/trackStoreClick'
 
 export default function ProductCard({ 
   product, 
@@ -171,6 +172,14 @@ export default function ProductCard({
               href={product.best_product_url || '#'}
               target="_blank"
               rel="noreferrer"
+              onClick={() => trackStoreClick({
+                productId: product.id,
+                productName: product.name,
+                storeName: storeInfo.name,
+                targetUrl: product.best_product_url,
+                price: product.lowest_price,
+                sourcePage: 'product_card'
+              })}
               className="flex items-center space-x-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
               title={lang === 'en' ? 'Go to cheapest store' : 'ไปยังร้านค้าที่ถูกที่สุด'}
             >

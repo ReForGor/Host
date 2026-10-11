@@ -6,15 +6,75 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc, update
 
 from backend.core.database import get_db
-from backend.features.analytics.models import VisitorRecord, SystemMetric
+from backend.features.analytics.models import VisitorRecord, SystemMetric, OutboundClickLog
 from backend.features.auth.models import User
 
 router = APIRouter(prefix="/api/analytics", tags=["Analytics & Visitors"])
+
+class ClickTrackRequest(BaseModel):
+    product_id: Optional[int] = None
+    product_name: Optional[str] = None
+    store_name: Optional[str] = None
+    target_url: str
+    price: Optional[float] = None
+    session_id: Optional[str] = None
+    user_id: Optional[int] = None
+    source_page: Optional[str] = None
+
+@router.post("/outbound-click")
+async def track_outbound_click(
+    data: ClickTrackRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Records a log whenever a user clicks on an external store link (e.g. Advice, JIB, BaNANA, iHaveCPU)
+    to view or buy a product on the store's primary website.
+    """
+    now = datetime.utcnow()
+    client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "127.0.0.1")
+    if "," in client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+    user_agent = request.headers.get("user-agent", "")[:255]
+
+    try:
+        log_entry = OutboundClickLog(
+            product_id=data.product_id,
+            product_name=data.product_name,
+            store_name=data.store_name,
+            target_url=data.target_url,
+            price=int(data.price) if data.price is not None else None,
+            user_id=data.user_id,
+            session_id=data.session_id,
+            ip_address=client_ip,
+            user_agent=user_agent,
+            source_page=data.source_page or "web",
+            created_at=now
+        )
+        db.add(log_entry)
+
+        # Increment total_outbound_clicks metric
+        metric_res = await db.execute(
+            select(SystemMetric).where(SystemMetric.metric_key == "total_outbound_clicks")
+        )
+        metric = metric_res.scalars().first()
+        if not metric:
+            metric = SystemMetric(metric_key="total_outbound_clicks", metric_value=0, updated_at=now)
+            db.add(metric)
+        metric.metric_value += 1
+        metric.updated_at = now
+
+        await db.commit()
+        return {"status": "success", "message": "Outbound click recorded"}
+    except Exception as e:
+        print(f"Outbound click logging warning: {e}")
+        return {"status": "error", "message": str(e)}
 
 class VisitPingRequest(BaseModel):
     session_id: str
     path: Optional[str] = "/"
     user_id: Optional[int] = None
+
 
 @router.post("/visit")
 async def record_visit(
@@ -132,14 +192,23 @@ async def get_analytics_stats(db: AsyncSession = Depends(get_db)):
         for u in users_list
     ]
 
+    # 5. Outbound store clicks count
+    click_metric_res = await db.execute(
+        select(SystemMetric).where(SystemMetric.metric_key == "total_outbound_clicks")
+    )
+    click_metric = click_metric_res.scalar_one_or_none()
+    total_outbound_clicks = click_metric.metric_value if click_metric else 0
+
     return {
         "total_visitors": total_visits,
         "unique_visitors": unique_visitors,
         "online_now": online_now,
+        "total_outbound_clicks": total_outbound_clicks,
         "total_users": len(real_users_data),
         "real_users": real_users_data,
         "updated_at": now.isoformat()
     }
+
 
 
 from collections import Counter, defaultdict

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { compareApi, productApi, alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
+import { trackStoreClick } from '../utils/trackStoreClick'
 
 // High-fidelity fallback comparison data matching Figma reference
 const MOCK_COMPARE_PRODUCTS = [
@@ -653,6 +654,14 @@ export default function ComparePage({ compareList, setCompareList }) {
                   href={curStore.url}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => trackStoreClick({
+                    productId: p.id,
+                    productName: p.name,
+                    storeName: curStore.name,
+                    targetUrl: curStore.url,
+                    price: curStore.price || p.lowest_price,
+                    sourcePage: 'compare_page'
+                  })}
                   className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${
                     isLeft
                       ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'

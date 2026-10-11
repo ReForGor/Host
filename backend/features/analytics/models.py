@@ -21,3 +21,20 @@ class SystemMetric(Base):
     metric_key = Column(String(50), primary_key=True)
     metric_value = Column(BigInteger, default=0)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class OutboundClickLog(Base):
+    __tablename__ = "outbound_click_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, nullable=True, index=True)
+    product_name = Column(String(255), nullable=True)
+    store_name = Column(String(100), nullable=True, index=True)
+    target_url = Column(String(1000), nullable=False)
+    price = Column(BigInteger, nullable=True)
+    user_id = Column(Integer, nullable=True, index=True)
+    session_id = Column(String(64), nullable=True, index=True)
+    ip_address = Column(String(64), nullable=True)
+    user_agent = Column(String(255), nullable=True)
+    source_page = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+

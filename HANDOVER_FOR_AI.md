@@ -28,6 +28,8 @@
    - **สิ่งที่แก้:** คำนวณส่วนลดเทียบกับ MSRP และส่วนต่างราคาของร้านค้าที่แพงที่สุด ทำให้สินค้าลดราคาแสดงผลถูกต้อง
 6. **บันทึกข้อมูลเมื่อมีคน Login (Login Audit Logging):**
    - **สิ่งที่แก้:** ใน `backend/features/auth/router.py` บันทึก session ลง `visitor_records` และเพิ่ม metric `total_logins` ใน `system_metrics` ทันทีเมื่อ Login สำเร็จ
+7. **บันทึก Log เมื่อมีคนกดเข้าไปดูสินค้าในเว็บหลักจากเว็บเรา (Outbound Store Click Tracking):**
+   - **สิ่งที่แก้:** เพิ่มตาราง `outbound_click_logs` และ API Endpoint `/api/analytics/outbound-click` เพื่อบันทึกทุกครั้งที่มีคนกดลิงก์ "ไปร้าน", "ซื้อทันที", หรือแบนเนอร์ร้านค้า (เก็บชื่อสินค้า, ร้านค้า, ราคา, URL ปลายทาง, IP, Session ID, User ID)
 *(รายละเอียดเชิงลึกทั้งหมดบันทึกไว้ใน [`ARCHITECTURE_AND_AI_DATABASE_SPEC.md`](file:///d:/Newfolder/ARCHITECTURE_AND_AI_DATABASE_SPEC.md))*
 
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)

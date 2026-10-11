@@ -4,6 +4,7 @@ import { productApi } from '../api/client'
 import PriceChartModal from '../components/PriceChartModal'
 import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
+import { trackStoreClick } from '../utils/trackStoreClick'
 
 export default function DealsPage({ user }) {
   const { t, lang } = useLanguage()
@@ -137,6 +138,14 @@ export default function DealsPage({ user }) {
                       href={prod.best_product_url || '#'}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => trackStoreClick({
+                        productId: prod.id,
+                        productName: prod.name,
+                        storeName: prod.best_store_name,
+                        targetUrl: prod.best_product_url,
+                        price: prod.lowest_price,
+                        sourcePage: 'deals_page'
+                      })}
                       className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.35)] text-xs font-bold rounded-xl flex items-center space-x-1 transition-all"
                     >
                       <span>{lang === 'en' ? 'Buy Now' : 'ซื้อทันที'}</span>

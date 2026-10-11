@@ -41,6 +41,7 @@ import ProductCard from '../components/ProductCard'
 import PriceChartModal from '../components/PriceChartModal'
 import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
+import { trackStoreClick } from '../utils/trackStoreClick'
 
 import { Helmet } from 'react-helmet-async'
 
@@ -580,6 +581,11 @@ export default function HomePage({ user, compareList, setCompareList }) {
               href={s.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackStoreClick({
+                storeName: s.name,
+                targetUrl: s.url,
+                sourcePage: 'home_store_banner'
+              })}
               className="bg-white rounded-2xl p-4 sm:p-5 h-20 sm:h-24 flex items-center justify-center text-center shadow-[0_4px_15px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_25px_rgba(255,255,255,0.4)] hover:scale-105 transition-all duration-300 group"
               title={`Visit ${s.name} Official Website`}
             >
