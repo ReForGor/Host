@@ -605,7 +605,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
         </div>
       </div>
 
-      {/* PRODUCTS DISPLAY GRID */}
+      {/* PRODUCTS DISPLAY GRID (Responsive across mobile, tablet, desktop, and large displays) */}
       {filteredProducts.length === 0 ? (
         <div className="glass-card rounded-3xl p-12 text-center space-y-3">
           <p className="text-slate-300 font-semibold">{lang === 'en' ? 'No products match the selected filters' : 'ไม่พบสินค้าตามเงื่อนไขตัวกรอง'}</p>
@@ -617,7 +617,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
           {paginatedProducts.map((product) => (
             <ProductCard
               key={product.id}

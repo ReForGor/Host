@@ -251,21 +251,23 @@ export default function HomePage({ user, compareList, setCompareList }) {
 
               <form 
                 onSubmit={handleHeroSearch}
-                className="flex items-center bg-[#070312]/95 border-2 border-purple-500/40 hover:border-purple-400 focus-within:border-cyan-400 rounded-2xl p-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_30px_rgba(139,92,246,0.3)] transition-all"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-[#070312]/95 border-2 border-purple-500/40 hover:border-purple-400 focus-within:border-cyan-400 rounded-2xl p-1.5 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_30px_rgba(139,92,246,0.3)] transition-all gap-1.5 sm:gap-0"
               >
-                <div className="pl-3 sm:pl-4 text-cyan-400">
-                  <Search className="w-5 h-5 text-cyan-400" />
+                <div className="flex items-center flex-1 min-w-0">
+                  <div className="pl-3 sm:pl-4 text-cyan-400 flex-shrink-0">
+                    <Search className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={lang === 'en' ? 'Search GPUs, CPUs, SSDs, RAM...' : 'ค้นหาการ์ดจอ, ซีพียู, SSD, แรม...'}
+                    className="w-full bg-transparent px-3 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none min-w-0"
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={lang === 'en' ? 'Search GPUs (RTX 4070, 3050), CPUs (9800X3D, 7800X3D), SSDs, RAM...' : 'ค้นหาการ์ดจอ (RTX 4070, 3050), ซีพียู (9800X3D, 7800X3D), SSD, แรม...'}
-                  className="w-full bg-transparent px-3 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none"
-                />
                 <button
                   type="submit"
-                  className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-1.5 flex-shrink-0 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all cursor-pointer"
+                  className="px-5 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center space-x-1.5 flex-shrink-0 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all cursor-pointer"
                 >
                   <span>{lang === 'en' ? 'Search' : 'ค้นหา'}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -524,15 +526,15 @@ export default function HomePage({ user, compareList, setCompareList }) {
           )}
         </div>
 
-        {/* Product Cards Grid (4 columns) */}
+        {/* Product Cards Grid (responsive across phone, tablet, laptop, and ultrawide/4K) */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
+            {[...Array(10)].map((_, i) => (
               <div key={i} className="h-80 bg-[#120826] rounded-2xl animate-pulse border border-purple-500/20" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5">
             {visibleProducts.map((product) => (
               <ProductCard
                 key={product.id}

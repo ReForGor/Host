@@ -554,14 +554,14 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                   {detail?.platforms?.map((item, idx) => (
                     <div
                       key={item.store_id || idx}
-                      className={`flex-1 p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                      className={`flex-1 p-3 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 ${
                         item.is_lowest && item.stock_status !== 'out_of_stock' && item.price > 0
                           ? 'bg-[#110524] border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
                           : 'bg-[#0E061E] border-purple-500/20 hover:border-purple-500/40'
                       }`}
                     >
                       {/* Store Icon & Details */}
-                      <div className="flex items-center space-x-3 min-w-0">
+                      <div className="flex items-center space-x-3 min-w-0 w-full sm:w-auto">
                         <div 
                           className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold font-mono border flex-shrink-0"
                           style={{ 
@@ -573,7 +573,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                           {item.store_slug === 'jib' ? 'JIB' : item.store_slug === 'ihavecpu' ? 'iHave' : item.store_slug === 'advice' ? 'Advice' : 'BNN'}
                         </div>
 
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                             <span className="text-xs font-bold text-white truncate">{item.store_name}</span>
                             
@@ -605,8 +605,8 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                       </div>
 
                       {/* Store Price & CTA Button */}
-                      <div className="flex items-center space-x-3 flex-shrink-0">
-                        <div className="text-right">
+                      <div className="flex items-center justify-between sm:justify-end space-x-3 flex-shrink-0 w-full sm:w-auto pt-1 sm:pt-0 border-t border-purple-500/15 sm:border-0">
+                        <div className="text-left sm:text-right">
                           <div className={`text-sm font-black font-display ${item.is_lowest ? 'text-emerald-400' : 'text-white'}`}>
                             {item.stock_status === 'out_of_stock' || !item.price ? (
                               <span className="text-red-400 text-xs">{lang === 'en' ? 'Out of Stock' : 'ของหมด'}</span>

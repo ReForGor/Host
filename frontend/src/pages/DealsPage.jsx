@@ -68,7 +68,7 @@ export default function DealsPage({ user }) {
           <h3 className="text-lg font-bold text-white">{lang === 'en' ? 'No special promotional deals right now' : 'ยังไม่มีดีลลดราคาพิเศษในขณะนี้'}</h3>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {deals.map((prod) => {
             const savings = (prod.highest_price || prod.msrp || prod.lowest_price) - prod.lowest_price
             return (

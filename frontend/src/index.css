@@ -3,10 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     font-family: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #070312;
     color: #dfe2f0;
+    overflow-x: hidden;
+    min-width: 320px;
+    /* Safe area insets for notched iPhones and tablets */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
     /* Figma Galaxy Cyber Grid & Cosmic Nebula Background */
     background-image: 
       /* Subtle Cyber Tech Grid lines from Figma */
@@ -25,6 +35,10 @@
   }
   h1, h2, h3, .font-heading {
     font-family: 'Space Grotesk', 'Prompt', sans-serif;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 
