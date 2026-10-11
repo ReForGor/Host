@@ -205,6 +205,365 @@ const MOCK_SPEC_ROWS = [
   }
 ]
 
+// Dynamic benchmark calculator based on real product specs & categories
+function getBenchmarks(p1, p2, compareData, lang) {
+  if (!p1 || !p2) return null
+
+  const isDemoCpu = (p1.name?.includes('7800X3D') && p2.name?.includes('14700K')) ||
+                    (p1.name?.includes('14700K') && p2.name?.includes('7800X3D'))
+
+  if (isDemoCpu) {
+    return {
+      subtitle: lang === 'en'
+        ? 'Estimated 1080p Ultra Gaming FPS and Cinebench R23 Multi-Core rendering scores'
+        : 'คะแนนประเมินระหว่าง FPS เกมมิ่ง 1080p Ultra และคะแนน Cinebench R23 Multi-Core',
+      metric1: {
+        title: lang === 'en' ? 'Average 1080p Gaming FPS (12 Titles)' : 'ค่าเฉลี่ย 1080p Gaming FPS (12 เกมดัง)',
+        deltaBadge: 'AMD +9.4%',
+        deltaColor: 'text-emerald-400',
+        val1: '248 FPS',
+        pct1: 95,
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: '227 FPS',
+        pct2: 85,
+        color2: 'bg-purple-500',
+        textColor2: 'text-purple-400'
+      },
+      metric2: {
+        title: lang === 'en' ? 'Cinebench R23 Rendering (Multi-Thread)' : 'คะแนนเรนเดอร์ Cinebench R23 (Multi-Thread)',
+        deltaBadge: 'Intel +85%',
+        deltaColor: 'text-purple-400',
+        val1: '18,650 Pts',
+        pct1: 53,
+        color1: 'bg-emerald-500/70',
+        textColor1: 'text-emerald-400',
+        val2: '34,500 Pts',
+        pct2: 98,
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      }
+    }
+  }
+
+  const cat = `${p1.category || ''} ${p2.category || ''} ${p1.name || ''} ${p2.name || ''}`.toLowerCase()
+
+  const extractNum = (str, regex) => {
+    if (!str) return null
+    const m = String(str).match(regex)
+    return m ? parseFloat(m[1]) : null
+  }
+
+  // 1. RAM / Memory
+  if (cat.includes('ram') || cat.includes('memory')) {
+    const speed1 = extractNum(p1.specs?.speed || p1.specs?.frequency || p1.name, /(\d{4,5})\s*(?:mhz|mt\/s)?/i) || 3200
+    const speed2 = extractNum(p2.specs?.speed || p2.specs?.frequency || p2.name, /(\d{4,5})\s*(?:mhz|mt\/s)?/i) || 3200
+    const maxSpeed = Math.max(speed1, speed2, 1)
+    const speedDelta = speed1 >= speed2 
+      ? `+${(((speed1 - speed2) / (speed2 || 1)) * 100).toFixed(1)}% Speed`
+      : `+${(((speed2 - speed1) / (speed1 || 1)) * 100).toFixed(1)}% Speed`
+
+    const cap1 = extractNum(p1.specs?.capacity || p1.name, /(\d+)\s*gb/i) || 16
+    const cap2 = extractNum(p2.specs?.capacity || p2.name, /(\d+)\s*gb/i) || 16
+    const costPerGb1 = p1.lowest_price ? Math.round(p1.lowest_price / cap1) : 0
+    const costPerGb2 = p2.lowest_price ? Math.round(p2.lowest_price / cap2) : 0
+    const bestCost = (costPerGb1 && costPerGb2) 
+      ? (costPerGb1 <= costPerGb2 ? `${p1.brand || 'P1'} คุ้มกว่า` : `${p2.brand || 'P2'} คุ้มกว่า`)
+      : 'คุ้มค่าสูสี'
+
+    return {
+      subtitle: lang === 'en'
+        ? 'Real-world Memory Bus Frequency and Price per Gigabyte value metric'
+        : 'ดัชนีความเร็วบัสแรม (MHz) และอัตราความคุ้มค่าราคาต่อหน่วยความจุ (฿/GB)',
+      metric1: {
+        title: lang === 'en' ? 'Memory Speed / Frequency (MHz / MT/s)' : 'ความเร็วบัสแรม (Memory Frequency / Speed)',
+        deltaBadge: speedDelta,
+        deltaColor: speed1 >= speed2 ? 'text-emerald-400' : 'text-purple-400',
+        val1: `${speed1.toLocaleString()} MHz`,
+        pct1: Math.min(100, Math.round((speed1 / maxSpeed) * 95)),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: `${speed2.toLocaleString()} MHz`,
+        pct2: Math.min(100, Math.round((speed2 / maxSpeed) * 95)),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      },
+      metric2: {
+        title: lang === 'en' ? 'Cost per Gigabyte (฿ / GB - Lower is Better)' : 'ต้นทุนต่อหน่วยความจุ (฿ / GB - ยิ่งต่ำยิ่งคุ้ม)',
+        deltaBadge: bestCost,
+        deltaColor: costPerGb1 <= costPerGb2 ? 'text-emerald-400' : 'text-purple-400',
+        val1: costPerGb1 ? `฿${costPerGb1.toLocaleString()} / GB (${cap1}GB)` : 'N/A',
+        pct1: Math.min(100, Math.max(25, Math.round((Math.min(costPerGb1, costPerGb2) / (costPerGb1 || 1)) * 95))),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: costPerGb2 ? `฿${costPerGb2.toLocaleString()} / GB (${cap2}GB)` : 'N/A',
+        pct2: Math.min(100, Math.max(25, Math.round((Math.min(costPerGb1, costPerGb2) / (costPerGb2 || 1)) * 95))),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      }
+    }
+  }
+
+  // 2. GPU / Graphics Card
+  if (cat.includes('gpu') || cat.includes('graphic') || cat.includes('vga')) {
+    const vram1 = extractNum(p1.specs?.vram || p1.specs?.VRAM || p1.name, /(\d+)\s*gb/i) || 8
+    const vram2 = extractNum(p2.specs?.vram || p2.specs?.VRAM || p2.name, /(\d+)\s*gb/i) || 8
+    const maxVram = Math.max(vram1, vram2, 1)
+
+    const cost1 = p1.lowest_price ? Math.round(p1.lowest_price / vram1) : 0
+    const cost2 = p2.lowest_price ? Math.round(p2.lowest_price / vram2) : 0
+
+    return {
+      subtitle: lang === 'en'
+        ? 'Graphics memory allocation and hardware pricing efficiency'
+        : 'ขนาดหน่วยความจำกราฟิก (VRAM) และอัตราส่วนต้นทุนต่อกิกะไบต์ VRAM',
+      metric1: {
+        title: lang === 'en' ? 'Video Memory Capacity (VRAM)' : 'ขนาดหน่วยความจำกราฟิก (VRAM Capacity)',
+        deltaBadge: vram1 >= vram2 ? `${p1.brand || 'P1'} +${vram1 - vram2} GB` : `${p2.brand || 'P2'} +${vram2 - vram1} GB`,
+        deltaColor: vram1 >= vram2 ? 'text-emerald-400' : 'text-purple-400',
+        val1: `${vram1} GB VRAM`,
+        pct1: Math.min(100, Math.round((vram1 / maxVram) * 95)),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: `${vram2} GB VRAM`,
+        pct2: Math.min(100, Math.round((vram2 / maxVram) * 95)),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      },
+      metric2: {
+        title: lang === 'en' ? 'VRAM Cost Efficiency (฿ / GB VRAM)' : 'ดัชนีต้นทุนต่อกิกะไบต์ VRAM (฿ / GB VRAM)',
+        deltaBadge: cost1 <= cost2 ? 'คุ้มค่ากว่า' : 'สเปกระดับท็อป',
+        deltaColor: 'text-cyan-400',
+        val1: cost1 ? `฿${cost1.toLocaleString()} / GB` : 'N/A',
+        pct1: Math.min(100, Math.max(25, Math.round((Math.min(cost1, cost2) / (cost1 || 1)) * 95))),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: cost2 ? `฿${cost2.toLocaleString()} / GB` : 'N/A',
+        pct2: Math.min(100, Math.max(25, Math.round((Math.min(cost1, cost2) / (cost2 || 1)) * 95))),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      }
+    }
+  }
+
+  // 3. SSD / Storage
+  if (cat.includes('ssd') || cat.includes('storage') || cat.includes('drive')) {
+    const read1 = extractNum(p1.specs?.seq_read || p1.name, /(\d{3,5})\s*(?:mb\/s)?/i) || (cat.includes('pcie 4') ? 5000 : 3500)
+    const read2 = extractNum(p2.specs?.seq_read || p2.name, /(\d{3,5})\s*(?:mb\/s)?/i) || (cat.includes('pcie 4') ? 5000 : 3500)
+    const maxRead = Math.max(read1, read2, 1)
+
+    return {
+      subtitle: lang === 'en'
+        ? 'Sequential transfer rate and storage price per gigabyte'
+        : 'ความเร็วการอ่านเขียนข้อมูลสูงสุด (MB/s) และความคุ้มค่าราคา',
+      metric1: {
+        title: lang === 'en' ? 'Sequential Read Speed (MB/s)' : 'ความเร็วการอ่านข้อมูลสูงสุด (Sequential Read)',
+        deltaBadge: read1 >= read2 ? `+${read1 - read2} MB/s` : `+${read2 - read1} MB/s`,
+        deltaColor: read1 >= read2 ? 'text-emerald-400' : 'text-purple-400',
+        val1: `${read1.toLocaleString()} MB/s`,
+        pct1: Math.min(100, Math.round((read1 / maxRead) * 95)),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: `${read2.toLocaleString()} MB/s`,
+        pct2: Math.min(100, Math.round((read2 / maxRead) * 95)),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      },
+      metric2: {
+        title: lang === 'en' ? 'Lowest Retail Price Advantage' : 'ความได้เปรียบด้านราคาต่ำสุด',
+        deltaBadge: (p1.lowest_price <= p2.lowest_price) ? `ประหยัด ฿${Math.abs((p2.lowest_price || 0) - (p1.lowest_price || 0)).toLocaleString()}` : `ประหยัด ฿${Math.abs((p1.lowest_price || 0) - (p2.lowest_price || 0)).toLocaleString()}`,
+        deltaColor: 'text-emerald-400',
+        val1: `฿${Number(p1.lowest_price || 0).toLocaleString()}`,
+        pct1: Math.min(100, Math.max(30, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p1.lowest_price || 1)) * 95))),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: `฿${Number(p2.lowest_price || 0).toLocaleString()}`,
+        pct2: Math.min(100, Math.max(30, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p2.lowest_price || 1)) * 95))),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      }
+    }
+  }
+
+  // 4. CPU (General CPU)
+  if (cat.includes('cpu') || cat.includes('processor')) {
+    const cores1 = extractNum(p1.specs?.cores_threads || p1.specs?.Cores || p1.name, /(\d+)\s*(?:cores|คอร์)/i) || 8
+    const cores2 = extractNum(p2.specs?.cores_threads || p2.specs?.Cores || p2.name, /(\d+)\s*(?:cores|คอร์)/i) || 8
+    const maxCores = Math.max(cores1, cores2, 1)
+
+    const costPerCore1 = p1.lowest_price ? Math.round(p1.lowest_price / cores1) : 0
+    const costPerCore2 = p2.lowest_price ? Math.round(p2.lowest_price / cores2) : 0
+
+    return {
+      subtitle: lang === 'en'
+        ? 'Compute density and cost per processing core comparison'
+        : 'จำนวนคอร์ประมวลผลและอัตราต้นทุนต่อหน่วยคอร์ (฿/Core)',
+      metric1: {
+        title: lang === 'en' ? 'Compute Cores / Threads' : 'จำนวนคอร์ประมวลผล (Compute Cores)',
+        deltaBadge: cores1 >= cores2 ? `+${cores1 - cores2} Cores` : `+${cores2 - cores1} Cores`,
+        deltaColor: cores1 >= cores2 ? 'text-emerald-400' : 'text-purple-400',
+        val1: `${cores1} Cores`,
+        pct1: Math.min(100, Math.round((cores1 / maxCores) * 95)),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: `${cores2} Cores`,
+        pct2: Math.min(100, Math.round((cores2 / maxCores) * 95)),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      },
+      metric2: {
+        title: lang === 'en' ? 'Cost per Core (฿ / Core - Lower is Better)' : 'ต้นทุนต่อหน่วยคอร์ (฿ / Core - ยิ่งต่ำยิ่งคุ้ม)',
+        deltaBadge: costPerCore1 <= costPerCore2 ? 'คุ้มค่าต่อคอร์กว่า' : 'ประสิทธิภาพต่อคอร์สูง',
+        deltaColor: 'text-cyan-400',
+        val1: costPerCore1 ? `฿${costPerCore1.toLocaleString()} / Core` : 'N/A',
+        pct1: Math.min(100, Math.max(25, Math.round((Math.min(costPerCore1, costPerCore2) / (costPerCore1 || 1)) * 95))),
+        color1: 'from-emerald-500 to-cyan-400',
+        textColor1: 'text-emerald-400',
+        val2: costPerCore2 ? `฿${costPerCore2.toLocaleString()} / Core` : 'N/A',
+        pct2: Math.min(100, Math.max(25, Math.round((Math.min(costPerCore1, costPerCore2) / (costPerCore2 || 1)) * 95))),
+        color2: 'from-purple-500 to-indigo-400',
+        textColor2: 'text-purple-400'
+      }
+    }
+  }
+
+  // 5. Fallback / General Hardware comparison
+  const disc1 = (p1.msrp && p1.lowest_price) ? Math.max(0, Math.round(((p1.msrp - p1.lowest_price) / p1.msrp) * 100)) : 5
+  const disc2 = (p2.msrp && p2.lowest_price) ? Math.max(0, Math.round(((p2.msrp - p2.lowest_price) / p2.msrp) * 100)) : 5
+
+  return {
+    subtitle: lang === 'en'
+      ? 'Pricing competitiveness and discount ratio based on real-time market data'
+      : 'เปรียบเทียบความคุ้มค่าและส่วนต่างราคาจากฐานข้อมูลร้านค้าจริงแบบเรียลไทม์',
+    metric1: {
+      title: lang === 'en' ? 'Discount Ratio vs MSRP (%)' : 'อัตราส่วนลดเทียบกับราคาเปิดตัว (%)',
+      deltaBadge: disc1 >= disc2 ? `ลดมากกว่า -${disc1}%` : `ลดมากกว่า -${disc2}%`,
+      deltaColor: 'text-emerald-400',
+      val1: `-${disc1}% ส่วนลด`,
+      pct1: Math.min(100, Math.max(20, disc1 * 4)),
+      color1: 'from-emerald-500 to-cyan-400',
+      textColor1: 'text-emerald-400',
+      val2: `-${disc2}% ส่วนลด`,
+      pct2: Math.min(100, Math.max(20, disc2 * 4)),
+      color2: 'from-purple-500 to-indigo-400',
+      textColor2: 'text-purple-400'
+    },
+    metric2: {
+      title: lang === 'en' ? 'Lowest Price in Market (฿ THB)' : 'ราคาต่ำสุดในตลาด (฿ THB)',
+      deltaBadge: p1.lowest_price <= p2.lowest_price ? 'ราคาเริ่มต้นถูกกว่า' : 'รุ่นสเปกพรีเมียม',
+      deltaColor: 'text-cyan-400',
+      val1: `฿${Number(p1.lowest_price || 0).toLocaleString()}`,
+      pct1: Math.min(100, Math.max(25, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p1.lowest_price || 1)) * 95))),
+      color1: 'from-emerald-500 to-cyan-400',
+      textColor1: 'text-emerald-400',
+      val2: `฿${Number(p2.lowest_price || 0).toLocaleString()}`,
+      pct2: Math.min(100, Math.max(25, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p2.lowest_price || 1)) * 95))),
+      color2: 'from-purple-500 to-indigo-400',
+      textColor2: 'text-purple-400'
+    }
+  }
+}
+
+// Dynamic dual analysis cards generator
+function getDualAnalysis(p1, p2, compareData, lang) {
+  if (!p1 || !p2) return null
+
+  const isDemoCpu = (p1.name?.includes('7800X3D') && p2.name?.includes('14700K')) ||
+                    (p1.name?.includes('14700K') && p2.name?.includes('7800X3D'))
+
+  if (isDemoCpu) {
+    return {
+      card1: {
+        icon: Gamepad2,
+        iconColor: 'text-emerald-400',
+        borderClass: 'border-emerald-500/20',
+        title: lang === 'en' ? 'Analysis: Pure Gaming Priority' : 'บทวิเคราะห์: สายเน้นเล่นเกมล้วนๆ',
+        badge: 'AMD 7800X3D',
+        badgeClass: 'bg-emerald-500/20 text-emerald-300',
+        text: lang === 'en'
+          ? 'If your primary PC usage is gaming, whether competitive eSports titles demanding high 1% low FPS or AAA open-world games, 3D V-Cache 96MB delivers class-leading framerates while drawing nearly half the power of competing Intel CPUs.'
+          : 'หากเป้าหมายหลักในการประกอบคอมพิวเตอร์คือการเล่นเกม ไม่ว่าจะเป็นเกมแนว eSports ที่ต้องการ 1% Low FPS เสถียรสูงสุด หรือเกมระดับ AAA โลกเปิด เทคโนโลยี 3D V-Cache 96MB ทำให้ 7800X3D ส่งข้อมูลเฟรมเรตได้เหนือชั้น และใช้ไฟน้อยกว่าถึงเกือบครึ่ง ประหยัดงบชุดระบายความร้อนได้อีกนับพันบาท',
+        points: [
+          lang === 'en' ? 'Standard air or 240mm cooling is sufficient' : 'ไม่ต้องใช้ชุดน้ำ 360mm',
+          lang === 'en' ? 'B650 motherboards run at full speed' : 'เมนบอร์ด B650 ใช้งานได้สมบูรณ์',
+          lang === 'en' ? 'AM5 socket upgrade path through 2027+' : 'อัปเกรดในอนาคตได้ต่อ'
+        ],
+        pointColor: 'text-emerald-300'
+      },
+      card2: {
+        icon: Briefcase,
+        iconColor: 'text-purple-400',
+        borderClass: 'border-purple-500/20',
+        title: lang === 'en' ? 'Analysis: Video Editing & Multi-Thread Rendering' : 'บทวิเคราะห์: สายทำงานตัดต่อ & เรนเดอร์',
+        badge: 'Intel 14700K',
+        badgeClass: 'bg-purple-500/20 text-purple-300',
+        text: lang === 'en'
+          ? 'If you run video editing software like Premiere Pro, DaVinci Resolve, 3D Blender, or stream games with heavy background tasks, 20 Cores / 28 Threads outpace the 7800X3D by up to 85% in multi-threaded benchmarks, bolstered by Intel QuickSync.'
+          : 'หากคุณใช้งานโปรแกรมตัดต่อ Premiere Pro, DaVinci Resolve, ทำงาน 3D Blender หรืองานมัลติทาสก์ 20 Cores / 28 Threads ของ 14700K กวาดคะแนน Multi-Thread แซงหน้าไปไกลถึงเกือบ 85% พร้อมทั้งมีชุดคำสั่ง Intel QuickSync ช่วยเอ็นโค้ดวิดีโอแบบเรียลไทม์',
+        points: [
+          'Intel QuickSync HW Decode',
+          lang === 'en' ? '28 threads for smooth multi-tasking' : '28 เธรด ทำงานหลายหน้าต่างลื่น',
+          lang === 'en' ? 'Recommended: 360mm AIO liquid cooling' : 'แนะนำจับคู่ชุดน้ำ 3 ตอน'
+        ],
+        pointColor: 'text-purple-300'
+      }
+    }
+  }
+
+  // Dynamic analysis for any products
+  const isP1Cheaper = (p1.lowest_price || 0) <= (p2.lowest_price || 0)
+  const priceDiff = Math.abs((p2.lowest_price || 0) - (p1.lowest_price || 0))
+
+  return {
+    card1: {
+      icon: isP1Cheaper ? Zap : Award,
+      iconColor: 'text-emerald-400',
+      borderClass: 'border-emerald-500/20',
+      title: lang === 'en' 
+        ? `Analysis: ${p1.name.slice(0, 32)}` 
+        : `บทวิเคราะห์: ${p1.name.slice(0, 32)}`,
+      badge: p1.brand || (isP1Cheaper ? (lang === 'en' ? 'BEST PRICE' : 'ราคาประหยัด') : (lang === 'en' ? 'PREMIUM' : 'สเปกเด่น')),
+      badgeClass: 'bg-emerald-500/20 text-emerald-300',
+      text: lang === 'en'
+        ? (isP1Cheaper
+          ? `${p1.name} from ${p1.brand || 'manufacturer'} offers superior affordability at ฿${Number(p1.lowest_price).toLocaleString()} at ${p1.best_store || 'top store'}, saving ฿${priceDiff.toLocaleString()} compared to the rival.`
+          : `${p1.name} delivers solid performance with top-grade hardware specifications for long-term reliability and seamless computing experience.`)
+        : (isP1Cheaper
+          ? `หากคุณต้องการความคุ้มค่าด้านงบประมาณ ${p1.name} จากแบรนด์ ${p1.brand || ''} เป็นตัวเลือกที่ตอบโจทย์อย่างยิ่ง ด้วยราคาเริ่มต้นเพียง ฿${Number(p1.lowest_price).toLocaleString()} ที่ร้าน ${p1.best_store || 'ร้านไอทีชั้นนำ'} ซึ่งประหยัดกว่าคู่เทียบถึง ฿${priceDiff.toLocaleString()}`
+          : `สำหรับผู้ที่ต้องการประสิทธิภาพระดับสูง ${p1.name} จากแบรนด์ ${p1.brand || ''} มาพร้อมสเปกที่ตอบโจทย์งานหนัก แม้ราคาจะอยู่ที่ ฿${Number(p1.lowest_price).toLocaleString()} แต่ให้ความเสถียรและประสิทธิภาพที่คุ้มค่าในระยะยาว`),
+      points: [
+        lang === 'en' ? `Cheapest at ${p1.best_store || 'Official Retailer'}: ฿${Number(p1.lowest_price).toLocaleString()}` : `ราคาต่ำสุด ณ ตอนนี้: ฿${Number(p1.lowest_price).toLocaleString()} (${p1.best_store || 'ร้านไอทีชั้นนำ'})`,
+        lang === 'en' ? `Category: ${p1.category || 'Hardware'} • Brand: ${p1.brand || 'Verified'}` : `หมวดหมู่: ${p1.category || 'ฮาร์ดแวร์'} • แบรนด์: ${p1.brand || 'ของแท้ศูนย์'}`,
+        lang === 'en' ? `Stock checked across ${p1.store_options?.length || 4} verified Thai retailers` : `ตรวจสอบสต็อกแล้ว ${p1.store_options?.length || 4} ร้านค้าชั้นนำ (Advice, JIB, iHaveCPU, BaNANA)`
+      ],
+      pointColor: 'text-emerald-300'
+    },
+    card2: {
+      icon: !isP1Cheaper ? Zap : Award,
+      iconColor: 'text-purple-400',
+      borderClass: 'border-purple-500/20',
+      title: lang === 'en' 
+        ? `Analysis: ${p2.name.slice(0, 32)}` 
+        : `บทวิเคราะห์: ${p2.name.slice(0, 32)}`,
+      badge: p2.brand || (!isP1Cheaper ? (lang === 'en' ? 'BEST PRICE' : 'ราคาประหยัด') : (lang === 'en' ? 'PREMIUM' : 'สเปกเด่น')),
+      badgeClass: 'bg-purple-500/20 text-purple-300',
+      text: lang === 'en'
+        ? (!isP1Cheaper
+          ? `${p2.name} from ${p2.brand || 'manufacturer'} offers superior affordability at ฿${Number(p2.lowest_price).toLocaleString()} at ${p2.best_store || 'top store'}, saving ฿${priceDiff.toLocaleString()} compared to the rival.`
+          : `${p2.name} delivers solid performance with top-grade hardware specifications for long-term reliability and seamless computing experience.`)
+        : (!isP1Cheaper
+          ? `หากคุณต้องการความคุ้มค่าด้านงบประมาณ ${p2.name} จากแบรนด์ ${p2.brand || ''} เป็นตัวเลือกที่ตอบโจทย์อย่างยิ่ง ด้วยราคาเริ่มต้นเพียง ฿${Number(p2.lowest_price).toLocaleString()} ที่ร้าน ${p2.best_store || 'ร้านไอทีชั้นนำ'} ซึ่งประหยัดกว่าคู่เทียบถึง ฿${priceDiff.toLocaleString()}`
+          : `สำหรับผู้ที่ต้องการประสิทธิภาพระดับสูง ${p2.name} จากแบรนด์ ${p2.brand || ''} มาพร้อมสเปกที่ตอบโจทย์งานหนัก แม้ราคาจะอยู่ที่ ฿${Number(p2.lowest_price).toLocaleString()} แต่ให้ความเสถียรและประสิทธิภาพที่คุ้มค่าในระยะยาว`),
+      points: [
+        lang === 'en' ? `Cheapest at ${p2.best_store || 'Official Retailer'}: ฿${Number(p2.lowest_price).toLocaleString()}` : `ราคาต่ำสุด ณ ตอนนี้: ฿${Number(p2.lowest_price).toLocaleString()} (${p2.best_store || 'ร้านไอทีชั้นนำ'})`,
+        lang === 'en' ? `Category: ${p2.category || 'Hardware'} • Brand: ${p2.brand || 'Verified'}` : `หมวดหมู่: ${p2.category || 'ฮาร์ดแวร์'} • แบรนด์: ${p2.brand || 'ของแท้ศูนย์'}`,
+        lang === 'en' ? `Stock checked across ${p2.store_options?.length || 4} verified Thai retailers` : `ตรวจสอบสต็อกแล้ว ${p2.store_options?.length || 4} ร้านค้าชั้นนำ (Advice, JIB, iHaveCPU, BaNANA)`
+      ],
+      pointColor: 'text-purple-300'
+    }
+  }
+}
+
 export default function ComparePage({ compareList, setCompareList }) {
   const { t, lang } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -272,12 +631,31 @@ export default function ComparePage({ compareList, setCompareList }) {
                   { name: p.best_store || 'Advice IT', price: p.lowest_price, tag: 'ต่ำสุด ณ ตอนนี้', tag_en: 'Lowest Now', url: p.best_product_url || '#' }
                 ]
 
+            const isPriceWinner = p.id === res.data.price_winner_id
+            const isValueLeader = p.id === res.data.value_score_leader_id
+
+            let badgeText = isValueLeader
+              ? (lang === 'en' ? 'VALUE CHAMPION' : 'คุ้มค่าต่อหน่วยสูงสุด')
+              : (isPriceWinner ? (lang === 'en' ? 'LOWEST PRICE' : 'ราคาต่ำสุดในกลุ่ม') : (idx === 0 ? 'TOP SPEC' : 'FEATURED'))
+            let badgeBg = isValueLeader
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+              : (isPriceWinner ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40')
+
+            const specParts = []
+            if (p.brand) specParts.push(p.brand)
+            if (p.category) specParts.push(p.category)
+            if (p.specs?.capacity) specParts.push(p.specs.capacity)
+            if (p.specs?.speed) specParts.push(p.specs.speed)
+            if (p.specs?.vram) specParts.push(p.specs.vram)
+            if (p.specs?.cores_threads) specParts.push(p.specs.cores_threads)
+            const autoSubtitle = specParts.length > 0 ? specParts.join(' • ') : [p.brand, p.category, p.model_no].filter(Boolean).join(' • ')
+
             return {
               ...p,
               store_options: storeOptions,
-              subtitle: `${p.brand} • ${p.category} ${p.model_no ? `• ${p.model_no}` : ''}`,
-              badge: idx === 0 ? 'BEST VALUE' : 'TOP PERFORMER',
-              badgeColor: idx === 0 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border-purple-500/40',
+              subtitle: autoSubtitle,
+              badge: badgeText,
+              badgeColor: badgeBg,
               discount: p.discount_percent ? `-${p.discount_percent}%` : null,
               price_diff: p.price_difference ? `-฿${Number(p.price_difference).toLocaleString()}` : null,
               score_label: 'คะแนนความคุ้มค่า (Value Score)',
@@ -391,6 +769,12 @@ export default function ComparePage({ compareList, setCompareList }) {
   } else if (!hasClearedMock) {
     activeProducts = MOCK_COMPARE_PRODUCTS
   }
+
+  const p1 = activeProducts[0]
+  const p2 = activeProducts[1]
+  const benchmarks = getBenchmarks(p1, p2, compareData, lang)
+  const analysis = getDualAnalysis(p1, p2, compareData, lang)
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 animate-fade-in">
 
@@ -576,7 +960,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                   ) : (
                     <Briefcase className="w-3.5 h-3.5 text-purple-300" />
                   )}
-                  <span>{p.badge || (isLeft ? 'GAMING CHAMPION' : 'PRODUCTIVITY KING')}</span>
+                  <span>{p.badge || (isLeft ? (lang === 'en' ? 'TOP VALUE' : 'คุ้มค่าอันดับ 1') : (lang === 'en' ? 'FEATURED' : 'สเปกเด่น'))}</span>
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-[#F97316] text-white font-display text-xs font-bold shadow-[0_0_10px_rgba(249,115,22,0.4)]">
                   {p.discount || '-11.8%'}
@@ -589,7 +973,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                   {p.name}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  {p.subtitle || 'Socket AM5 • 8 Cores / 16 Threads • 3D V-Cache'}
+                  {p.subtitle || [p.brand, p.category, p.model_no].filter(Boolean).join(' • ') || (lang === 'en' ? 'Hardware Spec' : 'สเปกฮาร์ดแวร์')}
                 </p>
               </div>
 
@@ -687,6 +1071,7 @@ export default function ComparePage({ compareList, setCompareList }) {
       </div>
 
       {/* SECTION: ENGINEERING BENCHMARKS */}
+      {benchmarks && (
       <section className="bg-[#120826]/90 rounded-3xl p-6 sm:p-8 border border-purple-500/25 space-y-6 shadow-[0_4px_25px_rgba(0,0,0,0.5)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -697,84 +1082,95 @@ export default function ComparePage({ compareList, setCompareList }) {
               </h2>
             </div>
             <p className="text-xs text-slate-400">
-              {lang === 'en' ? 'Estimated 1080p Ultra Gaming FPS and Cinebench R23 Multi-Core rendering scores' : 'คะแนนประเมินระหว่าง FPS เกมมิ่ง 1080p Ultra และคะแนน Cinebench R23 Multi-Core'}
+              {benchmarks.subtitle}
             </p>
           </div>
 
           <div className="flex items-center space-x-4 text-xs font-mono">
-            <span className="flex items-center space-x-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <span className="text-slate-300">AMD 7800X3D</span>
-            </span>
-            <span className="flex items-center space-x-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
-              <span className="text-slate-300">Intel 14700K</span>
-            </span>
+            {activeProducts.slice(0, 2).map((p, pIdx) => (
+              <span key={p.id || pIdx} className="flex items-center space-x-1.5">
+                <span className={`w-2.5 h-2.5 rounded-full ${pIdx === 0 ? 'bg-emerald-400' : 'bg-purple-400'}`}></span>
+                <span className="text-slate-300 truncate max-w-[160px]">{p.name}</span>
+              </span>
+            ))}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-          {/* Benchmark 1: Gaming FPS */}
+          {/* Benchmark 1 */}
           <div className="bg-[#0A0314] border border-purple-500/20 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-white">{lang === 'en' ? 'Average 1080p Gaming FPS (12 Titles)' : 'ค่าเฉลี่ย 1080p Gaming FPS (12 เกมดัง)'}</span>
-              <span className="text-emerald-400 font-mono font-bold">AMD +9.4%</span>
+              <span className="font-bold text-white">{benchmarks.metric1.title}</span>
+              <span className={`${benchmarks.metric1.deltaColor} font-mono font-bold`}>{benchmarks.metric1.deltaBadge}</span>
             </div>
             
             {/* Bar 1 */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>AMD Ryzen 7 7800X3D</span>
-                <span className="font-mono text-emerald-400 font-bold">248 FPS</span>
+                <span className="truncate max-w-[200px]">{activeProducts[0]?.name}</span>
+                <span className={`font-mono ${benchmarks.metric1.textColor1} font-bold`}>{benchmarks.metric1.val1}</span>
               </div>
               <div className="w-full h-3 bg-[#140826] rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 rounded-full w-[95%]" />
+                <div 
+                  className={`h-full ${benchmarks.metric1.color1.includes('from-') ? `bg-gradient-to-r ${benchmarks.metric1.color1}` : benchmarks.metric1.color1} rounded-full transition-all duration-500`}
+                  style={{ width: `${benchmarks.metric1.pct1}%` }}
+                />
               </div>
             </div>
 
             {/* Bar 2 */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>Intel Core i7-14700K</span>
-                <span className="font-mono text-purple-400 font-bold">227 FPS</span>
+                <span className="truncate max-w-[200px]">{activeProducts[1]?.name}</span>
+                <span className={`font-mono ${benchmarks.metric1.textColor2} font-bold`}>{benchmarks.metric1.val2}</span>
               </div>
               <div className="w-full h-3 bg-[#140826] rounded-full overflow-hidden">
-                <div className="h-full bg-purple-500 rounded-full w-[85%]" />
+                <div 
+                  className={`h-full ${benchmarks.metric1.color2.includes('from-') ? `bg-gradient-to-r ${benchmarks.metric1.color2}` : benchmarks.metric1.color2} rounded-full transition-all duration-500`}
+                  style={{ width: `${benchmarks.metric1.pct2}%` }}
+                />
               </div>
             </div>
           </div>
 
-          {/* Benchmark 2: Cinebench Multi-thread */}
+          {/* Benchmark 2 */}
           <div className="bg-[#0A0314] border border-purple-500/20 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-white">{lang === 'en' ? 'Cinebench R23 Rendering (Multi-Thread)' : 'คะแนนเรนเดอร์ Cinebench R23 (Multi-Thread)'}</span>
-              <span className="text-purple-400 font-mono font-bold">Intel +85%</span>
+              <span className="font-bold text-white">{benchmarks.metric2.title}</span>
+              <span className={`${benchmarks.metric2.deltaColor} font-mono font-bold`}>{benchmarks.metric2.deltaBadge}</span>
             </div>
             
             {/* Bar 1 */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>Intel Core i7-14700K</span>
-                <span className="font-mono text-purple-400 font-bold">34,500 Pts</span>
+                <span className="truncate max-w-[200px]">{activeProducts[0]?.name}</span>
+                <span className={`font-mono ${benchmarks.metric2.textColor1} font-bold`}>{benchmarks.metric2.val1}</span>
               </div>
               <div className="w-full h-3 bg-[#140826] rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full w-[98%]" />
+                <div 
+                  className={`h-full ${benchmarks.metric2.color1.includes('from-') ? `bg-gradient-to-r ${benchmarks.metric2.color1}` : benchmarks.metric2.color1} rounded-full transition-all duration-500`}
+                  style={{ width: `${benchmarks.metric2.pct1}%` }}
+                />
               </div>
             </div>
 
             {/* Bar 2 */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-400">
-                <span>AMD Ryzen 7 7800X3D</span>
-                <span className="font-mono text-emerald-400 font-bold">18,650 Pts</span>
+                <span className="truncate max-w-[200px]">{activeProducts[1]?.name}</span>
+                <span className={`font-mono ${benchmarks.metric2.textColor2} font-bold`}>{benchmarks.metric2.val2}</span>
               </div>
               <div className="w-full h-3 bg-[#140826] rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500/70 rounded-full w-[53%]" />
+                <div 
+                  className={`h-full ${benchmarks.metric2.color2.includes('from-') ? `bg-gradient-to-r ${benchmarks.metric2.color2}` : benchmarks.metric2.color2} rounded-full transition-all duration-500`}
+                  style={{ width: `${benchmarks.metric2.pct2}%` }}
+                />
               </div>
             </div>
           </div>
         </div>
       </section>
+      )}
 
       {/* SECTION: SPEC MATRIX ROW BY ROW (FIGMA EXACT TABLE) */}
       <section className="bg-[#120826]/90 rounded-3xl p-6 sm:p-8 border border-purple-500/25 space-y-6 shadow-[0_4px_25px_rgba(0,0,0,0.5)]">
@@ -861,90 +1257,86 @@ export default function ComparePage({ compareList, setCompareList }) {
 
         {/* Quick Stock Check buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-purple-500/20 text-xs">
-          <span className="text-slate-400">{lang === 'en' ? 'Live Stock Check across 4 stores:' : 'ตรวจสอบสต็อกทั้ง 4 ร้านค้าแบบสด:'}</span>
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => toast.success(lang === 'en' ? 'Stock Check 7800X3D: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 7800X3D: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
-              className="px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-semibold"
-            >
-              {lang === 'en' ? 'Check 7800X3D Stock' : 'ดูราคา 7800X3D ทุกร้าน'}
-            </button>
-            <button
-              onClick={() => toast.success(lang === 'en' ? 'Stock Check 14700K: JIB (In Stock), Advice (In Stock), iHaveCPU (In Stock), BaNANA (In Stock)' : 'กำลังเช็คสต็อก 14700K: JIB (มี), Advice (มี), iHaveCPU (มี), BaNANA (มี)')}
-              className="px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 font-semibold"
-            >
-              {lang === 'en' ? 'Check 14700K Stock' : 'ดูราคา 14700K ทุกร้าน'}
-            </button>
+          <span className="text-slate-400">{lang === 'en' ? 'Live Stock & Retailer Price Check:' : 'ตรวจสอบสต็อกและราคาแต่ละร้านค้าแบบสด:'}</span>
+          <div className="flex items-center flex-wrap gap-2.5">
+            {activeProducts.map((p, pIdx) => {
+              const isFirst = pIdx === 0
+              return (
+                <button
+                  key={p.id || pIdx}
+                  onClick={() => {
+                    const storeInfo = (p.store_options && p.store_options.length > 0)
+                      ? p.store_options.map(s => `${s.name}: ฿${Number(s.price).toLocaleString()}`).join(' | ')
+                      : `${p.best_store || 'ร้านค้า'}: ฿${Number(p.lowest_price).toLocaleString()} (ต่ำสุด)`
+                    toast.success(`${p.name}\n${storeInfo}`, { duration: 6000 })
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all max-w-[280px] truncate ${
+                    isFirst
+                      ? 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border-emerald-500/30'
+                      : 'bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-500/30'
+                  }`}
+                  title={p.name}
+                >
+                  {lang === 'en' ? `Check ${p.name.slice(0, 22)}... Stores` : `ดูราคา ${p.name.slice(0, 22)}... ทุกร้าน`}
+                </button>
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* SECTION: DUAL ANALYSIS CARDS */}
+      {analysis && (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Analysis Card 1 */}
-        <div className="glass-card rounded-3xl p-6 sm:p-7 border-emerald-500/20 space-y-4">
+        <div className={`glass-card rounded-3xl p-6 sm:p-7 ${analysis.card1.borderClass} space-y-4`}>
           <div className="flex items-center justify-between">
             <span className="font-bold text-white flex items-center space-x-2 text-sm sm:text-base">
-              <Gamepad2 className="w-4 h-4 text-emerald-400" />
-              <span>{lang === 'en' ? 'Analysis: Pure Gaming Priority' : 'บทวิเคราะห์: สายเน้นเล่นเกมล้วนๆ'}</span>
+              <analysis.card1.icon className={`w-4 h-4 ${analysis.card1.iconColor}`} />
+              <span className="truncate max-w-[260px]">{analysis.card1.title}</span>
             </span>
-            <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[11px] font-bold">
-              AMD 7800X3D
+            <span className={`px-2.5 py-0.5 rounded ${analysis.card1.badgeClass} font-mono text-[11px] font-bold`}>
+              {analysis.card1.badge}
             </span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            {lang === 'en'
-              ? 'If your primary PC usage is gaming, whether competitive eSports titles (CS2, Valorant, Apex Legends) demanding high 1% low FPS or AAA open-world games (Cyberpunk 2077, Black Myth: Wukong), 3D V-Cache 96MB delivers class-leading framerates while drawing nearly half the power of competing Intel CPUs.'
-              : 'หากเป้าหมายหลักในการประกอบคอมพิวเตอร์คือการเล่นเกม ไม่ว่าจะเป็นเกมแนว eSports (CS2, Valorant, Apex Legends) ที่ต้องการ 1% Low FPS เสถียรสูงสุด หรือเกมระดับ AAA โลกเปิด (Cyberpunk 2077, Black Myth Wukong) เทคโนโลยี 3D V-Cache 96MB ทำให้ 7800X3D ส่งข้อมูลเฟรมเรตได้เหนือชั้นกว่า Intel ทุกรุ่นในปัจจุบัน และใช้ไฟน้อยกว่าถึงเกือบครึ่ง ทำให้ประหยัดงบพาวเวอร์ซัพพลายและชุดระบายความร้อนได้อีกนับพันบาท'}
+            {analysis.card1.text}
           </p>
-          <div className="space-y-1.5 pt-2 text-xs text-emerald-300 font-medium">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? 'Standard air or 240mm cooling is sufficient' : 'ไม่ต้องใช้ชุดน้ำ 360mm'}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? 'B650 motherboards run at full speed' : 'เมนบอร์ด B650 ใช้งานได้สมบูรณ์'}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? 'AM5 socket upgrade path through 2027+' : 'อัปเกรดในอนาคตได้ต่อ'}</span>
-            </div>
+          <div className={`space-y-1.5 pt-2 text-xs ${analysis.card1.pointColor} font-medium`}>
+            {analysis.card1.points.map((pt, ptIdx) => (
+              <div key={ptIdx} className="flex items-center space-x-2">
+                <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>{pt}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Analysis Card 2 */}
-        <div className="glass-card rounded-3xl p-6 sm:p-7 border-purple-500/20 space-y-4">
+        <div className={`glass-card rounded-3xl p-6 sm:p-7 ${analysis.card2.borderClass} space-y-4`}>
           <div className="flex items-center justify-between">
             <span className="font-bold text-white flex items-center space-x-2 text-sm sm:text-base">
-              <Briefcase className="w-4 h-4 text-purple-400" />
-              <span>{lang === 'en' ? 'Analysis: Video Editing & Multi-Thread Rendering' : 'บทวิเคราะห์: สายทำงานตัดต่อ & เรนเดอร์'}</span>
+              <analysis.card2.icon className={`w-4 h-4 ${analysis.card2.iconColor}`} />
+              <span className="truncate max-w-[260px]">{analysis.card2.title}</span>
             </span>
-            <span className="px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-[11px] font-bold">
-              Intel 14700K
+            <span className={`px-2.5 py-0.5 rounded ${analysis.card2.badgeClass} font-mono text-[11px] font-bold`}>
+              {analysis.card2.badge}
             </span>
           </div>
           <p className="text-xs text-slate-300 leading-relaxed">
-            {lang === 'en'
-              ? 'If you run video editing software like Premiere Pro, DaVinci Resolve, 3D Blender, Unreal Engine 5, or stream games with heavy background tasks, 20 Cores / 28 Threads on the 14700K outpace the 7800X3D by up to 85% in multi-threaded benchmarks, bolstered by Intel QuickSync video encoding.'
-              : 'หากคุณใช้งานโปรแกรมตัดต่อ Premiere Pro, DaVinci Resolve, ทำงาน 3D Blender, Unreal Engine 5 หรือสตรีมเกมพร้อมเปิดโปรแกรมเบื้องหลังหนักๆ 20 Cores / 28 Threads ของ 14700K กวาดคะแนน Multi-Thread แซงหน้า 7800X3D ไปไกลถึงเกือบ 85% พร้อมทั้งมีชุดคำสั่ง Intel QuickSync ช่วยเอ็นโค้ดวิดีโอแบบเรียลไทม์ ทำให้ไทม์ไลน์ 4K ลื่นไหลเป็นพิเศษ'}
+            {analysis.card2.text}
           </p>
-          <div className="space-y-1.5 pt-2 text-xs text-purple-300 font-medium">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Intel QuickSync HW Decode</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? '28 threads for smooth multi-tasking' : '28 เธรด ทำงานหลายหน้าต่างลื่น'}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{lang === 'en' ? 'Recommended: 360mm AIO liquid cooling' : 'แนะนำจับคู่ชุดน้ำ 3 ตอน'}</span>
-            </div>
+          <div className={`space-y-1.5 pt-2 text-xs ${analysis.card2.pointColor} font-medium`}>
+            {analysis.card2.points.map((pt, ptIdx) => (
+              <div key={ptIdx} className="flex items-center space-x-2">
+                <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>{pt}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+      )}
 
       {/* BOTTOM ALERT BANNER */}
       <div className="glass-card rounded-2xl p-5 sm:p-6 border-purple-500/25 flex flex-col md:flex-row items-center justify-between gap-4">

@@ -34,6 +34,12 @@
    - **สิ่งที่แก้:** เชื่อมโยงตัวเลขทุก Dimension 1-4, สัดส่วนความได้เปรียบ (Dominance Rate), ค่าสัมประสิทธิ์การแปรผัน (CV %), ส่วนต่างราคาเฉลี่ย (26.7%) เข้ากับฐานข้อมูลจริง PostgreSQL (Neon Cloud) และเพิ่มกล่อง **Database Ground-Truth Citations & Methodology** แสดงตารางที่ใช้อ้างอิง (`products`, `price_listings`, `price_history`, `stores`) พร้อมสูตรคำนวณทางสถิติและ Timestamp ชัดเจน
 9. **แท็บประวัติการคลิกออกร้านค้าในหน้า Admin (`AdminPage.jsx` & `/api/analytics/outbound-clicks`):**
    - **สิ่งที่แก้:** เพิ่มแท็บ "7. ประวัติการคลิกออกร้านค้า (Outbound Click Logs)" และการ์ดแสดงยอดรวมคลิกในแดชบอร์ดภาพรวม พร้อมตารางประวัติการคลิกแบบ Real-time, ตัวกรองแยกตามร้านค้า (Advice, JIB, BaNANA, iHaveCPU), แสดงเวลา, ชื่อสินค้า, ราคา, IP Address และลิงก์สินค้า
+10. **หน้าเปรียบเทียบสินค้า Dynamic ครบทุกหมวดหมู่ (`ComparePage.jsx`):**
+   - **ปัญหา:** ไม่ว่าจะเปรียบเทียบสินค้าชนิดใด (เช่น RAM, GPU, SSD) ส่วนดัชนีคะแนนเชิงวิศวกรรม (Engineering Benchmark), ปุ่มดูสต็อกทุกร้านค้า และการ์ดบทวิเคราะห์ (Dual Analysis Cards) ถูก Hardcode เป็น CPU AMD Ryzen 7 7800X3D และ Intel Core i7-14700K เสมอ
+   - **สิ่งที่แก้:** 
+     1. ปรับระบบ Benchmark เป็น Dynamic ตามหมวดหมู่จริง: RAM คำนวณความเร็วบัส (MHz) และต้นทุนต่อกิกะไบต์ (฿/GB), GPU คำนวณ VRAM (GB) และต้นทุนต่อ VRAM, SSD คำนวณ Sequential Read Speed (MB/s) และราคาต่ำสุด, CPU ทั่วไปคำนวณ Cores และต้นทุนต่อ Core (฿/Core)
+     2. ปรับปุ่มตรวจสอบสต็อกสดให้ดึงชื่อและราคาจริงจากทุกร้านค้าของสินค้าที่เปรียบเทียบ
+     3. ปรับบทวิเคราะห์ (Dual Analysis Cards) ให้สร้างบทวิเคราะห์เชิงลึกตามชื่อสินค้า แบรนด์ สเปก และความได้เปรียบด้านราคาของสินค้านั้นจริง
 *(รายละเอียดเชิงลึกทั้งหมดบันทึกไว้ใน [`ARCHITECTURE_AND_AI_DATABASE_SPEC.md`](file:///d:/Newfolder/ARCHITECTURE_AND_AI_DATABASE_SPEC.md))*
 
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
