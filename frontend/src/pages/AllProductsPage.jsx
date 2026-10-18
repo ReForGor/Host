@@ -30,6 +30,55 @@ import AlertModal from '../components/AlertModal'
 import { useLanguage } from '../i18n/LanguageContext'
 import { Helmet } from 'react-helmet-async'
 
+// Helper for category normalization (defensive against unencoded URL splits or aliases)
+export const normalizeCategory = (rawCat) => {
+  if (!rawCat) return 'All'
+  let decoded = rawCat
+  try {
+    decoded = decodeURIComponent(rawCat).trim()
+  } catch (e) {
+    decoded = String(rawCat).trim()
+  }
+  if (!decoded || decoded === 'All' || decoded === 'all') return 'All'
+  
+  if (
+    decoded.startsWith('Storage (SSD') || 
+    decoded === 'Solid State Drives (SSD)' || 
+    decoded === 'Storage (SSD, HDD)' || 
+    decoded === 'Storage (SSD & HDD)'
+  ) {
+    return 'Storage (SSD & HDD)'
+  }
+  if (decoded.startsWith('Monitors') || decoded === 'Monitors & Displays') {
+    return 'Monitors & Displays'
+  }
+  if (decoded.startsWith('PC Cases') || decoded === 'Case & Cooling' || decoded === 'PC Cases & Cooling') {
+    return 'PC Cases & Cooling'
+  }
+  if (decoded.startsWith('Gaming Peripherals') || decoded === 'Accessories' || decoded === 'Accessories & Gear') {
+    return 'Gaming Peripherals'
+  }
+  if (decoded.startsWith('Laptops') || decoded === 'Notebooks' || decoded === 'Laptops & Notebooks') {
+    return 'Laptops & Notebooks'
+  }
+  if (decoded.startsWith('Graphics Cards') || decoded === 'GPU' || decoded === 'Graphics Cards (GPU)') {
+    return 'Graphics Cards (GPU)'
+  }
+  if (decoded.startsWith('Processors') || decoded === 'CPU' || decoded === 'Processors (CPU)') {
+    return 'Processors (CPU)'
+  }
+  if (decoded.startsWith('Memory') || decoded === 'RAM' || decoded === 'Memory (RAM)') {
+    return 'Memory (RAM)'
+  }
+  if (decoded.startsWith('Motherboard') || decoded === 'Motherboards') {
+    return 'Motherboards'
+  }
+  if (decoded.startsWith('Power Supplies') || decoded === 'PSU' || decoded === 'Power Supplies (PSU)') {
+    return 'Power Supplies (PSU)'
+  }
+  return decoded
+}
+
 export default function AllProductsPage({ user, compareList, setCompareList }) {
   const { t, lang } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -40,7 +89,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All')
+  const [selectedCategory, setSelectedCategory] = useState(() => normalizeCategory(searchParams.get('category')))
   const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || 'All')
   const [selectedStore, setSelectedStore] = useState(searchParams.get('store') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'cheapest')
@@ -62,8 +111,9 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
 
   // Helper for category titles in Thai/English
   const getCategoryTitle = (cat) => {
+    const normalized = normalizeCategory(cat)
     if (lang === 'en') {
-      switch (cat) {
+      switch (normalized) {
         case 'Graphics Cards (GPU)':
           return 'Graphics Cards (GPU)'
         case 'Processors (CPU)':
@@ -90,7 +140,7 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
           return cat
       }
     }
-    switch (cat) {
+    switch (normalized) {
       case 'Graphics Cards (GPU)':
         return 'การ์ดจอ (VGA / GPU)'
       case 'Processors (CPU)':
@@ -120,7 +170,8 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
 
   // Popular chip tags based on category
   const getSubSeriesChips = (cat) => {
-    switch (cat) {
+    const normalized = normalizeCategory(cat)
+    switch (normalized) {
       case 'Processors (CPU)':
         return ['Ryzen 7 7800X3D', 'Ryzen 5 5600', 'Core i5-12400F', 'Ryzen 5 5500']
       case 'Graphics Cards (GPU)':
@@ -149,17 +200,11 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
   const subSeriesChips = getSubSeriesChips(selectedCategory)
 
   useEffect(() => {
-    const cat = searchParams.get('category')
-    if (cat) {
-      if (cat !== selectedCategory) {
-        setSelectedCategory(cat)
-        setSelectedSubSeries('')
-      }
-    } else {
-      if (selectedCategory !== 'All') {
-        setSelectedCategory('All')
-        setSelectedSubSeries('')
-      }
+    const rawCat = searchParams.get('category')
+    const normalized = normalizeCategory(rawCat)
+    if (normalized !== selectedCategory) {
+      setSelectedCategory(normalized)
+      setSelectedSubSeries('')
     }
   }, [searchParams])
 

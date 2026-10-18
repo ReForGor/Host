@@ -17,6 +17,7 @@ export const translations = {
       mainboard: 'เมนบอร์ด (Mainboard)',
       psu: 'พาวเวอร์ซัพพลาย (PSU)',
       caseCooling: 'เคส & ระบายความร้อน',
+      laptop: 'โน้ตบุ๊ก (Laptop)',
       accessories: 'อุปกรณ์เสริม',
       compare: 'เปรียบเทียบสเปก',
       deals: 'สินค้า Hot Deal',
@@ -50,6 +51,7 @@ export const translations = {
       mainboard: 'เมนบอร์ด (Mainboard)',
       psu: 'พาวเวอร์ซัพพลาย (PSU)',
       caseCooling: 'เคส & ระบายความร้อน',
+      laptop: 'โน้ตบุ๊ก (Laptop)',
       accessories: 'อุปกรณ์เสริม'
     },
     popular: {
@@ -185,6 +187,7 @@ export const translations = {
       mainboard: 'Motherboards',
       psu: 'Power Supplies (PSU)',
       caseCooling: 'Case & Cooling',
+      laptop: 'Laptops',
       accessories: 'Accessories',
       compare: 'Compare Specs',
       deals: 'Hot Deals',
@@ -218,6 +221,7 @@ export const translations = {
       mainboard: 'Motherboards',
       psu: 'Power Supplies (PSU)',
       caseCooling: 'Case & Cooling',
+      laptop: 'Laptops & Notebooks',
       accessories: 'Accessories'
     },
     popular: {

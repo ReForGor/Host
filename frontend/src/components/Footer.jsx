@@ -76,22 +76,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-slate-400">
               <li>
-                <Link to="/products?category=Graphics Cards (GPU)" className="hover:text-cyan-400 transition-colors">
+                <Link to={`/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`} className="hover:text-cyan-400 transition-colors">
                   {lang === 'en' ? 'Nvidia GeForce & AMD Radeon GPUs' : 'การ์ดจอ Nvidia GeForce & Radeon'}
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=Processors (CPU)" className="hover:text-cyan-400 transition-colors">
+                <Link to={`/products?category=${encodeURIComponent('Processors (CPU)')}`} className="hover:text-cyan-400 transition-colors">
                   {lang === 'en' ? 'Intel Core & AMD Ryzen CPUs' : 'ซีพียู Intel Core & AMD Ryzen'}
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=Storage (SSD, HDD)" className="hover:text-cyan-400 transition-colors">
+                <Link to={`/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`} className="hover:text-cyan-400 transition-colors">
                   {lang === 'en' ? 'PCIe 4.0 / NVMe M.2 SSDs' : 'SSD PCIe 4.0 / NVMe M.2'}
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=Memory (RAM)" className="hover:text-cyan-400 transition-colors">
+                <Link to={`/products?category=${encodeURIComponent('Memory (RAM)')}`} className="hover:text-cyan-400 transition-colors">
                   {lang === 'en' ? 'DDR5 Gaming RAM Kits' : 'แรม DDR5 Gaming Kits'}
                 </Link>
               </li>

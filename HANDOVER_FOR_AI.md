@@ -103,6 +103,15 @@
       3. ปรับระบบการแจ้งเตือนทั้งหมดใน [`App.jsx`](file:///d:/Newfolder/frontend/src/App.jsx) และ Handler ให้มี `duration: 1000` (แสดงและหายไปอัตโนมัติใน 1 วินาที)
       4. ปรับคุณสมบัติรูปภาพทั้งหมดเป็น `loading="lazy"` และ `decoding="async"` เพื่อเร่งความเร็วในการโหลด (LCP) บนทุกอุปกรณ์
 
+18. **แก้ไขปัญหาหมวดหมู่หน้าว่างจากตัวคั่น & ใน URL (`Navbar.jsx`, `AllProductsPage.jsx`, `service.py`, `Footer.jsx`):**
+    - **ปัญหา:** เมื่อคลิกหมวดหมู่ที่มีเครื่องหมาย `&` ในเมนู Navbar Mega Menu (เช่น "ที่เก็บข้อมูล (SSD, HDD)", "จอมอนิเตอร์ & Displays", "เคส & ระบายความร้อน") เกิดอาการหน้าว่าง (No products match the selected filters)
+    - **สาเหตุ:** ใน URL Query String สัญลักษณ์ `&` เป็นตัวคั่นพารามิเตอร์ของ HTTP เมื่อไม่มีการ Encode ด้วย `encodeURIComponent` เบราว์เซอร์จะตัดข้อความตรงเครื่องหมาย `&` ทำให้ส่งค่าหมวดหมู่ไปที่ Backend เพียงครึ่งเดียว (เช่น `category=Storage (SSD ` หรือ `category=Monitors `) ซึ่งไม่ตรงกับหมวดหมู่ใดในฐานข้อมูล
+    - **สิ่งที่แก้:**
+      1. ใน [`Navbar.jsx`](file:///d:/Newfolder/frontend/src/components/Navbar.jsx) และ [`Footer.jsx`](file:///d:/Newfolder/frontend/src/components/Footer.jsx): ห่อพารามิเตอร์ `category` ด้วย `encodeURIComponent(...)` ทุกจุด ทำให้ URL ส่งค่าที่ถูกต้อง เช่น `Storage%20(SSD%20%26%20HDD)`
+      2. ใน [`Navbar.jsx`](file:///d:/Newfolder/frontend/src/components/Navbar.jsx): เพิ่มหมวดหมู่ `Laptops & Notebooks` (`โน้ตบุ๊ก (Laptop)`) พร้อมไอคอน `Laptop` และดีลลดราคาพิเศษ (`Hot Deals`) ทำให้เมนูครอบคลุมฮาร์ดแวร์ครบทั้ง 10 หมวดหมู่หลักในฐานข้อมูลอย่างสมดุล (7 แถว x 2 คอลัมน์)
+      3. ใน [`AllProductsPage.jsx`](file:///d:/Newfolder/frontend/src/pages/AllProductsPage.jsx): สร้างฟังก์ชัน `normalizeCategory` ทำหน้าที่ Decode และแปลงชื่อหมวดหมู่ที่อาจถูกส่งมาแบบไม่สมบูรณ์ หรือ alias เก่า ให้กลับมาเป็นหมวดหมู่มาตรฐาน พร้อมรีเซ็ต `selectedSubSeries` เมื่อเปลี่ยนหมวดหมู่
+      4. ใน [`backend/features/products/service.py`](file:///d:/Newfolder/backend/features/products/service.py): เพิ่มการตัด Whitespace ด้วย `clean_cat = category.strip()` และเพิ่ม Defensive Mapping ใน `cat_aliases` สำหรับคำค้นที่อาจถูกตัดทอน (เช่น `"Storage (SSD"`, `"Monitors"`, `"PC Cases"`) ให้ดึงข้อมูลสินค้าได้ครบถ้วน 100%
+
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
 - **Git Repository ที่ใช้:**
   - Remote `origin`: `https://github.com/ReForGor/Software-Proj.git`

@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   Sparkles,
   Flame,
-  Home
+  Home,
+  Laptop
 } from 'lucide-react'
 import { alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -46,19 +47,21 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
     }
   }
 
-  // 12 Categories from specifications with i18n support
+  // Categories from specifications with i18n support and robust URI encoding
   const megaMenuCategories = [
     { name: t.nav?.home || (lang === 'en' ? 'Home' : 'หน้าหลัก'), path: '/', icon: Home, highlight: false },
     { name: t.nav?.allProducts || (lang === 'en' ? 'All Products' : 'ทั้งหมด'), path: '/products', icon: LayoutGrid, highlight: false },
-    { name: t.nav?.gpu || (lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (VGA/GPU)'), path: '/products?category=Graphics Cards (GPU)', icon: Layers, highlight: true },
-    { name: t.nav?.cpu || (lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)'), path: '/products?category=Processors (CPU)', icon: Cpu, highlight: true },
-    { name: t.nav?.ram || (lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)'), path: '/products?category=Memory (RAM)', icon: Zap, highlight: true },
-    { name: t.nav?.storage || (lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD, HDD)'), path: '/products?category=Storage (SSD & HDD)', icon: HardDrive, highlight: false },
-    { name: t.nav?.monitor || (lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์ (Monitor)'), path: '/products?category=Monitors & Displays', icon: Tv, highlight: false },
-    { name: t.nav?.mainboard || (lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Motherboard)'), path: '/products?category=Motherboards', icon: Server, highlight: false },
-    { name: t.nav?.psu || (lang === 'en' ? 'Power Supplies (PSU)' : 'พาวเวอร์ซัพพลาย (PSU)'), path: '/products?category=Power Supplies (PSU)', icon: Zap, highlight: false },
-    { name: t.nav?.caseCooling || (lang === 'en' ? 'Case & Cooling' : 'เคส & ชุดระบายความร้อน'), path: '/products?category=PC Cases & Cooling', icon: Wind, highlight: false },
-    { name: t.nav?.accessories || (lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์'), path: '/products?category=Gaming Peripherals', icon: MousePointer, highlight: false },
+    { name: t.nav?.gpu || (lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (VGA/GPU)'), path: `/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`, icon: Layers, highlight: true },
+    { name: t.nav?.cpu || (lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)'), path: `/products?category=${encodeURIComponent('Processors (CPU)')}`, icon: Cpu, highlight: true },
+    { name: t.nav?.ram || (lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)'), path: `/products?category=${encodeURIComponent('Memory (RAM)')}`, icon: Zap, highlight: true },
+    { name: t.nav?.storage || (lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD, HDD)'), path: `/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`, icon: HardDrive, highlight: false },
+    { name: t.nav?.monitor || (lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์ (Monitor)'), path: `/products?category=${encodeURIComponent('Monitors & Displays')}`, icon: Tv, highlight: false },
+    { name: t.nav?.mainboard || (lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Motherboard)'), path: `/products?category=${encodeURIComponent('Motherboards')}`, icon: Server, highlight: false },
+    { name: t.nav?.psu || (lang === 'en' ? 'Power Supplies (PSU)' : 'พาวเวอร์ซัพพลาย (PSU)'), path: `/products?category=${encodeURIComponent('Power Supplies (PSU)')}`, icon: Zap, highlight: false },
+    { name: t.nav?.caseCooling || (lang === 'en' ? 'Case & Cooling' : 'เคส & ชุดระบายความร้อน'), path: `/products?category=${encodeURIComponent('PC Cases & Cooling')}`, icon: Wind, highlight: false },
+    { name: t.nav?.laptop || (lang === 'en' ? 'Laptops & Notebooks' : 'โน้ตบุ๊ก (Laptop)'), path: `/products?category=${encodeURIComponent('Laptops & Notebooks')}`, icon: Laptop, highlight: false },
+    { name: t.nav?.accessories || (lang === 'en' ? 'Accessories & Gear' : 'อุปกรณ์เสริม & เกมมิ่งเกียร์'), path: `/products?category=${encodeURIComponent('Gaming Peripherals')}`, icon: MousePointer, highlight: false },
+    { name: t.nav?.deals || (lang === 'en' ? 'Hot Deals' : 'ดีลลดราคาพิเศษ'), path: '/deals', icon: Flame, highlight: true, isHotDeal: true },
     { name: t.nav?.compare || (lang === 'en' ? 'Compare Specs' : 'เปรียบเทียบสเปก'), path: '/compare', icon: Scale, highlight: true, special: true },
   ]
 
@@ -66,9 +69,9 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
   const quickLinks = [
     { name: t.nav?.home || (lang === 'en' ? 'Home' : 'หน้าหลัก'), path: '/' },
     { name: t.nav?.allProducts || (lang === 'en' ? 'All Products' : 'ทั้งหมด'), path: '/products' },
-    { name: lang === 'en' ? 'GPU' : 'การ์ดจอ', path: '/products?category=Graphics Cards (GPU)' },
-    { name: lang === 'en' ? 'CPU' : 'ซีพียู', path: '/products?category=Processors (CPU)' },
-    { name: lang === 'en' ? 'RAM' : 'แรม', path: '/products?category=Memory (RAM)' },
+    { name: lang === 'en' ? 'GPU' : 'การ์ดจอ', path: `/products?category=${encodeURIComponent('Graphics Cards (GPU)')}` },
+    { name: lang === 'en' ? 'CPU' : 'ซีพียู', path: `/products?category=${encodeURIComponent('Processors (CPU)')}` },
+    { name: lang === 'en' ? 'RAM' : 'แรม', path: `/products?category=${encodeURIComponent('Memory (RAM)')}` },
     { name: t.nav?.compare || (lang === 'en' ? 'Compare' : 'เปรียบเทียบสเปก'), path: '/compare' },
     { name: t.nav?.deals || 'Hot Deals', path: '/deals', isHotDeal: true },
     ...(user?.is_admin ? [{ name: t.nav?.stores || (lang === 'en' ? 'Stores' : 'สถานะร้านค้า'), path: '/platforms' }] : []),
@@ -95,7 +98,10 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
       const currentCategory = currentParams.get('category')
 
       if (targetCategory) {
-        return currentCategory === targetCategory
+        return (
+          currentCategory === targetCategory ||
+          decodeURIComponent(currentCategory || '') === decodeURIComponent(targetCategory)
+        )
       }
 
       for (const [key, value] of targetParams.entries()) {
@@ -156,7 +162,7 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
               {isMegaMenuOpen && (
                 <div className="absolute left-0 mt-2 w-[460px] glass-panel-elevated rounded-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="text-[11px] font-bold text-slate-400 px-2 py-1 uppercase tracking-wider border-b border-purple-500/20 mb-2 flex items-center justify-between">
-                    <span>{lang === 'en' ? '12 Categories' : '12 หมวดหมู่ทั้งหมด'}</span>
+                    <span>{lang === 'en' ? 'All Categories' : 'หมวดหมู่สินค้าทั้งหมด'}</span>
                     <span className="text-purple-400 font-mono text-[10px]">REAL-TIME SYNC</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">

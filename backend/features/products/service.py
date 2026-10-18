@@ -38,20 +38,29 @@ async def list_products_service(
         )
 
     if category and category != "All":
-        # Category alias normalization mapping
+        clean_cat = category.strip()
+        # Category alias normalization mapping (defensive against unencoded or partial query strings)
         cat_aliases = {
             "Case & Cooling": ["PC Cases & Cooling", "Case & Cooling"],
             "PC Cases & Cooling": ["PC Cases & Cooling", "Case & Cooling"],
+            "PC Cases": ["PC Cases & Cooling", "Case & Cooling"],
             "Accessories": ["Gaming Peripherals", "Accessories"],
             "Gaming Peripherals": ["Gaming Peripherals", "Accessories"],
             "Monitors": ["Monitors & Displays", "Monitors"],
             "Monitors & Displays": ["Monitors & Displays", "Monitors"],
             "Storage (SSD, HDD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)", "Storage (SSD, HDD)"],
             "Storage (SSD & HDD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)", "Storage (SSD, HDD)"],
+            "Storage (SSD": ["Storage (SSD & HDD)", "Solid State Drives (SSD)", "Storage (SSD, HDD)"],
             "Solid State Drives (SSD)": ["Storage (SSD & HDD)", "Solid State Drives (SSD)"],
-            "Laptops & Notebooks": ["Laptops & Notebooks", "Laptops", "Notebooks"]
+            "Laptops & Notebooks": ["Laptops & Notebooks", "Laptops", "Notebooks"],
+            "Laptops": ["Laptops & Notebooks", "Laptops", "Notebooks"],
+            "Graphics Cards (GPU)": ["Graphics Cards (GPU)", "GPU"],
+            "Processors (CPU)": ["Processors (CPU)", "CPU"],
+            "Memory (RAM)": ["Memory (RAM)", "RAM"],
+            "Power Supplies (PSU)": ["Power Supplies (PSU)", "PSU"],
+            "Motherboards": ["Motherboards", "Mainboard", "Motherboard"],
         }
-        allowed_cats = cat_aliases.get(category, [category])
+        allowed_cats = cat_aliases.get(clean_cat, [clean_cat])
         query = query.where(Product.category.in_(allowed_cats))
 
     if brand and brand != "All":
