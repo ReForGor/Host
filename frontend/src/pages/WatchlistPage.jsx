@@ -5,6 +5,7 @@ import { alertApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
 import { toast } from 'react-hot-toast'
 import { Helmet } from 'react-helmet-async'
+import ConfirmModal from '../components/ConfirmModal'
 
 export default function WatchlistPage({ user, onOpenLogin }) {
   const { t, lang } = useLanguage()
@@ -12,6 +13,8 @@ export default function WatchlistPage({ user, onOpenLogin }) {
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('alerts') // 'alerts' or 'notifications'
+  const [alertToDelete, setAlertToDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -43,51 +46,29 @@ export default function WatchlistPage({ user, onOpenLogin }) {
     }
   }
 
-  const handleDeleteAlert = async (id) => {
-    const confirmMsg = lang === 'en' 
-      ? 'Are you sure you want to stop tracking this product?' 
-      : 'คุณต้องการยกเลิกการติดตามสินค้ารายการนี้ใช่หรือไม่?'
-
-    toast((t) => (
-      <div className="flex flex-col gap-3">
-        <p className="font-medium text-sm text-white">{confirmMsg}</p>
-        <div className="flex gap-2 justify-end">
-          <button 
-            className="px-3 py-1.5 text-xs bg-[#1C0F3A] hover:bg-purple-900/40 border border-purple-500/30 rounded-lg text-white transition-colors"
-            onClick={() => toast.dismiss(t.id)}
-          >
-            {lang === 'en' ? 'Cancel' : 'ยกเลิก'}
-          </button>
-          <button 
-            className="px-3 py-1.5 text-xs bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold transition-colors shadow-[0_0_10px_rgba(225,29,72,0.4)]"
-            onClick={async () => {
-              toast.dismiss(t.id)
-              try {
-                await alertApi.deleteAlert(id)
-                setAlerts((prev) => prev.filter(a => a.id !== id))
-                toast.success(lang === 'en' ? 'Alert deleted successfully' : 'ลบการแจ้งเตือนสำเร็จ')
-              } catch (e) {
-                toast.error(lang === 'en' ? 'Unable to delete alert' : 'ไม่สามารถลบการแจ้งเตือนได้')
-              }
-            }}
-          >
-            {lang === 'en' ? 'Yes, Delete' : 'ลบเลย'}
-          </button>
-        </div>
-      </div>
-    ), {
-      duration: 8000,
-      id: `confirm-delete-${id}`,
-    });
+  const handleConfirmDeleteAlert = async () => {
+    if (!alertToDelete) return
+    const id = alertToDelete.id
+    setDeleting(true)
+    try {
+      await alertApi.deleteAlert(id)
+      setAlerts((prev) => prev.filter(a => a.id !== id))
+      toast.success(lang === 'en' ? 'Alert deleted successfully' : 'ลบการแจ้งเตือนสำเร็จ', { duration: 1000 })
+    } catch (e) {
+      toast.error(lang === 'en' ? 'Unable to delete alert' : 'ไม่สามารถลบการแจ้งเตือนได้', { duration: 1000 })
+    } finally {
+      setDeleting(false)
+      setAlertToDelete(null)
+    }
   }
 
   const handleToggleAlert = async (id) => {
     try {
       const res = await alertApi.toggleAlert(id)
       setAlerts(alerts.map(a => a.id === id ? { ...a, is_active: res.data.is_active } : a))
-      toast.success(lang === 'en' ? 'Alert status changed' : 'เปลี่ยนสถานะสำเร็จ')
+      toast.success(lang === 'en' ? 'Alert status changed' : 'เปลี่ยนสถานะสำเร็จ', { duration: 1000 })
     } catch (e) {
-      toast.error(lang === 'en' ? 'Unable to change alert status' : 'ไม่สามารถเปลี่ยนสถานะการแจ้งเตือนได้')
+      toast.error(lang === 'en' ? 'Unable to change alert status' : 'ไม่สามารถเปลี่ยนสถานะการแจ้งเตือนได้', { duration: 1000 })
     }
   }
 
@@ -217,6 +198,8 @@ export default function WatchlistPage({ user, onOpenLogin }) {
                         <img
                           src={alert.product_image}
                           alt={alert.product_name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-16 h-16 object-contain rounded-xl bg-[#0A0314] p-1 border border-purple-500/20"
                         />
                       )}
@@ -269,7 +252,7 @@ export default function WatchlistPage({ user, onOpenLogin }) {
                     </button>
 
                     <button
-                      onClick={() => handleDeleteAlert(alert.id)}
+                      onClick={() => setAlertToDelete(alert)}
                       className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg transition-colors"
                       title={lang === 'en' ? 'Delete alert' : 'ลบการแจ้งเตือน'}
                     >
@@ -340,6 +323,21 @@ export default function WatchlistPage({ user, onOpenLogin }) {
           </div>
         )
       )}
+
+      {/* Centered Confirmation Modal for Delete Alert */}
+      <ConfirmModal
+        isOpen={!!alertToDelete}
+        onClose={() => setAlertToDelete(null)}
+        onConfirm={handleConfirmDeleteAlert}
+        loading={deleting}
+        title={lang === 'en' ? 'Stop Tracking Product' : 'ยืนยันการลบการแจ้งเตือน'}
+        message={lang === 'en'
+          ? `Are you sure you want to stop tracking price drops for "${alertToDelete?.product_name || 'this product'}"?`
+          : `คุณต้องการยกเลิกการติดตามราคา "${alertToDelete?.product_name || 'สินค้ารายการนี้'}" ใช่หรือไม่?`}
+        confirmText={lang === 'en' ? 'Yes, Delete' : 'ยืนยันการลบ'}
+        cancelText={lang === 'en' ? 'Cancel' : 'ยกเลิก'}
+        confirmVariant="danger"
+      />
     </div>
   )
 }

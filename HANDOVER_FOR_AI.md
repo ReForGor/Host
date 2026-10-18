@@ -95,6 +95,14 @@
            - โน้ตบุ๊กทำงาน & เล่นเกม: แสดง **2 รายการ** (ตรงกับของจริง)
            - รวมทุกหมวดหมู่: ครบ **34 รายการ** ตรงตามฐานข้อมูลจริง 100%
 
+17. **ระบบยืนยันการลบแบบ Centered Modal & แจ้งเตือนหายไปใน 1 วินาที (`ConfirmModal.jsx`, `WatchlistPage.jsx`, `AdminPage.jsx`, `App.jsx`):**
+    - **ปัญหา:** เดิมการกดยืนยันลบการแจ้งเตือนหรือลบสินค้าใช้ Toast ชิดมุมขวาบน ไม่เด่นชัด และข้อความแจ้งเตือนผลการทำงานค้างอยู่นาน
+    - **สิ่งที่แก้:** 
+      1. สร้างคอมโพเนนต์ [`ConfirmModal.jsx`](file:///d:/Newfolder/frontend/src/components/ConfirmModal.jsx) แสดงกล่องยืนยันการลบตรงกลางหน้าจอ (Centered Screen) พร้อมฉากหลัง Backdrop Blur, ไอคอนแจ้งเตือนสีทูโทน, ปุ่มยกเลิก และปุ่มยืนยันการลบสี Rose Red สวยงามทันสมัย
+      2. เชื่อมต่อ [`ConfirmModal.jsx`](file:///d:/Newfolder/frontend/src/components/ConfirmModal.jsx) เข้ากับหน้ารายการติดตาม [`WatchlistPage.jsx`](file:///d:/Newfolder/frontend/src/pages/WatchlistPage.jsx) (ลบการแจ้งเตือนราคา) และหน้าแอดมิน [`AdminPage.jsx`](file:///d:/Newfolder/frontend/src/pages/AdminPage.jsx) (ลบสินค้า)
+      3. ปรับระบบการแจ้งเตือนทั้งหมดใน [`App.jsx`](file:///d:/Newfolder/frontend/src/App.jsx) และ Handler ให้มี `duration: 1000` (แสดงและหายไปอัตโนมัติใน 1 วินาที)
+      4. ปรับคุณสมบัติรูปภาพทั้งหมดเป็น `loading="lazy"` และ `decoding="async"` เพื่อเร่งความเร็วในการโหลด (LCP) บนทุกอุปกรณ์
+
 ## 3. วิธีการนำโค้ดขึ้นระบบ (Git & Deployment Workflow)
 - **Git Repository ที่ใช้:**
   - Remote `origin`: `https://github.com/ReForGor/Software-Proj.git`

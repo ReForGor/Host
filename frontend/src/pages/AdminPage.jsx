@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { adminApi, alertApi, productApi, scraperApi, analyticsApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
+import ConfirmModal from '../components/ConfirmModal'
 
 export default function AdminPage({ user }) {
   const { t } = useLanguage()
@@ -35,6 +36,8 @@ export default function AdminPage({ user }) {
   const [usersList, setUsersList] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview') // 'overview', 'scrapers', 'products', 'notifications', 'scheduler', 'errors'
+  const [productToDelete, setProductToDelete] = useState(null)
+  const [deletingProduct, setDeletingProduct] = useState(false)
 
   // Product form state
   const [showAddModal, setShowAddModal] = useState(false)
@@ -148,39 +151,21 @@ export default function AdminPage({ user }) {
     }
   }
 
-  const handleDeleteProduct = async (id) => {
-    toast((t) => (
-      <div className="flex flex-col gap-3">
-        <p className="font-medium text-sm text-white">คุณแน่ใจว่าต้องการลบสินค้านี้ออกจากระบบใช่หรือไม่?</p>
-        <div className="flex gap-2 justify-end">
-          <button 
-            className="px-3 py-1.5 text-xs bg-[#1C0F3A] hover:bg-purple-900/40 border border-purple-500/30 rounded-lg text-white transition-colors"
-            onClick={() => toast.dismiss(t.id)}
-          >
-            ยกเลิก
-          </button>
-          <button 
-            className="px-3 py-1.5 text-xs bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold transition-colors shadow-[0_0_10px_rgba(225,29,72,0.4)]"
-            onClick={async () => {
-              toast.dismiss(t.id)
-              try {
-                await adminApi.deleteProduct(id)
-                setProducts((prev) => prev.filter(p => p.id !== id))
-                await loadData()
-                toast.success('ลบสินค้าสำเร็จ')
-              } catch (err) {
-                toast.error('เกิดข้อผิดพลาดในการลบสินค้า')
-              }
-            }}
-          >
-            ลบเลย
-          </button>
-        </div>
-      </div>
-    ), {
-      duration: 8000,
-      id: `confirm-delete-product-${id}`,
-    });
+  const handleConfirmDeleteProduct = async () => {
+    if (!productToDelete) return
+    const id = productToDelete.id
+    setDeletingProduct(true)
+    try {
+      await adminApi.deleteProduct(id)
+      setProducts((prev) => prev.filter(p => p.id !== id))
+      await loadData()
+      toast.success('ลบสินค้าสำเร็จ', { duration: 1000 })
+    } catch (err) {
+      toast.error('เกิดข้อผิดพลาดในการลบสินค้า', { duration: 1000 })
+    } finally {
+      setDeletingProduct(false)
+      setProductToDelete(null)
+    }
   }
 
   const handleBroadcast = async (e) => {
@@ -680,7 +665,7 @@ export default function AdminPage({ user }) {
                     <td className="py-3 px-4 text-right font-bold text-white font-mono">฿{Number(p.lowest_price).toLocaleString()}</td>
                     <td className="py-3 px-4 text-center">
                       <button
-                        onClick={() => handleDeleteProduct(p.id)}
+                        onClick={() => setProductToDelete(p)}
                         className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-purple-900/40 rounded-lg transition-colors"
                         title="ลบสินค้า"
                       >
@@ -1150,6 +1135,19 @@ export default function AdminPage({ user }) {
           </div>
         </div>
       )}
+
+      {/* Centered Confirmation Modal for Delete Product */}
+      <ConfirmModal
+        isOpen={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={handleConfirmDeleteProduct}
+        loading={deletingProduct}
+        title="ยืนยันการลบสินค้า"
+        message={`คุณแน่ใจว่าต้องการลบสินค้า "${productToDelete?.name || ''}" ออกจากระบบใช่หรือไม่?`}
+        confirmText="ยืนยันการลบ"
+        cancelText="ยกเลิก"
+        confirmVariant="danger"
+      />
     </div>
   )
 }

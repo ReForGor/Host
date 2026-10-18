@@ -600,6 +600,8 @@ export default function HomePage({ user, compareList, setCompareList }) {
               <img 
                 src={s.logoUrl} 
                 alt={s.badge} 
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -643,6 +645,8 @@ export default function HomePage({ user, compareList, setCompareList }) {
               <img 
                 src={b.logoUrl} 
                 alt={b.logoText} 
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
                 onError={(e) => {
                   e.target.style.display = 'none';

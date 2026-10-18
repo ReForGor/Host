@@ -93,6 +93,8 @@ export default function DealsPage({ user }) {
                     <img
                       src={prod.image_url}
                       alt={prod.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-20 h-20 object-contain rounded-xl bg-[#0A0314]/90 p-1.5 border border-purple-500/20"
                     />
                     <div className="flex-1 min-w-0">

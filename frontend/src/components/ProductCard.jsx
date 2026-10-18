@@ -90,6 +90,7 @@ export default function ProductCard({
           alt={product.name}
           className="max-h-32 max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
+          decoding="async"
           onError={(e) => {
             e.target.src = 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400'
           }}

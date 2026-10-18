@@ -781,6 +781,8 @@ export default function ComparePage({ compareList, setCompareList }) {
                 <img
                   src={p.image_url}
                   alt={p.name}
+                  loading="lazy"
+                  decoding="async"
                   className="max-h-36 object-contain"
                 />
                 <div className="absolute bottom-2.5 left-3 flex items-center space-x-1.5 text-[10px] text-slate-400">
