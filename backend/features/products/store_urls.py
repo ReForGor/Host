@@ -135,6 +135,8 @@ def generate_store_product_url(
     slug = (store_slug or "").lower().strip()
     raw_model = (model_no or "").strip()
     
+    if existing_url == "#":
+        return "#"
     if existing_url and is_direct_product_url(existing_url, slug):
         return existing_url
         

@@ -662,7 +662,13 @@ export default function AdminPage({ user }) {
                     </td>
                     <td className="py-3 px-4 text-xs text-purple-400 font-medium">{p.category}</td>
                     <td className="py-3 px-4 text-xs text-slate-300">{p.brand}</td>
-                    <td className="py-3 px-4 text-right font-bold text-white font-mono">฿{Number(p.lowest_price).toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right font-bold font-mono">
+                      {p.lowest_price && p.lowest_price > 0 ? (
+                        <span className="text-white">฿{Number(p.lowest_price).toLocaleString()}</span>
+                      ) : (
+                        <span className="text-rose-400 text-xs font-semibold">สินค้าหมด</span>
+                      )}
+                    </td>
                     <td className="py-3 px-4 text-center">
                       <button
                         onClick={() => setProductToDelete(p)}

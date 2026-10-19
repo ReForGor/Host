@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { 
   X, 
   Bell, 
@@ -94,11 +95,35 @@ export default function AlertModal({ product, user, onClose, onSuccess }) {
     }
   }
 
+  // Lock body scroll and handle Escape key while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
   const savingsPercent = Math.max(5, Math.round(((product.msrp || (currentPrice * 1.1)) - currentPrice) / (product.msrp || (currentPrice * 1.1)) * 100))
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-xl bg-[#120826]/95 rounded-3xl shadow-[0_0_60px_rgba(139,92,246,0.35)] overflow-hidden border border-purple-500/35 my-8">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-start sm:justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-xl bg-[#120826]/95 rounded-3xl shadow-[0_0_60px_rgba(139,92,246,0.35)] overflow-hidden border border-purple-500/35 my-auto max-h-[92vh]"
+      >
         
         {/* TOP STATUS PILL (FIGMA STYLE) */}
         <div className="pt-6 pb-2 px-6 text-center space-y-3">
@@ -438,4 +463,7 @@ export default function AlertModal({ product, user, onClose, onSuccess }) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

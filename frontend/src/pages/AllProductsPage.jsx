@@ -276,9 +276,8 @@ export default function AllProductsPage({ user, compareList, setCompareList }) {
   }, [selectedCategory, selectedBrand, selectedStore, sortBy, maxPrice, selectedSubSeries, searchQuery])
 
   // Compute key stats
-  const lowestTodayPrice = filteredProducts.length > 0
-    ? Math.min(...filteredProducts.map(p => p.lowest_price || 999999))
-    : 7190
+  const inStockPrices = filteredProducts.filter(p => p.lowest_price && p.lowest_price > 0).map(p => p.lowest_price)
+  const lowestTodayPrice = inStockPrices.length > 0 ? Math.min(...inStockPrices) : 0
   const maxWeeklyDiscount = filteredProducts.length > 0
     ? Math.max(...filteredProducts.map(p => p.max_discount_percent || 0))
     : 22.8

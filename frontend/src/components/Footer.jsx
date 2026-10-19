@@ -30,7 +30,7 @@ export default function Footer() {
   }, [])
 
   return (
-    <footer className="bg-[#070312]/95 border-t border-purple-500/25 mt-24 text-slate-400 text-xs relative overflow-hidden">
+    <footer className="bg-[#070312]/95 border-t border-purple-500/25 mt-24 text-slate-400 text-xs relative overflow-hidden z-0">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[150px] bg-purple-600/10 blur-[100px] pointer-events-none" />
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">

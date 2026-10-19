@@ -74,56 +74,82 @@ async def list_products_service(
     for prod in all_products:
         all_active_listings = [
             l for l in prod.listings 
-            if l.is_available and l.price > 0 and l.store and l.product_url
+            if l.is_available and l.price > 0 and l.stock_status != 'out_of_stock' and l.store and l.product_url and l.product_url != '#'
         ]
         unique_store_slugs = {l.store.slug for l in all_active_listings}
         
-        # Include products that have active listings
-        if not all_active_listings:
-            continue
-
         if store_slug and store_slug not in unique_store_slugs:
             continue
 
-        sorted_listings = sorted(all_active_listings, key=lambda x: x.price)
-        lowest_p = sorted_listings[0].price
-        highest_p = max(l.price for l in all_active_listings)
-        
-        if store_slug:
-            store_specific = [l for l in all_active_listings if l.store.slug == store_slug]
-            best_listing = store_specific[0] if store_specific else sorted_listings[0]
-        else:
-            best_listing = sorted_listings[0]
+        if all_active_listings:
+            sorted_listings = sorted(all_active_listings, key=lambda x: x.price)
+            lowest_p = sorted_listings[0].price
+            highest_p = max(l.price for l in all_active_listings)
             
-        discounts = [
-            ((l.original_price - l.price) / l.original_price * 100)
-            for l in all_active_listings if l.original_price and l.original_price > l.price
-        ]
-        if prod.msrp and lowest_p and prod.msrp > lowest_p:
-            discounts.append(((prod.msrp - lowest_p) / prod.msrp * 100))
-        if highest_p and lowest_p and highest_p > lowest_p:
-            discounts.append(((highest_p - lowest_p) / highest_p * 100))
-        max_discount = max(discounts) if discounts else 0.0
+            if store_slug:
+                store_specific = [l for l in all_active_listings if l.store.slug == store_slug]
+                best_listing = store_specific[0] if store_specific else sorted_listings[0]
+            else:
+                best_listing = sorted_listings[0]
+                
+            discounts = [
+                ((l.original_price - l.price) / l.original_price * 100)
+                for l in all_active_listings if l.original_price and l.original_price > l.price
+            ]
+            if prod.msrp and lowest_p and prod.msrp > lowest_p:
+                discounts.append(((prod.msrp - lowest_p) / prod.msrp * 100))
+            if highest_p and lowest_p and highest_p > lowest_p:
+                discounts.append(((highest_p - lowest_p) / highest_p * 100))
+            max_discount = max(discounts) if discounts else 0.0
 
-        if min_price is not None and lowest_p is not None and lowest_p < min_price:
-            continue
-        if max_price is not None and lowest_p is not None and lowest_p > max_price:
-            continue
+            if min_price is not None and lowest_p is not None and lowest_p < min_price:
+                continue
+            if max_price is not None and lowest_p is not None and lowest_p > max_price:
+                continue
 
-        savings_amt = round(highest_p - lowest_p, 2)
-        savings_pct = round((savings_amt / highest_p * 100), 1) if highest_p > 0 else 0.0
+            savings_amt = round(highest_p - lowest_p, 2)
+            savings_pct = round((savings_amt / highest_p * 100), 1) if highest_p > 0 else 0.0
 
-        if prod.msrp and lowest_p < prod.msrp * 0.95:
-            price_trend = "down"
-            price_trend_text = "Trend ขาลง (แนะนำซื้อ)"
-        elif prod.msrp and lowest_p > prod.msrp * 1.02:
-            price_trend = "up"
-            price_trend_text = "Trend ขาขึ้น"
+            if prod.msrp and lowest_p < prod.msrp * 0.95:
+                price_trend = "down"
+                price_trend_text = "Trend ขาลง (แนะนำซื้อ)"
+            elif prod.msrp and lowest_p > prod.msrp * 1.02:
+                price_trend = "up"
+                price_trend_text = "Trend ขาขึ้น"
+            else:
+                price_trend = "stable"
+                price_trend_text = "ราคาคงที่"
+
+            suggested_target = round(lowest_p * 0.95, -1) if lowest_p else None
+            best_store_name = best_listing.store.name if best_listing and best_listing.store else None
+            best_store_logo = best_listing.store.logo_url if best_listing and best_listing.store else None
+            best_product_url = (
+                generate_store_product_url(
+                    best_listing.store.slug,
+                    prod.name,
+                    prod.brand,
+                    prod.model_no,
+                    best_listing.product_url,
+                    product_slug=prod.slug
+                )
+                if best_listing and best_listing.store
+                else None
+            )
         else:
+            if store_slug or min_price is not None or max_price is not None:
+                continue
+            lowest_p = 0.0
+            highest_p = 0.0
+            best_listing = None
+            max_discount = 0.0
+            savings_amt = 0.0
+            savings_pct = 0.0
             price_trend = "stable"
-            price_trend_text = "ราคาคงที่"
-
-        suggested_target = round(lowest_p * 0.95, -1) if lowest_p else None
+            price_trend_text = "สินค้าหมดทุกร้านค้า (Out of Stock)"
+            suggested_target = None
+            best_store_name = "สินค้าหมด"
+            best_store_logo = None
+            best_product_url = "#"
 
         item = ProductSummaryOut(
             id=prod.id,
@@ -141,20 +167,9 @@ async def list_products_service(
             lowest_price=lowest_p,
             highest_price=highest_p,
             store_count=len(all_active_listings),
-            best_store_name=best_listing.store.name if best_listing and best_listing.store else None,
-            best_store_logo=best_listing.store.logo_url if best_listing and best_listing.store else None,
-            best_product_url=(
-                generate_store_product_url(
-                    best_listing.store.slug,
-                    prod.name,
-                    prod.brand,
-                    prod.model_no,
-                    best_listing.product_url,
-                    product_slug=prod.slug
-                )
-                if best_listing and best_listing.store
-                else None
-            ),
+            best_store_name=best_store_name,
+            best_store_logo=best_store_logo,
+            best_product_url=best_product_url,
             max_discount_percent=round(max_discount, 1),
             savings_amount=savings_amt,
             savings_percent=savings_pct,
@@ -166,7 +181,7 @@ async def list_products_service(
         results.append(item)
 
     if sort_by == "cheapest":
-        results.sort(key=lambda x: (x.lowest_price or 999999))
+        results.sort(key=lambda x: (x.lowest_price if x.lowest_price and x.lowest_price > 0 else 999999999))
     elif sort_by == "expensive":
         results.sort(key=lambda x: (x.lowest_price or 0), reverse=True)
     elif sort_by == "discount":
@@ -193,7 +208,7 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
 
     active_listings = [
         l for l in prod.listings 
-        if l.is_available and l.price > 0 and l.store and l.product_url
+        if l.is_available and l.price > 0 and l.stock_status != 'out_of_stock' and l.store and l.product_url and l.product_url != '#'
     ]
     
     # We no longer enforce REQUIRED_STORES strictly with 404
@@ -252,21 +267,21 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
         
     # Inject out of stock for missing required stores
     store_meta = {
-        'jib': {'id': 1, 'name': 'JIB Computer Official', 'color': '#10b981'},
-        'ihavecpu': {'id': 2, 'name': 'iHaveCPU Official', 'color': '#8b5cf6'},
-        'advice': {'id': 3, 'name': 'Advice IT Infinite', 'color': '#06b6d4'},
-        'banana': {'id': 4, 'name': 'BaNANA IT Online', 'color': '#f59e0b'}
+        'jib': {'id': 1, 'name': 'JIB Computer Group', 'color': '#f59e0b', 'logo': 'https://www.jib.co.th/web/images/logo/logo_jib.png'},
+        'ihavecpu': {'id': 2, 'name': 'iHaveCPU', 'color': '#ef4444', 'logo': 'https://www.ihavecpu.com/images/logo.png'},
+        'advice': {'id': 3, 'name': 'Advice IT Infinite', 'color': '#3b82f6', 'logo': 'https://www.advice.co.th/assets/images/advice-logo.png'},
+        'banana': {'id': 4, 'name': 'BaNANA IT', 'color': '#22c55e', 'logo': 'https://media-cdn.bnn.in.th/289945/banana-logo.png'}
     }
     
     for req_slug in REQUIRED_STORES:
         if req_slug not in found_stores:
-            meta = store_meta.get(req_slug, {'id': 99, 'name': req_slug, 'color': '#ccc'})
+            meta = store_meta.get(req_slug, {'id': 99, 'name': req_slug, 'color': '#ccc', 'logo': None})
             platform_items.append(
                 PlatformComparisonItem(
                     store_id=meta['id'],
                     store_name=meta['name'],
                     store_slug=req_slug,
-                    store_logo=None,
+                    store_logo=meta.get('logo'),
                     store_color=meta['color'],
                     price=0,
                     original_price=None,
@@ -285,15 +300,18 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
             )
 
     savings_pct = round((max_savings / highest_price * 100), 1) if highest_price > 0 else 0.0
-    if prod.msrp and lowest_raw_price < prod.msrp * 0.95:
+    if prod.msrp and lowest_raw_price and lowest_raw_price < prod.msrp * 0.95:
         price_trend = "down"
         price_trend_text = "Trend ขาลง (แนะนำซื้อ)"
-    elif prod.msrp and lowest_raw_price > prod.msrp * 1.02:
+    elif prod.msrp and lowest_raw_price and lowest_raw_price > prod.msrp * 1.02:
         price_trend = "up"
         price_trend_text = "Trend ขาขึ้น"
-    else:
+    elif lowest_raw_price and lowest_raw_price > 0:
         price_trend = "stable"
         price_trend_text = "ราคาคงที่"
+    else:
+        price_trend = "stable"
+        price_trend_text = "สินค้าหมดทุกร้านค้า (Out of Stock)"
 
     suggested_target = round(lowest_raw_price * 0.95, -1) if lowest_raw_price else None
 
@@ -315,7 +333,7 @@ async def get_product_detail_service(product_id: int, db: AsyncSession) -> Produ
         avg_price=avg_price,
         total_savings=max_savings,
         savings_percent=savings_pct,
-        best_store=sorted_listings[0].store.name if sorted_listings[0].store else None,
+        best_store=sorted_listings[0].store.name if sorted_listings and sorted_listings[0].store else None,
         price_trend=price_trend,
         price_trend_text=price_trend_text,
         volatility_score=savings_pct,
@@ -331,7 +349,7 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
     query = (
         select(PriceHistory)
         .options(selectinload(PriceHistory.store))
-        .where(PriceHistory.product_id == product_id)
+        .where(PriceHistory.product_id == product_id, PriceHistory.price > 0)
         .order_by(asc(PriceHistory.timestamp))
     )
     res = await db.execute(query)
@@ -343,6 +361,8 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
     all_prices = []
 
     for rec in records:
+        if not rec.price or rec.price <= 0:
+            continue
         all_prices.append(rec.price)
         d_str = rec.timestamp.strftime("%Y-%m-%d")
         if d_str not in date_prices:
@@ -371,7 +391,9 @@ async def get_price_history_service(product_id: int, db: AsyncSession) -> Produc
         .where(
             PriceListing.product_id == product_id,
             PriceListing.is_available == True,
-            PriceListing.price > 0
+            PriceListing.stock_status != 'out_of_stock',
+            PriceListing.price > 0,
+            PriceListing.product_url != '#'
         )
     )
     listing_res = await db.execute(listing_q)

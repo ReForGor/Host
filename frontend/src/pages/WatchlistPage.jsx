@@ -208,7 +208,12 @@ export default function WatchlistPage({ user, onOpenLogin }) {
                           {alert.product_name}
                         </h4>
                         <div className="mt-1 text-xs">
-                          {lang === 'en' ? 'Current Market: ' : 'ราคาตลาดตอนนี้: '}<span className="text-white font-bold font-mono">฿{Number(alert.current_lowest_price || 0).toLocaleString()}</span>
+                          {lang === 'en' ? 'Current Market: ' : 'ราคาตลาดตอนนี้: '}
+                          {alert.current_lowest_price && alert.current_lowest_price > 0 ? (
+                            <span className="text-white font-bold font-mono">฿{Number(alert.current_lowest_price).toLocaleString()}</span>
+                          ) : (
+                            <span className="text-red-400 font-bold">{lang === 'en' ? 'Out of Stock' : 'ของหมดทุกร้าน'}</span>
+                          )}
                         </div>
                       </div>
                     </div>

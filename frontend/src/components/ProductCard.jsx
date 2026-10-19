@@ -96,10 +96,16 @@ export default function ProductCard({
           }}
         />
 
-        {/* 4-Store Sync Indicator */}
+        {/* Store Sync Indicator */}
         <div className="absolute bottom-2 right-2.5 flex items-center space-x-1.5 bg-[#140826]/90 px-2 py-0.5 rounded-full border border-purple-500/30 text-[10px] text-slate-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>{lang === 'en' ? 'All 4 Retailers Synced' : 'ครบทั้ง 4 ร้านค้า'}</span>
+          <span className={`w-1.5 h-1.5 rounded-full ${product.store_count > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
+          <span>
+            {product.store_count >= 4 
+              ? (lang === 'en' ? 'All 4 Retailers Synced' : 'ครบทั้ง 4 ร้านค้า') 
+              : product.store_count > 0 
+                ? (lang === 'en' ? `${product.store_count} Stores In Stock` : `พร้อมจำหน่าย ${product.store_count} ร้าน`) 
+                : (lang === 'en' ? 'Out of Stock' : 'สินค้าหมด')}
+          </span>
         </div>
       </div>
 
@@ -143,11 +149,19 @@ export default function ProductCard({
           <div className="flex items-baseline justify-between">
             <div>
               <span className="text-[10px] text-slate-400 block font-normal">
-                {t.productCard?.lowestPrice || (lang === 'en' ? 'Lowest Price in TH' : 'ราคาต่ำสุดในไทย')}
+                {product.lowest_price && product.lowest_price > 0 
+                  ? (t.productCard?.lowestPrice || (lang === 'en' ? 'Lowest Price in TH' : 'ราคาต่ำสุดในไทย'))
+                  : (lang === 'en' ? 'Stock Status' : 'สถานะสินค้า')}
               </span>
-              <span className="text-lg sm:text-xl font-bold font-display text-white tracking-tight">
-                {formatPrice(product.lowest_price)}
-              </span>
+              {product.lowest_price && product.lowest_price > 0 ? (
+                <span className="text-lg sm:text-xl font-bold font-display text-white tracking-tight">
+                  {formatPrice(product.lowest_price)}
+                </span>
+              ) : (
+                <span className="text-base sm:text-lg font-bold font-display text-red-400 tracking-tight">
+                  {lang === 'en' ? 'Out of Stock' : 'ของหมดทุกร้าน'}
+                </span>
+              )}
             </div>
           </div>
 
@@ -165,29 +179,42 @@ export default function ProductCard({
 
           {/* Best Store Tag + Quick Cart Action */}
           <div className="flex items-center justify-between text-xs pt-1">
-            <div className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border text-[11px] font-medium ${storeInfo.color}`}>
-              <Award className="w-3 h-3" />
-              <span className="truncate max-w-[120px]">{storeInfo.name}</span>
-            </div>
-            <a
-              href={product.best_product_url || '#'}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => trackStoreClick({
-                productId: product.id,
-                productName: product.name,
-                storeName: storeInfo.name,
-                targetUrl: product.best_product_url,
-                price: product.lowest_price,
-                sourcePage: 'product_card'
-              })}
-              className="flex items-center space-x-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-              title={lang === 'en' ? 'Go to cheapest store' : 'ไปยังร้านค้าที่ถูกที่สุด'}
-            >
-              <ShoppingCart className="w-3 h-3" />
-              <span>{lang === 'en' ? 'Buy (Lowest)' : 'ใส่ตะกร้า (ถูกสุด)'}</span>
-              <ExternalLink className="w-2.5 h-2.5 opacity-70" />
-            </a>
+            {product.lowest_price && product.lowest_price > 0 && product.best_store_name ? (
+              <>
+                <div className={`flex items-center space-x-1.5 px-2 py-0.5 rounded-md border text-[11px] font-medium ${storeInfo.color}`}>
+                  <Award className="w-3 h-3" />
+                  <span className="truncate max-w-[120px]">{storeInfo.name}</span>
+                </div>
+                <a
+                  href={product.best_product_url || '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => trackStoreClick({
+                    productId: product.id,
+                    productName: product.name,
+                    storeName: storeInfo.name,
+                    targetUrl: product.best_product_url,
+                    price: product.lowest_price,
+                    sourcePage: 'product_card'
+                  })}
+                  className="flex items-center space-x-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                  title={lang === 'en' ? 'Go to cheapest store' : 'ไปยังร้านค้าที่ถูกที่สุด'}
+                >
+                  <ShoppingCart className="w-3 h-3" />
+                  <span>{lang === 'en' ? 'Buy (Lowest)' : 'ใส่ตะกร้า (ถูกสุด)'}</span>
+                  <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                </a>
+              </>
+            ) : (
+              <div className="w-full flex items-center justify-between text-[11px] text-slate-500 py-0.5">
+                <span className="text-red-400/80 font-medium">
+                  {lang === 'en' ? 'No stock available' : 'ยังไม่มีสินค้าในสต็อก'}
+                </span>
+                <span className="text-slate-500 text-[10px]">
+                  {lang === 'en' ? 'Check back soon' : 'รออัปเดตสต็อก'}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons: Compare Price (CTA) & Spec Compare Toggle */}

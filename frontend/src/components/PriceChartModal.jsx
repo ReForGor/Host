@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { 
   X, 
   ExternalLink, 
@@ -67,6 +68,24 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const [alertSuccess, setAlertSuccess] = useState(false)
   const [alertError, setAlertError] = useState(null)
   const [timeframe, setTimeframe] = useState('1m')
+
+  // Lock body scroll and handle Escape key while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
 
   useEffect(() => {
     if (!product) return
@@ -395,14 +414,20 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
   const skuCode = product.model_no || 'ROG-STRIX-RTX4080S-O16G'
   const discountPercent = product.max_discount_percent || 7.4
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-5xl bg-[#0D051D]/95 rounded-3xl shadow-[0_0_80px_rgba(139,92,246,0.35)] overflow-hidden flex flex-col border border-purple-500/35 my-auto max-h-[96vh]">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-5xl bg-[#0D051D]/95 rounded-3xl shadow-[0_0_80px_rgba(139,92,246,0.35)] overflow-hidden flex flex-col border border-purple-500/35 my-auto max-h-[92vh]"
+      >
         
         {/* ========================================================= */}
         {/* HEADER BAR (EXACT AS SCREENSHOT) */}
         {/* ========================================================= */}
-        <div className="px-5 py-4 border-b border-purple-500/25 flex items-center justify-between bg-[#080214]/90">
+        <div className="sticky top-0 z-30 px-5 py-4 border-b border-purple-500/25 flex items-center justify-between bg-[#080214]/95 backdrop-blur-md flex-shrink-0">
           <div className="flex items-center space-x-2.5 text-xs min-w-0">
             {/* Cyan circular (i) info icon */}
             <div className="w-6 h-6 rounded-full border border-cyan-400/60 bg-cyan-400/10 flex items-center justify-center text-cyan-400 font-serif font-bold text-xs shadow-[0_0_10px_rgba(6,182,212,0.3)] flex-shrink-0">
@@ -634,7 +659,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                       <div className="flex items-center justify-between sm:justify-end space-x-3 flex-shrink-0 w-full sm:w-auto pt-1 sm:pt-0 border-t border-purple-500/15 sm:border-0">
                         <div className="text-left sm:text-right">
                           <div className={`text-sm font-black font-display ${item.is_lowest ? 'text-emerald-400' : 'text-white'}`}>
-                            {item.stock_status === 'out_of_stock' || !item.price ? (
+                            {item.stock_status === 'out_of_stock' || !item.price || Number(item.price) <= 0 ? (
                               <span className="text-red-400 text-xs">{lang === 'en' ? 'Out of Stock' : 'ของหมด'}</span>
                             ) : (
                               `฿${Number(item.price).toLocaleString()}`
@@ -647,7 +672,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                           )}
                         </div>
 
-                        {item.stock_status === 'out_of_stock' || !item.price ? (
+                        {item.stock_status === 'out_of_stock' || !item.price || Number(item.price) <= 0 ? (
                           <div
                             className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all bg-slate-800 text-slate-500 cursor-not-allowed"
                           >
@@ -702,10 +727,14 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                   <div className="p-3 rounded-xl bg-[#06020E] border border-purple-500/20">
                     <span className="text-[10px] text-slate-400 block">{lang === 'en' ? 'Current Lowest' : 'ต่ำสุดปัจจุบัน'}</span>
                     <span className="text-xl font-black font-display text-emerald-400 block my-0.5">
-                      ฿{Number(lowestPrice).toLocaleString()}
+                      {lowestPrice && Number(lowestPrice) > 0 
+                        ? `฿${Number(lowestPrice).toLocaleString()}`
+                        : <span className="text-red-400 text-base">{lang === 'en' ? 'Out of Stock' : 'ของหมด'}</span>}
                     </span>
                     <span className="text-[10px] text-slate-400 block truncate">
-                      {detail?.best_store || product.best_store_name || (lang === 'en' ? 'Lowest Store' : 'ร้านที่ถูกที่สุด')}
+                      {lowestPrice && Number(lowestPrice) > 0
+                        ? (detail?.best_store || product.best_store_name || (lang === 'en' ? 'Lowest Store' : 'ร้านที่ถูกที่สุด'))
+                        : (lang === 'en' ? 'No store in stock' : 'ไม่มีสินค้าในสต็อก')}
                     </span>
                   </div>
 
@@ -715,7 +744,9 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
                       <Clock className="w-3 h-3 text-purple-400" />
                     </span>
                     <span className="text-xl font-black font-display text-purple-400 block my-0.5">
-                      ฿{Number(allTimeLow).toLocaleString()}
+                      {allTimeLow && Number(allTimeLow) > 0 
+                        ? `฿${Number(allTimeLow).toLocaleString()}`
+                        : <span className="text-slate-500 text-base">-</span>}
                     </span>
                     <span className="text-[10px] text-slate-400 block truncate">
                       {history?.all_time_low_date
@@ -908,4 +939,7 @@ export default function PriceChartModal({ product, onClose, onSetAlert }) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

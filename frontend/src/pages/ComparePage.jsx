@@ -195,14 +195,16 @@ function getBenchmarks(p1, p2, compareData, lang) {
       },
       metric2: {
         title: lang === 'en' ? 'Lowest Retail Price Advantage' : 'ความได้เปรียบด้านราคาต่ำสุด',
-        deltaBadge: (p1.lowest_price <= p2.lowest_price) ? `ประหยัด ฿${Math.abs((p2.lowest_price || 0) - (p1.lowest_price || 0)).toLocaleString()}` : `ประหยัด ฿${Math.abs((p1.lowest_price || 0) - (p2.lowest_price || 0)).toLocaleString()}`,
+        deltaBadge: (p1.lowest_price && p2.lowest_price && p1.lowest_price > 0 && p2.lowest_price > 0)
+          ? ((p1.lowest_price <= p2.lowest_price) ? `ประหยัด ฿${Math.abs(p2.lowest_price - p1.lowest_price).toLocaleString()}` : `ประหยัด ฿${Math.abs(p1.lowest_price - p2.lowest_price).toLocaleString()}`)
+          : (lang === 'en' ? 'Stock Difference' : 'สถานะสต็อกต่างกัน'),
         deltaColor: 'text-emerald-400',
-        val1: `฿${Number(p1.lowest_price || 0).toLocaleString()}`,
-        pct1: Math.min(100, Math.max(30, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p1.lowest_price || 1)) * 95))),
+        val1: p1.lowest_price && p1.lowest_price > 0 ? `฿${Number(p1.lowest_price).toLocaleString()}` : (lang === 'en' ? 'Out of Stock' : 'ของหมด'),
+        pct1: Math.min(100, Math.max(30, Math.round((Math.min(p1.lowest_price || 1, p2.lowest_price || 1) / (p1.lowest_price || 1)) * 95))),
         color1: 'from-emerald-500 to-cyan-400',
         textColor1: 'text-emerald-400',
-        val2: `฿${Number(p2.lowest_price || 0).toLocaleString()}`,
-        pct2: Math.min(100, Math.max(30, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p2.lowest_price || 1)) * 95))),
+        val2: p2.lowest_price && p2.lowest_price > 0 ? `฿${Number(p2.lowest_price).toLocaleString()}` : (lang === 'en' ? 'Out of Stock' : 'ของหมด'),
+        pct2: Math.min(100, Math.max(30, Math.round((Math.min(p1.lowest_price || 1, p2.lowest_price || 1) / (p2.lowest_price || 1)) * 95))),
         color2: 'from-purple-500 to-indigo-400',
         textColor2: 'text-purple-400'
       }
@@ -274,14 +276,16 @@ function getBenchmarks(p1, p2, compareData, lang) {
     },
     metric2: {
       title: lang === 'en' ? 'Lowest Price in Market (฿ THB)' : 'ราคาต่ำสุดในตลาด (฿ THB)',
-      deltaBadge: p1.lowest_price <= p2.lowest_price ? 'ราคาเริ่มต้นถูกกว่า' : 'รุ่นสเปกพรีเมียม',
+      deltaBadge: (p1.lowest_price && p2.lowest_price && p1.lowest_price > 0 && p2.lowest_price > 0)
+        ? (p1.lowest_price <= p2.lowest_price ? 'ราคาเริ่มต้นถูกกว่า' : 'รุ่นสเปกพรีเมียม')
+        : (lang === 'en' ? 'Stock Status' : 'สถานะสต็อก'),
       deltaColor: 'text-cyan-400',
-      val1: `฿${Number(p1.lowest_price || 0).toLocaleString()}`,
-      pct1: Math.min(100, Math.max(25, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p1.lowest_price || 1)) * 95))),
+      val1: p1.lowest_price && p1.lowest_price > 0 ? `฿${Number(p1.lowest_price).toLocaleString()}` : (lang === 'en' ? 'Out of Stock' : 'ของหมด'),
+      pct1: Math.min(100, Math.max(25, Math.round((Math.min(p1.lowest_price || 1, p2.lowest_price || 1) / (p1.lowest_price || 1)) * 95))),
       color1: 'from-emerald-500 to-cyan-400',
       textColor1: 'text-emerald-400',
-      val2: `฿${Number(p2.lowest_price || 0).toLocaleString()}`,
-      pct2: Math.min(100, Math.max(25, Math.round((Math.min(p1.lowest_price, p2.lowest_price) / (p2.lowest_price || 1)) * 95))),
+      val2: p2.lowest_price && p2.lowest_price > 0 ? `฿${Number(p2.lowest_price).toLocaleString()}` : (lang === 'en' ? 'Out of Stock' : 'ของหมด'),
+      pct2: Math.min(100, Math.max(25, Math.round((Math.min(p1.lowest_price || 1, p2.lowest_price || 1) / (p2.lowest_price || 1)) * 95))),
       color2: 'from-purple-500 to-indigo-400',
       textColor2: 'text-purple-400'
     }
@@ -444,13 +448,16 @@ export default function ComparePage({ compareList, setCompareList }) {
               ? p.listings.map(l => ({
                   name: l.store_name,
                   price: l.price,
-                  tag: l.store_name === p.best_store ? 'ต่ำสุด ณ ตอนนี้' : '',
-                  tag_en: l.store_name === p.best_store ? 'Lowest Now' : '',
+                  stock_status: l.stock_status,
+                  tag: (l.store_name === p.best_store && l.price > 0) ? 'ต่ำสุด ณ ตอนนี้' : (l.price <= 0 ? 'ของหมด' : ''),
+                  tag_en: (l.store_name === p.best_store && l.price > 0) ? 'Lowest Now' : (l.price <= 0 ? 'Out of Stock' : ''),
                   url: l.product_url || '#'
                 }))
-              : [
+              : (p.lowest_price > 0 ? [
                   { name: p.best_store || 'Advice IT', price: p.lowest_price, tag: 'ต่ำสุด ณ ตอนนี้', tag_en: 'Lowest Now', url: p.best_product_url || '#' }
-                ]
+                ] : [
+                  { name: 'ร้านค้า', price: 0, tag: 'ของหมด', tag_en: 'Out of Stock', url: '#' }
+                ])
 
             const isPriceWinner = p.id === res.data.price_winner_id
             const isValueLeader = p.id === res.data.value_score_leader_id
@@ -678,7 +685,11 @@ export default function ComparePage({ compareList, setCompareList }) {
                   <img src={p.image_url} alt={p.name} className="w-8 h-8 object-contain rounded bg-[#070B14] p-1" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-white truncate">{p.name}</p>
-                    <p className="text-[11px] text-cyan-400 font-mono font-bold">฿{Number(p.lowest_price).toLocaleString()}</p>
+                    {p.lowest_price && p.lowest_price > 0 ? (
+                      <p className="text-[11px] text-cyan-400 font-mono font-bold">฿{Number(p.lowest_price).toLocaleString()}</p>
+                    ) : (
+                      <p className="text-[11px] text-red-400 font-bold">{lang === 'en' ? 'Out of Stock' : 'ของหมด'}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -786,8 +797,8 @@ export default function ComparePage({ compareList, setCompareList }) {
                   className="max-h-36 object-contain"
                 />
                 <div className="absolute bottom-2.5 left-3 flex items-center space-x-1.5 text-[10px] text-slate-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>{lang === 'en' ? 'All 4 Stores' : 'ครบ 4 ร้าน'}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${p.lowest_price > 0 ? 'bg-emerald-400' : 'bg-red-400'}`}></span>
+                  <span>{p.lowest_price > 0 ? (lang === 'en' ? `${p.store_count || 'Multi'} Stores Available` : `พร้อมจำหน่าย ${p.store_count || ''} ร้าน`) : (lang === 'en' ? 'Out of Stock' : 'สินค้าหมดทุกร้าน')}</span>
                 </div>
               </div>
 
@@ -797,10 +808,16 @@ export default function ComparePage({ compareList, setCompareList }) {
                   <div>
                     <span className="text-[11px] text-slate-400 block">{lang === 'en' ? 'Lowest Price in TH:' : 'ราคาต่ำสุดในไทย:'}</span>
                     <div className="flex items-baseline space-x-2">
-                      <span className="text-2xl sm:text-3xl font-black font-display text-cyan-400">
-                        ฿{Number(p.lowest_price).toLocaleString()}
-                      </span>
-                      {p.price_diff && (
+                      {p.lowest_price && p.lowest_price > 0 ? (
+                        <span className="text-2xl sm:text-3xl font-black font-display text-cyan-400">
+                          ฿{Number(p.lowest_price).toLocaleString()}
+                        </span>
+                      ) : (
+                        <span className="text-xl sm:text-2xl font-bold font-display text-red-400">
+                          {lang === 'en' ? 'Out of Stock' : 'ของหมดทุกร้าน'}
+                        </span>
+                      )}
+                      {p.price_diff && p.lowest_price > 0 && (
                         <span className="text-xs font-mono text-emerald-400">({p.price_diff})</span>
                       )}
                     </div>
@@ -826,7 +843,7 @@ export default function ComparePage({ compareList, setCompareList }) {
                     >
                       {storeOpt.map((opt, sIdx) => (
                         <option key={sIdx} value={sIdx} className="bg-[#120826] text-white">
-                          {opt.name} - ฿{Number(opt.price).toLocaleString()} {opt.tag ? `(${lang === 'en' ? (opt.tag_en || 'Lowest Now') : opt.tag})` : ''}
+                          {opt.name} - {opt.price > 0 ? `฿${Number(opt.price).toLocaleString()}` : (lang === 'en' ? 'Out of Stock' : 'ของหมด')} {opt.tag ? `(${lang === 'en' ? (opt.tag_en || 'Lowest Now') : opt.tag})` : ''}
                         </option>
                       ))}
                     </select>
@@ -835,27 +852,36 @@ export default function ComparePage({ compareList, setCompareList }) {
                 </div>
 
                 {/* Buy button */}
-                <a
-                  href={curStore.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => trackStoreClick({
-                    productId: p.id,
-                    productName: p.name,
-                    storeName: curStore.name,
-                    targetUrl: curStore.url,
-                    price: curStore.price || p.lowest_price,
-                    sourcePage: 'compare_page'
-                  })}
-                  className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${
-                    isLeft
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                      : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]'
-                  }`}
-                >
-                  <span>{lang === 'en' ? `Go to Cheapest Store (${curStore.name})` : `ไปร้านที่ถูกที่สุด (${curStore.name})`}</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                {curStore.url && curStore.url !== '#' && curStore.price > 0 ? (
+                  <a
+                    href={curStore.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => trackStoreClick({
+                      productId: p.id,
+                      productName: p.name,
+                      storeName: curStore.name,
+                      targetUrl: curStore.url,
+                      price: curStore.price || p.lowest_price,
+                      sourcePage: 'compare_page'
+                    })}
+                    className={`w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all ${
+                      isLeft
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                        : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                    }`}
+                  >
+                    <span>{lang === 'en' ? `Go to Store (${curStore.name})` : `ไปยังร้านค้า (${curStore.name})`}</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 bg-slate-800/80 text-slate-500 cursor-not-allowed border border-white/[0.05]"
+                  >
+                    <span>{lang === 'en' ? `Out of Stock (${curStore.name || 'Store'})` : `สินค้าหมด (${curStore.name || 'ร้านค้า'})`}</span>
+                  </button>
+                )}
 
                 {/* Highlight score bar */}
                 <div className="flex items-center justify-between text-xs pt-1 border-t border-purple-500/20">
@@ -1033,8 +1059,8 @@ export default function ComparePage({ compareList, setCompareList }) {
                   key={p.id || pIdx}
                   onClick={() => {
                     const storeInfo = (p.store_options && p.store_options.length > 0)
-                      ? p.store_options.map(s => `${s.name}: ฿${Number(s.price).toLocaleString()}`).join(' | ')
-                      : `${p.best_store || 'ร้านค้า'}: ฿${Number(p.lowest_price).toLocaleString()} (ต่ำสุด)`
+                      ? p.store_options.map(s => `${s.name}: ${Number(s.price) > 0 ? '฿' + Number(s.price).toLocaleString() : (lang === 'en' ? 'Out of Stock' : 'ของหมด')}`).join(' | ')
+                      : (Number(p.lowest_price) > 0 ? `${p.best_store || 'ร้านค้า'}: ฿${Number(p.lowest_price).toLocaleString()} (ต่ำสุด)` : (lang === 'en' ? 'Out of Stock' : 'ของหมดทุกร้าน'))
                     toast.success(`${p.name}\n${storeInfo}`, { duration: 6000 })
                   }}
                   className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all max-w-[280px] truncate ${

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Lock, Mail, User, Zap, Cpu } from 'lucide-react'
 import { authApi } from '../api/client'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -56,10 +57,37 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     }
   }
 
+  // Lock body scroll and handle Escape key while modal is open
+  useEffect(() => {
+    if (!isOpen) return
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-[#0E061E]/95 border border-purple-500/35 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.3)] backdrop-blur-xl p-6 sm:p-8">
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md bg-[#0E061E]/95 border border-purple-500/35 rounded-3xl shadow-[0_0_50px_rgba(139,92,246,0.3)] backdrop-blur-xl p-6 sm:p-8"
+      >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-purple-900/30 transition-colors"
@@ -201,4 +229,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }
