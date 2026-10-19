@@ -12,6 +12,7 @@ import {
   Tv, 
   Server, 
   Zap, 
+  MemoryStick,
   Box, 
   Wind, 
   MousePointer, 
@@ -127,7 +128,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
   const allCategoriesDef = [
     { name: lang === 'en' ? 'Graphics Cards (GPU)' : 'การ์ดจอ (GPU)', path: `/products?category=${encodeURIComponent('Graphics Cards (GPU)')}`, icon: Layers, dbKey: 'Graphics Cards (GPU)', aliases: ['Graphics Cards (GPU)'], color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
     { name: lang === 'en' ? 'Processors (CPU)' : 'ซีพียู (CPU)', path: `/products?category=${encodeURIComponent('Processors (CPU)')}`, icon: Cpu, dbKey: 'Processors (CPU)', aliases: ['Processors (CPU)'], color: 'from-purple-500/20 to-indigo-600/20 text-purple-400' },
-    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: `/products?category=${encodeURIComponent('Memory (RAM)')}`, icon: Zap, dbKey: 'Memory (RAM)', aliases: ['Memory (RAM)'], color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
+    { name: lang === 'en' ? 'Memory (RAM)' : 'แรม (RAM)', path: `/products?category=${encodeURIComponent('Memory (RAM)')}`, icon: MemoryStick, dbKey: 'Memory (RAM)', aliases: ['Memory (RAM)'], color: 'from-cyan-500/20 to-teal-600/20 text-cyan-300' },
     { name: lang === 'en' ? 'Storage (SSD, HDD)' : 'ที่เก็บข้อมูล (SSD)', path: `/products?category=${encodeURIComponent('Storage (SSD & HDD)')}`, icon: HardDrive, dbKey: 'Storage (SSD & HDD)', aliases: ['Storage (SSD & HDD)', 'Solid State Drives (SSD)', 'Storage (SSD, HDD)'], color: 'from-blue-500/20 to-indigo-600/20 text-blue-400' },
     { name: lang === 'en' ? 'Monitors' : 'จอมอนิเตอร์', path: `/products?category=${encodeURIComponent('Monitors & Displays')}`, icon: Tv, dbKey: 'Monitors & Displays', aliases: ['Monitors & Displays', 'Monitors'], color: 'from-purple-500/20 to-pink-600/20 text-purple-300' },
     { name: lang === 'en' ? 'Motherboards' : 'เมนบอร์ด (Board)', path: `/products?category=${encodeURIComponent('Motherboards')}`, icon: Server, dbKey: 'Motherboards', aliases: ['Motherboards'], color: 'from-cyan-500/20 to-blue-600/20 text-cyan-400' },
@@ -143,7 +144,7 @@ export default function HomePage({ user, compareList, setCompareList }) {
       return {
         ...c,
         realCount,
-        count: lang === 'en' ? `${realCount} Items` : `${realCount} รายการ`
+        count: lang === 'en' ? `${realCount} ${realCount === 1 ? 'Item' : 'Items'}` : `${realCount} รายการ`
       }
     })
     .filter(c => c.realCount > 0);
