@@ -292,14 +292,14 @@ export default function Navbar({ user, onLogout, onOpenLogin }) {
                 </button>
               </div>
             ) : (
-              <button
-                aria-label="Open Login Modal"
-                onClick={onOpenLogin}
+              <Link
+                to="/login"
+                aria-label="Sign In"
                 className="flex items-center space-x-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold rounded-xl btn-cyber-primary"
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 <span>{t.nav?.login || (lang === 'en' ? 'Sign In' : 'เข้าสู่ระบบ')}</span>
-              </button>
+              </Link>
             )}
           </div>
         </div>

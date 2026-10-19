@@ -13,6 +13,7 @@ const DealsPage = lazy(() => import('./pages/DealsPage'))
 const WatchlistPage = lazy(() => import('./pages/WatchlistPage'))
 const PlatformsPage = lazy(() => import('./pages/PlatformsPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 import { authApi, analyticsApi } from './api/client'
@@ -30,7 +31,10 @@ const ProtectedAdminRoute = ({ user, children }) => {
       </div>
     )
   }
-  if (!user || !user.is_admin) {
+  if (!user) {
+    return <Navigate to={`/login?redirect=${encodeURIComponent(window.location.pathname)}`} replace />
+  }
+  if (!user.is_admin) {
     return <Navigate to="/" replace />
   }
   return children
@@ -218,6 +222,11 @@ export default function App() {
                       <AdminPage user={user} />
                     </ProtectedAdminRoute>
                   } 
+                />
+                {/* 'เข้าสู่ระบบ' - Dedicated Login & Register Page */}
+                <Route 
+                  path="/login" 
+                  element={<LoginPage user={user} onLoginSuccess={(u) => setUser(u)} />} 
                 />
                 {/* 404 Catch-all */}
                 <Route path="*" element={<NotFoundPage />} />
